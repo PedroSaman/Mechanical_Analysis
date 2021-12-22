@@ -1,21 +1,50 @@
-function y = knob(model)
-%Convert block model data to convex data
+function y = knob(model, layer)
+%Convert block model data to knob data
 %input: model:(block_number, x, y, z, Block_type, color)
+        layer:(the layer that is desired to search for knobs. If 0, consider all layers) 
 %output: y:(x,y,z,block_type,color,block_number,knob_index)
 
 loop = size(model);
 k = 0;  %Number of knobs
-for n = 1 : loop(1)
-    a = floor(model(n,5)/10);                    %number of collums
-    b = 10*((model(n,5)/10)-floor(model(n,5)/10)); %number of rows
-    k = k + a*b;
+
+if(layer == 0) %if it is searching for all layers knobs
+    for n = 1 : loop(1)
+        a = floor(model(n,5)/10);                      %number of collums
+        b = 10*((model(n,5)/10)-floor(model(n,5)/10)); %number of rows
+        k = k + a*b;
+    end
+    k = round(k);
+    k_min = 1;
+    k_max = loop(1);
+else %if it is searching for only one layer knobs
+    k_min = 0; %first block to be in the layer this function is searching
+    for n = 1 : loop(1) %for each block in the model
+        if(model(n, 4) == layer) %if the block z value is equal to the layer argument
+            if(k_min == 0) 
+                k_min = n; %Store the first block in the model that is in the layer
+            end
+            if(model(n, 5) == 24) %if the block is 2x4
+                k = k + 8;
+            elseif(model(n, 5) == 22) %if the block is 2x2
+                k = k + 4;
+            elseif(model(n, 5) == 12) %if the block is 1x2
+                k = k + 2;
+            elseif(model(n, 5) == 21) %if the block is 2x1
+                k = k + 2;
+            elseif(model(n, 5) == 11) %if the block is 1x1
+                k = k + 1;
+            end
+            k_max = n; %Store the last block in the model that is in the layer so far.
+        elseif(model(n, 4) > layer) %if the block model z value is less than the layer argument
+            break
+        end
+    end
 end
-k = round(k);
 
 %For each knob create 7 information data
 y = zeros(k, 7); %y(x,y,z,block_type,color,block_number,knob_index)
 m = 1;  %Count the number of stored convex parts
-for n = 1 : loop(1) %for each block
+for n = k_min : k_max %for each block
     if(model(n,5) == 24) %if the block is 2x4
         for i = 0:7 %for each of the 8 knobs
             y(m+i, 1:5) = model (n, 2:6); %Copy the model data to y

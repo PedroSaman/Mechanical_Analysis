@@ -18,13 +18,13 @@ model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 %% Model and knobs information
 N = size(model,1); %Total number of blocks
 z_max = lines(model); % Structure height
-knobs = knob(model); % Knobs information (entire block model)
+knobs = knob(model,0); % Knobs information (entire block model)
 
 %% Find the forces acting on the model
 F_nx = [ ];  F_ny = [ ];
 
 %for the first layer
-knob_i = knob_line(model, 1); %knobs in this layer information
+knob_i = knob(model, 1); %knobs in this layer information
 adjoin_i = adjoin(knob_i); %adjoint blocks information
 F_f = Ff_0_180723(model); %Friction force of blocks in the first layer
 F_nz = Fnz_0(model); %Normal force in the z axis in the first layer
@@ -41,7 +41,7 @@ if(adjoin_i ~= -1) %There are adjacent blocks
 end
 
 for n = 2 : z_max %for layer = 2 to the end 
-    knob_i = knob_line(model, n); %knobs in this layer information
+    knob_i = knob(model, n); %knobs in this layer information
     adjoin_i = adjoin(knob_i); %adjoint blocks information
     join_i = join(knobs, n); %knobs are snaped togheter
 
