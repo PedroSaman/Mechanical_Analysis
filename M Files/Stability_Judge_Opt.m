@@ -11,8 +11,8 @@ T=70*g;  %Maximum static friction force of one set of convex part
 M=2/15; %Mass of a 2x2 block
 
 %% Load the block model data
-filename = 'fail_30.dat' %Specify the data file name
-model_original = feval('load',filename); % model_original = (x, y, z, type)
+filename = '../Dat Files/fail_30.dat' %Specify the data file name
+model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 
 %% Model and knobs information
