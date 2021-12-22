@@ -5,7 +5,7 @@ function Fny = Fny(adjoin)
 %output: Fny = (Force_Number, Block_Number 1, Knob_Number 1, x1, y1, z1, -1, Block_Number 2, Knob_Number 2, x2, y2, z2, 1)
 
 if(adjoin == -1)
-    Fny = -1
+    Fny = -1;
 else
     % 1x1 Block
     pn1 = [-2, 2, -1.5];  pn2 = [-2, 2,  1.5];  pn3 = [ 2, 2, -1.5];  pn4 = [ 2, 2,  1.5];
