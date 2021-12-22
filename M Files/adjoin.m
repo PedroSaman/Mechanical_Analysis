@@ -1,21 +1,23 @@
 function A = adjoin(line)
-%Find adjacent blocks in this layer from the block model
+%Find the pairs of adjacent blocks in this layer from the block model. Because it finds the pair of block, in the Y axis it only checks to the top 
+%and in the X axis only checks to the right.
 %input: line: each knob in a given layer. (x,y,z,block_type,color,block_number,knob_index)
-%output: A: for each adjacent block there are one line in A with 7 info: 
-%           (to the right(1) or top(2),own block_number, own block_type, adjacent block_number, adjacent block_type, adjacent knob_index, adjoin_type)
+%output: A: for each pair of adjacent blocks there are one line in A with 7 info: 
+%           (X axis(1) or Y axis(2), first block_number, first block_type, second block_number, second block_type, second knob_index, adjoin_type)
 %           if there is no adjacent block, this function returns -1
+%           adjoin_type is acording with the Sugimoto definition.
 
 blocks = size(line);
 X = zeros(blocks(1) * 2, 7);  Y = zeros(blocks(1) * 2, 7);
 count_x = 1;  count_y = 1;  same_block = 0;
 
 for n = 1 : blocks(1) %for every knob in this layer
-    x = -1 * ones(2, 5);  y = -1 * ones(2, 5); %Initialize x and y for this knob
-    %x: adjoint knob information to the right (x,y,knob block number,knob block_type, knob_index in the block model)
-    %y: adjoint knob information to the top (x,y,knob block number,knob block_type, knob_index in the block model)
+    %x: adjoint knob information in the X axis (x,y, knob block_number, knob block_type, knob_index in the block model)
+    %y: adjoint knob information in the Y axis (x,y, knob block_number, knob block_type, knob_index in the block model)
     if(same_block ~= 0) %If the knob is from the same block, continue. This will be computed until it reaches the next block.
         same_block = same_block - 1; %Generic subtractor
     elseif(line(n, 4) == 22) %if the block is 2x2
+        x = -1 * ones(2, 5);  y = -1 * ones(2, 5); %Initialize x and y for this knob (2x2 block can have 2 adjacent knobs in X and Y axis)
         check = 4; %In a 2x2 block, there is only 4 knob spaces possible to be adjacent (to the top and to the right)
         same_block = 3; %In a 2x2 block, excluding the first knob, there are only 3 more knobs
         x(1, 1) = line(n, 1) + 2;  x(1, 2) = line(n, 2);    
@@ -78,12 +80,12 @@ for n = 1 : blocks(1) %for every knob in this layer
         end
    
     elseif(line(n, 4) == 12) %if the block is 1x2
+        x = -1 * ones(2, 5);  y = -1 * ones(1, 5); %Initialize x and y for this knob (1x2 block can have 2 adjacent knobs in X and 1 in Y axis)
         check = 3; %In a 1x2 block, there are only 3 knob spaces possible to be adjacent (1 to the top and 2 to the right)
         same_block = 1; %In a 1x2 block, excluding the first knob, there are only 1 more knobs
         x(1, 1) = line(n, 1) + 1;  x(1, 2) = line(n, 2);
         x(2, 1) = line(n, 1) + 1;  x(2, 2) = line(n, 2) + 1; %Coordinates of the possible adjoint block to the right.
         y(1, 1) = line(n, 1);  y(1, 2) = line(n, 2) + 2; %Coordinate of the possible adjoint block to the top.
-        y(2, 1:3) = -1 * ones(1, 3);
         
         for m = 1 : blocks(1) %For every knob in this layer
             if(check == 0) %If all possible adjacent knob were checked, break.
@@ -123,10 +125,10 @@ for n = 1 : blocks(1) %for every knob in this layer
         end
 
     elseif(line(n, 4) == 21) %if the block is 2x1
+        x = -1 * ones(1, 5);  y = -1 * ones(2, 5); %Initialize x and y for this knob (2x1 block can have 1 adjacent knob in X and 2 in Y axis)
         check = 3; %In a 2x1 block, there are only 3 knob spaces possible to be adjacent (2 to the top and 1 to the right)
         same_block = 1; %In a 2x1 block, excluding the first knob, there are only 1 more knobs
         x(1, 1) = line(n, 1) + 2;  x(1, 2) = line(n, 2); %Coordinate of the possible adjoint block to the right.
-        x(2, 1:3) = -1 *ones(1, 3);
         y(1, 1) = line(n, 1);  y(1, 2) = line(n, 2) + 1;
         y(2, 1) = line(n, 1) + 1;  y(2, 2) = line(n, 2) + 1; %Coordinates of the possible adjoint block to the top.
         
@@ -166,11 +168,10 @@ for n = 1 : blocks(1) %for every knob in this layer
             end
         end
     elseif(line(n, 4) == 11) %if the block is 1x1
+        x = -1 * ones(1, 5);  y = -1 * ones(1, 5); %Initialize x and y for this knob (1x1 block can have 1 adjacent knob in X and Y axis)
         check = 2; %In a 1x1 block, there are only 2 knob spaces possible to be adjacent (1 to the top and 1 to the right)
         x(1, 1) = line(n, 1) + 1;  x(1, 2) = line(n, 2); %Coordinate of the possible adjoint block to the right.
-        x(2, 1:3) = -1 *ones(1, 3);
         y(1, 1) = line(n, 1);  y(1, 2) = line(n, 2) + 1; %Coordinate of the possible adjoint block to the top.
-        y(2, 1:3) = -1 *ones(1, 3);
         
         for m = 1 : blocks(1) %For every knob in this layer
             if(check == 0) %If all possible adjacent knob were checked, break.
@@ -191,15 +192,15 @@ for n = 1 : blocks(1) %for every knob in this layer
             count_y = count_y + 1; %count the number of adjacent blocks to the top
         end
     end
+end
 
-    %optimization problem here, every loop in m it execute this if else condicions and rewrite an info that may have not changed at all
-    if((count_x ~= 1) && (count_y ~= 1)) %if there is something in X or Y matrix
-        A = [X(1:(count_x-1), 1:7); Y(1:(count_y-1), 1:7)];
-    elseif(count_x ~= 1) %if there is something only in X matrix
-        A = X(1:(count_x-1), 1:7);
-    elseif(count_y ~= 1) %if there is something only in Y matrix
-        A = Y(1:(count_y-1), 1:7);
-    else %There are no adjacent blocks
-        A = -1;
-    end
+%Assemble A matrix from X and Y
+if((count_x ~= 1) && (count_y ~= 1)) %if there is something in X or Y matrix
+    A = [X(1:(count_x-1), 1:7); Y(1:(count_y-1), 1:7)];
+elseif(count_x ~= 1) %if there is something only in X matrix
+    A = X(1:(count_x-1), 1:7);
+elseif(count_y ~= 1) %if there is something only in Y matrix
+    A = Y(1:(count_y-1), 1:7);
+else %There are no adjacent blocks
+    A = -1;
 end
