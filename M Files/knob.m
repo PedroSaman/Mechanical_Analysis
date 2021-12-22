@@ -1,14 +1,15 @@
 function y = knob(model, layer)
 %Convert block model data to knob data
 %input: model:(block_number, x, y, z, Block_type, color)
-        layer:(the layer that is desired to search for knobs. If 0, consider all layers) 
+%       layer:(the layer that is desired to search for knobs. If 0, consider all layers) 
 %output: y:(x,y,z,block_type,color,block_number,knob_index)
 
 loop = size(model);
 k = 0;  %Number of knobs
 
+%Count how many knobs it is needed to be iterated
 if(layer == 0) %if it is searching for all layers knobs
-    for n = 1 : loop(1)
+    for n = 1 : loop(1) %uses the block type nomenclature to calculate k
         a = floor(model(n,5)/10);                      %number of collums
         b = 10*((model(n,5)/10)-floor(model(n,5)/10)); %number of rows
         k = k + a*b;
@@ -23,7 +24,7 @@ else %if it is searching for only one layer knobs
             if(k_min == 0) 
                 k_min = n; %Store the first block in the model that is in the layer
             end
-            if(model(n, 5) == 24) %if the block is 2x4
+            if(model(n, 5) == 24)     %if the block is 2x4
                 k = k + 8;
             elseif(model(n, 5) == 22) %if the block is 2x2
                 k = k + 4;
@@ -41,7 +42,7 @@ else %if it is searching for only one layer knobs
     end
 end
 
-%For each knob create 7 information data
+%Create a matrix with each knob information
 y = zeros(k, 7); %y(x,y,z,block_type,color,block_number,knob_index)
 m = 1;  %Count the number of stored convex parts
 for n = k_min : k_max %for each block
