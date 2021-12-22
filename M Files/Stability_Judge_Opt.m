@@ -1,5 +1,8 @@
 %% Stability_Judge.m
 
+clear
+clc
+
 tic;
 
 %% constant numbers
