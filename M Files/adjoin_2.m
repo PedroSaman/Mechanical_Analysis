@@ -51,7 +51,22 @@ for n = 1 : knobs(1) %for every knob in this layer
         end
 
         %After finding which of the possible adjacent knobs in fact exist
-        %...
+        for i = 1:row
+            if(x(i,3)~=-1)
+                if(count_x == 1)
+                    X(count_x,1:7) = [1, line(n, 6), line(n, 4), x(i, 3), x(i, 4), x(i, 5), i]; %add info to X matrix (right)
+                    count_x = count_x + 1;
+                elseif(x(i,3) == x((i-1),3))
+                    if(X(count_x-1,7)<10)
+                        X(count_x-1,7) = X(count_x-1,7)*10
+                    end
+                    X(count_x-1,7) = floor(X(count_x-1,7)/10)*10 + i
+                else
+                    X(count_x,1:7) = [1, line(n, 6), line(n, 4), x(i, 3), x(i, 4), x(i, 5), i]; %add info to X matrix (right)
+                    count_x = count_x + 1;
+                end
+            end
+        end
     end
     A = 1;
 end
