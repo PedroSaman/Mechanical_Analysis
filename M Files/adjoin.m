@@ -1,4 +1,4 @@
-function A = adjoin_2(line)
+function A = adjoin(line)
 %Find the pairs of adjacent knobs in this layer from the block model. Because it finds the pair of knob, in the Y axis it only checks to the top 
 %and in the X axis only checks to the right.
 %input: line: every knob in a given layer. (x,y,z,block_type,color,block_number,knob_index)
@@ -34,6 +34,9 @@ for n = 1 : knobs(1) %for every knob in this layer
 
         %Search if there are knobs in the possible adjoin knob positions
         for m = 1 : knobs(1) %For every knob in this layer
+            if(line(n,6)==line(m,6)) %skip the knobs from the current block
+                continue;
+            end
             if(check == 0) %If all possible adjacent knob were checked, break.
                 break;
             else
@@ -50,23 +53,51 @@ for n = 1 : knobs(1) %for every knob in this layer
             end
         end
 
-        %After finding which of the possible adjacent knobs in fact exist
+        %Save in X matrix the adjoin knobs information
         for i = 1:row
             if(x(i,3)~=-1)
-                if(count_x == 1)
-                    X(count_x,1:7) = [1, line(n, 6), line(n, 4), x(i, 3), x(i, 4), x(i, 5), i]; %add info to X matrix (right)
+                if(i == 1)
+                    X(count_x,1:7) = [1, line(n, 6), line(n, 4), x(i, 3), x(i, 4), x(i, 5), i]; %add info to X matrix
                     count_x = count_x + 1;
                 elseif(x(i,3) == x((i-1),3))
                     if(X(count_x-1,7)<10)
-                        X(count_x-1,7) = X(count_x-1,7)*10
+                        X(count_x-1,7) = X(count_x-1,7)*10;
                     end
-                    X(count_x-1,7) = floor(X(count_x-1,7)/10)*10 + i
+                    X(count_x-1,7) = floor(X(count_x-1,7)/10)*10 + i;
                 else
-                    X(count_x,1:7) = [1, line(n, 6), line(n, 4), x(i, 3), x(i, 4), x(i, 5), i]; %add info to X matrix (right)
+                    X(count_x,1:7) = [1, line(n, 6), line(n, 4), x(i, 3), x(i, 4), x(i, 5), i]; %add info to X matrix
                     count_x = count_x + 1;
                 end
             end
         end
-    end
-    A = 1;
+        
+        %Save in Y matrix the adjoin knobs information
+        for i = 1:col
+            if(y(i,3)~=-1)
+                if(i == 1)
+                    Y(count_y,1:7) = [2, line(n, 6), line(n, 4), y(i, 3), y(i, 4), y(i, 5), i]; %add info to Y matrix
+                    count_y = count_y + 1;
+                elseif(y(i,3) == y((i-1),3))
+                    if(Y(count_y-1,7)<10)
+                        Y(count_y-1,7) = Y(count_y-1,7)*10;
+                    end
+                    Y(count_y-1,7) = floor(Y(count_y-1,7)/10)*10 + i;
+                else
+                    Y(count_y,1:7) = [2, line(n, 6), line(n, 4), y(i, 3), y(i, 4), y(i, 5), i]; %add info to Y matrix
+                    count_y = count_y + 1;
+                end
+            end
+        end
+    end    
+end
+
+%Assemble A matrix from X and Y
+if((count_x ~= 1) && (count_y ~= 1)) %if there is something in X or Y matrix
+    A = [X(1:(count_x-1), 1:7); Y(1:(count_y-1), 1:7)];
+elseif(count_x ~= 1) %if there is something only in X matrix
+    A = X(1:(count_x-1), 1:7);
+elseif(count_y ~= 1) %if there is something only in Y matrix
+    A = Y(1:(count_y-1), 1:7);
+else %There are no adjacent blocks
+    A = -1;
 end
