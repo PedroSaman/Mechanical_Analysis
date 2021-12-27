@@ -57,7 +57,7 @@ else
             %In this cases does not matter the adjoin type. (there is only one)
             if(type_1 == 11) %if the left block is a 1x1
                 Fnx((4*n-3):4*n, 4:6) = Pnx11;
-            elseif(type_1 == 21) %if the bottom block is a 2x1
+            elseif(type_1 == 21) %if the left block is a 2x1
                 Fnx((4*n-3):4*n, 4:6) = Pnx21_2;
             end
             if(type_2 == 11) %if the right block is a 1x1
