@@ -49,7 +49,7 @@ for n = 1 : loop
 end
 
 force = 1;
-F = zeros(count*12, 13);
+F = zeros(count*24, 13);
 F(1:(count*24), 1) = 1: (count*24);  %Force Number
 for n = 1 : count %for each block in the 1st layer
    if(model(n, 5) == 11) % 1x1 Block
