@@ -80,8 +80,7 @@ elseif(force_type == "fnz")
 
                     %Adding z axis value to f
                     FP(force_index:force_index+3,:) = [[f1,1.5];[f2,1.5];[f3,1.5];[f4,1.5]];
-                    FP(force_index+4:force_index+7,:) = [[f1,-1.5];[f2,-1.5];[f3,-1.5];[f4,-1.5]];
-                    force_index = force_index + 8;
+                    force_index = force_index + 4;
                 end
             end
         end
@@ -93,7 +92,7 @@ elseif(force_type == "ff")
     pf_index = 1; %force index in pf matrix
     
     %These force vector Pf are have the forces excluding the ones that
-    %doesn't exist in the block.
+    %doesnt exist in the block.
     if(row == 1 && col == 1)
         Pf = zeros(4,3);
     elseif(row>=col)
@@ -117,24 +116,24 @@ elseif(force_type == "ff")
                 Pf(pf_index:pf_index+3,:) = [[f1,-1.5];[f2,-1.5];[f3,-1.5];[f4,-1.5]];
                 pf_index = pf_index + 4;
             elseif(row>=col) %if the block is taller than wide
-                if(j==0) %if column's first knob
+                if(j==0) %if columns first knob
                     Pf(pf_index:pf_index+2,:) = [[f1,-1.5];[f2,-1.5];[f4,-1.5]];
                     pf_index = pf_index + 3;
-                elseif(j==row-1) %if column's last knob
+                elseif(j==row-1) %if columns last knob
                     Pf(pf_index:pf_index+2,:) = [[f1,-1.5];[f3,-1.5];[f4,-1.5]];
                     pf_index = pf_index + 3;
-                else %if column's inside knob
+                else %if columns inside knob
                     Pf(pf_index:pf_index+1,:) = [[f1,-1.5];[f4,-1.5]];
                     pf_index = pf_index + 2;
                 end
             elseif(col>row) %if the block is wider than tall
-                if(i == 0) %if row's first knob
+                if(i == 0) %if rows first knob
                     Pf(pf_index:pf_index+2,:) = [[f1,-1.5];[f2,-1.5];[f3,-1.5]];
                     pf_index = pf_index + 3;
-                elseif(i == col-1) %if row's last knob
+                elseif(i == col-1) %if rows last knob
                     Pf(pf_index:pf_index+2,:) = [[f2,-1.5];[f3,-1.5];[f4,-1.5]];
                     pf_index = pf_index + 3;
-                else %if row's inside knob
+                else %if rows inside knob
                     Pf(pf_index:pf_index+1,:) = [[f2,-1.5];[f3,-1.5]];
                     pf_index = pf_index + 2;
                 end
