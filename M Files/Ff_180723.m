@@ -85,7 +85,7 @@ for n = 1 : loop(1) %for each knob connection
     if(type_1 == 11) %If the upper block is 1x1
         Ff(count:count+3, 2:6:8) = [join(n, 3:3:6); join(n, 3:3:6); join(n, 3:3:6); join(n, 3:3:6)];  %Block No.
         Ff(count:count+3, 3:6:9) = [join(n, 4:3:7); join(n, 4:3:7); join(n, 4:3:7); join(n, 4:3:7)];  %Knob No.
-        Ff(count:count+3, 4:6) = Pf_11;  %Coordinate 1 (z = -1.5) 
+        Ff(count:count+3, 4:6) = Pf_11_0;  %Coordinate 1 (z = -1.5) 
         %Coordinate 2 (z = 1.5) 
         if(type_2 == 11)
             Ff(count:count+3, 10:12) = Pf11;
