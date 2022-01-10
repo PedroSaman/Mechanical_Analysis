@@ -1,48 +1,34 @@
 function Ff = Ff_0_180723(model)
-%Find the friction force position in blocks that are in the first layer of the block model in regard to its own coordinate axis.
+%Find the friction force position in blocks that are in the first layer of 
+%the block model in regard to its own coordinate axis.
 %input: model:(Block_Number, x, y, z, type, color)
-%output: Ff = (Force_Number, Block_Number, Knob_Number, x, y, z, *, 0, 0, 0, 0, 0, 0)
+%output: Ff = (Force_Number, Block_Number, Knob_Number, x, y, z, *, ...)
 %             *: upper and lower limits of the normal force
-% Pfnm_xy = position force of a block with n columns and m rows touching from the xth to the yth knob. Special case to 0 which represents
-% that it is touching the entire block. a "_" after the Pf, mean that this position is the negative one.
+%Obs: Pfnm_xy = position force of a block with n columns and m rows touching
+%from the xth to the yth knob. Special case to 0 which represents that it is
+%touching the entire block. a "_" after the Pf, mean that this position is 
+%the negative one.
 
+%1x1 block
 Pf = force_position(1,1,"ff");
 Pf11_0 = Pf(1:4,:);
 Pf_11_0 = [Pf11_0(1:4, 1:2), -Pf11_0(1:4, 3)];
 
-%1x1 Block
-%pf1 = [-1.25,     0, 1.5];  pf2 = [    0, -1.25, 1.5];  pf3 = [    0,  1.25, 1.5];  pf4 = [ 1.25,     0, 1.5];
-%Pf11_0 = [pf1; pf2; pf3; pf4]; %1x1 blocks friction forces position
-%Pf_11_0 = [Pf11_0(1:4, 1:2), -Pf11_0(1:4, 3)]; %Same as above but negative z axis
-
+%1x2 block
 Pf = force_position(1,2,"ff");
 Pf12_1 = Pf(1:4,:);
 Pf12_2 = Pf(5:8,:);
 Pf12_0 = [Pf12_1(1:2, 1:3); Pf12_1(4, 1:3); Pf12_2(1, 1:3); Pf12_2(3:4,1:3)]; %1x2 blocks friction forces position
 Pf_12_0 = [Pf12_0(1:6, 1:2), -Pf12_0(1:6, 3)]; %Same as above but negative z axis
 
-%1x2 Block
-%pf1 = [-1.25,    -2, 1.5];  pf2 = [    0, -3.25, 1.5];  pf3 = [    0, -0.75, 1.5];  pf4 = [ 1.25,    -2, 1.5];
-%Pf12_1 = [pf1; pf2; pf3; pf4];  %Pf_12_1 = [Pf12_1(1:4, 1:2), -Pf12_1(1:4, 3)];
-%pf1 = [-1.25,     2, 1.5];  pf2 = [    0,  0.75, 1.5];  pf3 = [    0,  3.25, 1.5];  pf4 = [ 1.25,     2, 1.5];
-%Pf12_2 = [pf1; pf2; pf3; pf4];  %Pf_12_2 = [Pf12_2(1:4, 1:2), -Pf12_2(1:4, 3)];
-%Pf12_0 = [Pf12_1(1:2, 1:3); Pf12_1(4, 1:3); Pf12_2(1, 1:3); Pf12_2(3:4,1:3)]; %1x2 blocks friction forces position
-%Pf_12_0 = [Pf12_0(1:6, 1:2), -Pf12_0(1:6, 3)]; %Same as above but negative z axis
-
+%2x1 block
 Pf = force_position(2,1,"ff");
 Pf21_1 = Pf(1:4,:);
 Pf21_2 = Pf(5:8,:);
 Pf21_0 = [Pf21_1(1:3, 1:3); Pf21_2(2:4, 1:3)]; %2x1 blocks friction forces position
 Pf_21_0 = [Pf21_0(1:6, 1:2), -Pf21_0(1:6, 3)]; %Same as above but negative z axis
 
-%2x1 Block
-%pf1 = [-3.25,     0, 1.5];  pf2 = [   -2, -1.25, 1.5];  pf3 = [   -2,  1.25, 1.5];  pf4 = [-0.75,     0, 1.5];
-%Pf21_1 = [pf1; pf2; pf3; pf4];  %Pf_21_1 = [Pf21_1(1:4, 1:2), -Pf21_1(1:4, 3)];
-%pf1 = [0.75,     0, 1.5];  pf2 = [   2, -1.25, 1.5];  pf3 = [   2,  1.25, 1.5];  pf4 = [3.25,     0, 1.5];
-%Pf21_2 = [pf1; pf2; pf3; pf4];  %Pf_21_2 = [Pf21_2(1:4, 1:2), -Pf21_2(1:4, 3)];
-%Pf21_0 = [Pf21_1(1:3, 1:3); Pf21_2(2:4, 1:3)]; %2x1 blocks friction forces position
-%Pf_21_0 = [Pf21_0(1:6, 1:2), -Pf21_0(1:6, 3)]; %Same as above but negative z axis
-
+%2x2 Block
 Pf = force_position(2,2,"ff");
 Pf22_1 = Pf(1:4,:);
 Pf22_2 = Pf(5:8,:);
@@ -50,19 +36,6 @@ Pf22_3 = Pf(9:12,:);
 Pf22_4 = Pf(13:16,:);
 Pf22_0 = [Pf22_1(1:2, 1:3); Pf22_1(4, 1:3); Pf22_2(1, 1:3); Pf22_2(3:4, 1:3); Pf22_3(1:2, 1:3); Pf22_3(4, 1:3); Pf22_4(1, 1:3); Pf22_4(3:4, 1:3)]; %2x2 blocks friction forces position
 Pf_22_0 = [Pf22_0(1:12, 1:2), -Pf22_0(1:12, 3)]; %Same as above but negative z axis
-
-%2x2 Block
-%pf1 = [-3.25,    -2, 1.5];  pf2 = [   -2, -3.25, 1.5];  pf3 = [   -2, -0.75, 1.5];  pf4 = [-0.75,    -2, 1.5]; 
-%Pf22_1 = [pf1; pf2; pf3; pf4];  %Pf_22_1 = [Pf22_1(1:4, 1:2), -Pf22_1(1:4, 3)];
-%pf1 = [-3.25,    2, 1.5];  pf2 = [   -2, 0.75, 1.5];  pf3 = [   -2, 3.25, 1.5];  pf4 = [-0.75,    2, 1.5];
-%Pf22_2 = [pf1; pf2; pf3; pf4];  %Pf_22_2 = [Pf22_2(1:4, 1:2), -Pf22_2(1:4, 3)];
-%pf1 = [0.75,    -2, 1.5];  pf2 = [   2, -3.25, 1.5];  pf3 = [   2, -0.75, 1.5];  pf4 = [3.25,    -2, 1.5];
-%Pf22_3 = [pf1; pf2; pf3; pf4];  %Pf_22_3 = [Pf22_3(1:4, 1:2), -Pf22_3(1:4, 3)];
-%pf1 = [0.75,    2, 1.5];  pf2 = [   2, 0.75, 1.5];  pf3 = [    2, 3.25, 1.5];  pf4 = [3.25,    2, 1.5];
-%Pf22_4 = [pf1; pf2; pf3; pf4];  %Pf_22_4 = [Pf22_4(1:4, 1:2), -Pf22_4(1:4, 3)];
-%2x2 blocks friction forces position
-%Pf22_0 = [Pf22_1(1:2, 1:3); Pf22_1(4, 1:3); Pf22_2(1, 1:3); Pf22_2(3:4, 1:3); Pf22_3(1:2, 1:3); Pf22_3(4, 1:3); Pf22_4(1, 1:3); Pf22_4(3:4, 1:3)]; 
-%Pf_22_0 = [Pf22_0(1:12, 1:2), -Pf22_0(1:12, 3)]; %Same as above but negative z axis
 
 loop = size(model);
 count = 0;
@@ -75,8 +48,9 @@ for n = 1 : loop
 end
 
 force = 1;
-F = zeros(count*24, 13);
-F(1:(count*24), 1) = 1: (count*24);  %Force Number
+max_force_number = 24; %Maximum number of forces that can appear in a block. (for a 2x2 block is 24)
+F = zeros(count*max_force_number, 13);
+F(1:(count*max_force_number), 1) = 1: (count*max_force_number);  %Force Number
 for n = 1 : count %for each block in the 1st layer
    if(model(n, 5) == 11) % 1x1 Block
        F(force:(force+7), 2) = model(n, 1);  %Block Number
