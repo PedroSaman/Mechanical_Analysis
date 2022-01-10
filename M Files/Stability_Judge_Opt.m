@@ -224,7 +224,12 @@ end
 %% Solve problem
 f = zeros(3*force+1, 1);
 f((3*force + 1), 1) = 1;
-[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub)  %Linear programming problem
-XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]  %Force acting on the block model 
-CM = -x(3*force+1) %Capacity CM 
+[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Linear programming problem
+if(~isempty(x))
+    fprintf('Solution found');
+    XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]  %Force acting on the block model 
+    CM = -x(3*force+1) %Capacity CM 
+else
+    fprintf('No feasible solution found \n');
+end
 time = toc
