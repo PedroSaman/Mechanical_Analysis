@@ -1,4 +1,5 @@
 function A = adjoin(line)
+%This function is ready for every block of 1 to 9 rows and 1 to 9 columns
 %Find the pairs of adjacent knobs in this layer from the block model. 
 %Because it finds the pair of knob, in the Y axis it only checks to the top 
 %and in the X axis only checks to the right.
@@ -9,7 +10,6 @@ function A = adjoin(line)
 %Obs: if there is no adjacent block, this function returns -1
 %adjoin_type is acording with Pedro definition: Type_xy means: the first block
 %is touching the second block from the knob x to knob y (knobs of the first block).
-%This function is ready for every block of 1 to 9 rows and 1 to 9 columns
 
 knobs = size(line);
 X = zeros(knobs(1) * 2, 7);  Y = zeros(knobs(1) * 2, 7);
