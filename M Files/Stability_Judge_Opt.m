@@ -1,14 +1,11 @@
 %% Stability_Judge.m
 
-clear
-clc
-
-tic;
+clear; clc; tic;
 
 %% constant numbers
 g = 9.81;
 T=70*g;  %Maximum static friction force of one set of convex part
-M=2/15; %Mass of a 2x2 block
+M=2/60; %Mass of a 1x1 block
 
 %% Load the block model data
 filename = '../Dat Files/fail_30.dat' %Specify the data file name
@@ -86,21 +83,21 @@ ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %The Fny force component in
 %%Fn_line Lower and Upper bounds 
 check = 0;
 for i = 1 : force_f
-   if((F_f(i, 7) == -10)||(F_f(i, 7) == -11))
-       % x < 0, y = 0
-       lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0];
+   if((F_f(i, 7) == -10))
+       %x points to -infinite, y = 0 
+       lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
        check = 1;
-   elseif((F_f(i, 7) == -20)||(F_f(i, 7) == -21))
-       % x = 0, y < 0
-       lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0];
+   elseif((F_f(i, 7) == -20)) 
+       %x = 0, y points to -infinite 
+       lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
        check = 1;
-   elseif((F_f(i, 7) == 20)||(F_f(i, 7) == 21))
-       % x = 0, y > 0
-       lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0;
+   elseif((F_f(i, 7) == 20))
+       %x = 0, y points to +infinite
+       lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
        check = 1;
-   elseif((F_f(i, 7) == 10)||(F_f(i, 7) == 11))
-       % x > 0, y = 0
-       lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0;
+   elseif((F_f(i, 7) == 10))
+       %x points to +infinite, y = 0
+       lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0; %no force component in Y axis and in X axis = [0,+inf]
        check = 1;
    end
    if(check == 1) %The Fn_line orientation is determined by the height 
@@ -214,11 +211,11 @@ for n = 1 : N   %for each block in the model
     Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i; %[W1*A1;W2*A2,...,Wn*An]
     %Mass changes depending on block type [b1;b2;...;bn]
     if(model(n, 5) == 22)
-        beq((6*n - 5) : 6*n, 1) = [0; 0; M*g; 0; 0; 0];
+        beq((6*n - 5) : 6*n, 1) = [0; 0; 4*M*g; 0; 0; 0];
     elseif((model(n, 5) == 12) || (model(n, 5) == 21))
-        beq((6*n - 5) : 6*n, 1) = [0; 0; M*g/2; 0; 0; 0];
+        beq((6*n - 5) : 6*n, 1) = [0; 0; 2*M*g; 0; 0; 0];
     elseif(model(n, 5) == 11)
-        beq((6*n - 5) : 6*n, 1) = [0; 0; M*g/4; 0; 0; 0];
+        beq((6*n - 5) : 6*n, 1) = [0; 0; M*g; 0; 0; 0];
     end
 end
 %% Solve problem
