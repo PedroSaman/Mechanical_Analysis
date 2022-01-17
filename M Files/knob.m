@@ -36,6 +36,7 @@ else %if it is searching for only one layer knobs
 end
 
 %Create a matrix with each knob information
+k = round(k);
 y = zeros(k, 7); %y(x,y,z,block_type,color,block_number,knob_index)
 m = 1;  %Count the number of stored convex parts
 for n = k_min : k_max %for each block
