@@ -12,10 +12,9 @@ k = 0;  %Number of knobs
 if(layer == 0) %if it is searching for all layers knobs
     for n = 1 : loop(1) %uses the block type nomenclature to calculate k
         a = floor(model(n,5)/10);                      %number of columns
-        b = 10*((model(n,5)/10)-floor(model(n,5)/10)); %number of rows
+        b = round(10*((model(n,5)/10)-floor(model(n,5)/10))); %number of rows
         k = k + a*b;
     end
-    k = round(k);
     k_min = 1;
     k_max = loop(1);
 else %if it is searching for only one layer knobs
