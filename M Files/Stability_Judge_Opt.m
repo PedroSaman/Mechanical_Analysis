@@ -83,19 +83,19 @@ ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %The Fny force component in
 %%Fn_line Lower and Upper bounds 
 check = 0;
 for i = 1 : force_f
-   if((F_f(i, 7) == -10))
+   if((F_f(i, 7) == -1))
        %x points to -infinite, y = 0 
        lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
        check = 1;
-   elseif((F_f(i, 7) == -20)) 
+   elseif((F_f(i, 7) == -2)) 
        %x = 0, y points to -infinite 
        lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
        check = 1;
-   elseif((F_f(i, 7) == 20))
+   elseif((F_f(i, 7) == 2))
        %x = 0, y points to +infinite
        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
        check = 1;
-   elseif((F_f(i, 7) == 10))
+   elseif((F_f(i, 7) == 1))
        %x points to +infinite, y = 0
        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0; %no force component in Y axis and in X axis = [0,+inf]
        check = 1;
