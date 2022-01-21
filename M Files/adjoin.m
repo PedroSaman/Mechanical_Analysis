@@ -25,8 +25,8 @@ for n = 1 : knobs(1) %for every knob in this layer
         row = round(10*((line(n, 4)/10)-floor(line(n, 4)/10))); %block number of rows
         
         x = -ones(row,5); y = -ones(col,5); %Initialize the x and y matrices
-        check = row*col;
-        same_block = check-1;
+        check = row+col;
+        same_block = row*col-1;
 
         %Determine where are the possible adjoin position for this block
         for i=0:row-1
@@ -104,4 +104,17 @@ elseif(count_y ~= 1) %if there is something only in Y matrix
     A = Y(1:(count_y-1), 1:7);
 else %There are no adjacent blocks
     A = -1;
+end
+
+%Correcting some conventions to be used in the next functions
+if(A(1) ~= -1)
+    for i = 1 : size(A,1)
+        if(A(i,7)<10) %If the adjoin block 1 is only one number duplicate this number (x -> xx)
+            A(i,7) = A(i,7)*10+A(i,7);
+        end
+        col = floor(A(i, 7)/10);                          %block number of collums
+        row = round(10*((A(i, 7)/10)-floor(A(i, 7)/10))); %block number of rows
+        d = A(i,6) + abs(col-row);
+        A(i,6) = A(i,6)*10 + d; %Second block knob
+    end 
 end
