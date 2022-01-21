@@ -68,17 +68,17 @@ force = force_f + force_nz + force_nx + force_ny;
 
 %% Lower bounds (Ff, Fn)
 lb = -Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
-lb(3:3:3*force_f) = 0;  %The lower bound for the z axis component of the F_f force is 0
-lb(3*force_f+1:3*force) = 0; %The lower bound of the F_n force is 0 in all 3 axis
+lb(3:3:3*force_f) = 0;  %F_f lower bound component in z is 0
+lb(3*force_f+1:3*force) = 0; %lower bound of the F_n is 0 in all 3 axis
 
 %% Upper bounds (Ff, Fn)
 ub = Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
-ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; %The Fnz force component in x is 0
-ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; %The Fnz force component in y is 0
-ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; %The Fnx force component in y is 0
-ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; %The Fnx force component in z is 0
-ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %The Fny force component in x is 0
-ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %The Fny force component in z is 0
+ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; %Fnz upper bound component in x is 0
+ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; %Fnz upper bound component in y is 0
+ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; %Fnx upper bound component in y is 0
+ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; %Fnx upper bound component in z is 0
+ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %Fny upper bound component in x is 0
+ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny upper bound component in z is 0
 
 %%Fn_line Lower and Upper bounds 
 check = 0;

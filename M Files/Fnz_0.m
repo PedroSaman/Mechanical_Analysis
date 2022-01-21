@@ -14,10 +14,10 @@ for n = 1 : loop
        count = count + 1; %Count the number of blocks in the first stage
        col = floor(model(n, 5)/10);                             %block number of collums
        row = round(10*((model(n, 5)/10)-floor(model(n, 5)/10))); %block number of rows
-       if(bc(col,row) == 0)
+       if(bc(col,row) == 0) %If this is the 1st time this block type appears
            bc(col,row) = 1;
            Pf = force_position(col,row,"fnz");
-           Pnz = Pf(end-3:end,1:3);
+           Pnz = Pf(end-3:end,1:3); %Get only the last 4 forces from Pf
            Pnz_neg = [Pnz(1:4, 1:2), -Pnz(1:4, 3)];
            All_Forces = [All_Forces;Pnz_neg,[10*col+row;zeros(3,1)]];
        end
