@@ -18,7 +18,7 @@ else
     
     All_Forces = [];
     bc = zeros(9,9);
-    for n = 1 : nx %for every adjoin block duo
+    for n = 1 : ny %for every adjoin block duo
         %First Block
         col = floor(adjoin(n, 3)/10);                               %block number of collums
         row = round(10*((adjoin(n, 3)/10)-floor(adjoin(n, 3)/10))); %block number of rows
@@ -62,6 +62,34 @@ else
     else
         Fny = zeros(force_y, 13);  Fny(1:force_y, 1) = 1:force_y; %create a matrix to store each force data
         Fny(:, 7:6:13) = [-ones(force_y, 1), ones(force_y, 1)];  %set column 7 as -1 and column 13 as 1
+        for n = 1 : ny  %For each adjoin block, determine where the normal forces in the Y axis is located
+            Fny((4*n-3):4*n, 2:6:8) = [ones(4, 1) * adjoin(n, 2), ones(4, 1) * adjoin(n, 4)]; %set column 2 as the lower block and column 8 as the upper block
+            type_1 = adjoin(n, 3); %lower block type
+            type_2 = adjoin(n, 5); %upper block type
+            adjoin_type_1 = adjoin(n, 7); %lower block adjoin type
+            adjoin_type_2 = adjoin(n, 6); %upper block adjoin type
+
+            i = 1;
+            while(i<size(All_Forces,1))
+                if(type_1 == All_Forces(i,4) && adjoin_type_1 == All_Forces(i+1,4))
+                    Fny((4*n-3):4*n, 4:6) = All_Forces(i:i+3,1:3);
+                    break;
+                end
+                i = i + 4;
+            end
+            
+            i = 1;
+            while(i<size(All_Forces,1))
+                if(type_2 == All_Forces(i,4) && adjoin_type_2 == All_Forces(i+1,4))
+                    Fny((4*n-3):4*n, 10:12) = [-All_Forces(i:i+3,1), All_Forces(i:i+3,2:3)];
+                    break;
+                end
+                i = i + 4;
+            end
+        end
+        
+        %OLD
+        %{
         for n = 1 : ny %For each adjoin block
             Fny((4*n-3):4*n, 2:6:8) = [ones(4, 1) * adjoin(n, 2), ones(4, 1) * adjoin(n, 4)]; %set column 2 as the lower block and column 8 as the upper block
         end
@@ -124,5 +152,6 @@ else
                 end
             end
         end
+        %}
     end
 end
