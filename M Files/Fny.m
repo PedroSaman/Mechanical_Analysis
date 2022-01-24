@@ -7,36 +7,52 @@ function Fny = Fny(adjoin)
 if(adjoin == -1)
     Fny = -1;
 else
-    % 1x1 Block
-    pn1 = [-2, 2, -1.5];  pn2 = [-2, 2,  1.5];  pn3 = [ 2, 2, -1.5];  pn4 = [ 2, 2,  1.5];
-    Pny11 = [pn1; pn2; pn3; pn4];  Pny_11 = [Pny11(1:4, 1), -Pny11(1:4, 2), Pny11(1:4, 3)];
-
-    % 1x2 Block
-    pn1 = [-2, -4, -1.5];  pn2 = [-2, -4,  1.5];  pn3 = [ 2, -4, -1.5];  pn4 = [ 2, -4,  1.5];
-    Pny12_1 = [pn1; pn2; pn3; pn4];  Pny12_2 = [Pny12_1(1:4, 1), -Pny12_1(1:4, 2), Pny12_1(1:4, 3)];
-
-    % 2x1 Block
-    pn1 = [-4, 2, -1.5];  pn2 = [-4, 2,  1.5];  pn3 = [ 4, 2, -1.5];  pn4 = [ 4, 2,  1.5];
-    Pny21_0 = [pn1; pn2; pn3; pn4];  Pny_21_0 = [Pny21_0(1:4, 1), -Pny21_0(1:4, 2), Pny21_0(1:4, 3)];
-    pn1 = [-4, 2, -1.5];  pn2 = [-4, 2,  1.5];  pn3 = [ 0, 2, -1.5];  pn4 = [ 0, 2,  1.5];
-    Pny21_1 = [pn1; pn2; pn3; pn4];  Pny_21_1 = [Pny21_1(1:4, 1), -Pny21_1(1:4, 2), Pny21_1(1:4, 3)];
-    pn1 = [0, 2, -1.5];  pn2 = [0, 2,  1.5];  pn3 = [4, 2, -1.5];  pn4 = [4, 2,  1.5];
-    Pny21_2 = [pn1; pn2; pn3; pn4];  Pny_21_2 = [Pny21_2(1:4, 1), -Pny21_2(1:4, 2), Pny21_2(1:4, 3)];
-
-    % 2x2 Block
-    pn1 = [-4, 4, -1.5];  pn2 = [-4, 4,  1.5];  pn3 = [ 4, 4, -1.5];  pn4 = [ 4, 4,  1.5];
-    Pny22_0 = [pn1; pn2; pn3; pn4];  Pny_22_0 = [Pny22_0(1:4, 1), -Pny22_0(1:4, 2), Pny22_0(1:4, 3)];
-    pn1 = [-4, -4, -1.5];  pn2 = [-4, -4,  1.5];  pn3 = [ 0, -4, -1.5];  pn4 = [ 0, -4,  1.5];
-    Pny22_1 = [pn1; pn2; pn3; pn4];  Pny22_2 = [Pny22_1(1:4, 1), -Pny22_1(1:4, 2), Pny22_1(1:4, 3)];
-    pn1 = [0, -4, -1.5];  pn2 = [0, -4,  1.5];  pn3 = [4, -4, -1.5];  pn4 = [4, -4,  1.5];
-    Pny22_3 = [pn1; pn2; pn3; pn4];  Pny22_4 = [Pny22_3(1:4, 1), -Pny22_3(1:4, 2), Pny22_3(1:4, 3)];
-
-    loop = size(adjoin);
-    ny = loop(1); %Number of contact surfaces in the y direction 
+    loop = size(adjoin,1);
+    ny = loop; %Number of contact surfaces in the y direction 
     for n = loop(1) : -1 : 1
         if(adjoin(n, 1) == 1) %Remove contact surfaces in the x direction from adjoin 
             adjoin(n, :) = [];
             ny = ny - 1;
+        end
+    end
+    
+    All_Forces = [];
+    bc = zeros(9,9);
+    for n = 1 : nx %for every adjoin block duo
+        %First Block
+        col = floor(adjoin(n, 3)/10);                               %block number of collums
+        row = round(10*((adjoin(n, 3)/10)-floor(adjoin(n, 3)/10))); %block number of rows
+        if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix
+            bc(col,row) = 1; %Mark as visited
+            Pny = force_position(col,row,"fny"); %Load the forces
+            count = 1;
+            for i = 1 : col %Iterate every set of 4 forces (every kind of normal force comes in sets of 4)
+                for j = 1 : col 
+                    if(j<i)
+                        continue;
+                    end
+                    All_Forces = [All_Forces;Pny(count:count+3,:),[10*col+row;10*i+j;0;0]]; %Add the force to the matrix with block type and adjoin type information
+                    count = count + 4;
+                end
+            end
+        end
+        
+        %Second Block
+        col = floor(adjoin(n, 5)/10);                               %block number of collums
+        row = round(10*((adjoin(n, 5)/10)-floor(adjoin(n, 5)/10))); %block number of rows
+        if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix
+            bc(col,row) = 1; %Mark as visited
+            Pny = force_position(col,row,"fny"); %Load the forces
+            count = 1;
+            for i = 1 : col %Iterate every set of 4 forces (every kind of normal force comes in sets of 4)
+                for j = 1 : col 
+                    if(j<i)
+                        continue;
+                    end
+                    All_Forces = [All_Forces;Pny(count:count+3,:),[10*col+row;10*i+j;0;0]]; %Add the force to the matrix with block type and adjoin type information
+                    count = count + 4;
+                end
+            end
         end
     end
 
