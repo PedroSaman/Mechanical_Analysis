@@ -81,7 +81,7 @@ else
             i = 1;
             while(i<size(All_Forces,1))
                 if(type_2 == All_Forces(i,4) && adjoin_type_2 == All_Forces(i+1,4))
-                    Fny((4*n-3):4*n, 10:12) = [-All_Forces(i:i+3,1), All_Forces(i:i+3,2:3)];
+                    Fny((4*n-3):4*n, 10:12) = [All_Forces(i:i+3,1), -All_Forces(i:i+3,2), All_Forces(i:i+3,3)];
                     break;
                 end
                 i = i + 4;
