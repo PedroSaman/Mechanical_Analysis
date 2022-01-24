@@ -1,7 +1,7 @@
 function Fnz = Fnz_0(model)
 %Find the normal forces position in the z axis of blocks that are in the 
+%This function is working for up to 9x9 blocks
 %first layer of the block model in regard to its own coordinate axis.
-%This function is ready for every block of 1 to 9 rows and 1 to 9 columns
 %input: model:(Block_Number, x, y, z, type, color)
 %output: Fnz:(Force_Number, Block_Number, 0, x, y, z, 1, 0, 0, 0, 0, 0, 0)
 

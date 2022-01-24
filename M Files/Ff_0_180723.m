@@ -1,6 +1,7 @@
 function Ff = Ff_0_180723(model)
 %Find the friction force position in blocks that are in the first layer of 
 %the block model in regard to its own coordinate axis.
+%This function is working for up to 9x9 blocks
 %input: model:(Block_Number, x, y, z, type, color)
 %output: Ff = (Force_Number, Block_Number, Knob_Number, x, y, z, ub/lb, ...)
 %             ub/lb: upper and lower bounds information.

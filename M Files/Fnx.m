@@ -1,5 +1,6 @@
 function Fnx = Fnx(adjoin)
 %Find the normal forces position in the x axis given the neighbors blocks found in the adjoin.m function in regard to its own coordinate axis.
+%This function is working for up to 9x9 blocks
 %This function stores in Fnx the position of this forces for both blocks.
 %input: adjoin = (1,own block_number, own block_type, adjacent block_number, adjacent block_type, adjacent knob_index, adjoin type)
 %output: Fnx = (Force_Number, Block_Number 1, Knob_Number 1, x1, y1, z1, -1, Block_Number 2, Knob_Number 2, x2, y2, z2, 1)
