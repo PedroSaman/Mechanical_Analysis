@@ -11,9 +11,8 @@ k = 0;  %Number of knobs
 %Count how many knobs it is needed to be iterated
 if(layer == 0) %if it is searching for all layers knobs
     for n = 1 : loop(1) %uses the block type nomenclature to calculate k
-        a = floor(model(n,5)/10);                      %number of columns
-        b = round(10*((model(n,5)/10)-floor(model(n,5)/10))); %number of rows
-        k = k + a*b;
+        [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+        k = k + col*row;
     end
     k_min = 1;
     k_max = loop(1);
@@ -24,9 +23,8 @@ else %if it is searching for only one layer knobs
             if(k_min == 0) 
                 k_min = n; %Store the first block in the model that is in the layer
             end
-            a = floor(model(n,5)/10);                      %number of columns
-            b = 10*((model(n,5)/10)-floor(model(n,5)/10)); %number of rows
-            k = k + a*b;
+            [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+            k = k + col*row;
             k_max = n; %Store the last block in the model that is in the layer so far.
         elseif(model(n, 4) > layer) %if the block model z value is less than the layer argument
             break
@@ -39,9 +37,8 @@ k = round(k);
 y = zeros(k, 7); %y(x,y,z,block_type,color,block_number,knob_index)
 m = 1;  %Count the number of stored convex parts
 for n = k_min : k_max %for each block
-    a = floor(model(n,5)/10);                      %number of columns
-    b = round(10*((model(n,5)/10)-floor(model(n,5)/10))); %number of rows
-    for i = 0:a*b-1 %for each knob in the block
+    [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+    for i = 0:col*row-1 %for each knob in the block
         y(m+i, 1:5) = model (n, 2:6); %Copy the model data to y
         y(m+i, 6) = model(n, 1); %Block number inside the block model
         y(m+i, 7) = i + 1; %Knob index inside its block
@@ -49,8 +46,8 @@ for n = k_min : k_max %for each block
     
     %Correction of X and Y values
     k = 0;
-    for i = 0:a-1 %for every column
-        for j = 0:b-1 %for every row
+    for i = 0:col-1 %for every column
+        for j = 0:row-1 %for every row
             y(m+k, 1) = y(m+k, 1) + i; %Correct X value   
             y(m+k, 2) = y(m+k, 2) + j; %Correct Y value
             k = k + 1; %Same block knobs iterator

@@ -20,10 +20,8 @@ for n = 1 : knobs(1) %for every knob in this layer
     if(same_block ~= 0) %If the knob is from the same block, continue. This will be computed until it reaches the next block.
         same_block = same_block - 1; %Generic subtractor
     else %If this is the first knob in a block
-
-        col = floor(line(n, 4)/10);                             %block number of collums
-        row = round(10*((line(n, 4)/10)-floor(line(n, 4)/10))); %block number of rows
         
+        [col,row] = col_row_converter(line(n, 4)); %block number of collums and rows
         x = -ones(row,5); y = -ones(col,5); %Initialize the x and y matrices
         check = row+col;
         same_block = row*col-1;
@@ -112,8 +110,7 @@ if(A(1) ~= -1)
         if(A(i,7)<10) %If the adjoin block 1 is only one number duplicate this number (x -> xx)
             A(i,7) = A(i,7)*10+A(i,7);
         end
-        col = floor(A(i, 7)/10);                          %block number of collums
-        row = round(10*((A(i, 7)/10)-floor(A(i, 7)/10))); %block number of rows
+        [col,row] = col_row_converter(A(i, 7)); %block number of collums and rows        
         d = A(i,6) + abs(col-row);
         A(i,6) = A(i,6)*10 + d; %Second block knob
     end 

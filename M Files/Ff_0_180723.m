@@ -26,9 +26,7 @@ max_force_number = 40; %Maximum number of forces that can appear in a block. (fo
 F = zeros(count*max_force_number, 13);
 F(1:(count*max_force_number), 1) = 1: (count*max_force_number);  %Force Number
 for n = 1 : count %for each block in the 1st layer
-    col = floor(model(n, 5)/10);                             %block number of collums
-    row = round(10*((model(n, 5)/10)-floor(model(n, 5)/10))); %block number of rows
-    
+    [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
     if(col > row) %To correctly count the force numbers, row number needs to be higher than col
         temp_c = row;
         temp_r = col;

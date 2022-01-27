@@ -5,8 +5,7 @@ All_Forces = [];
 
 loop = size(model,1);
 for n = 1 : loop
-    col = floor(model(n, 5)/10);                             %block number of collums
-    row = round(10*((model(n, 5)/10)-floor(model(n, 5)/10))); %block number of rows
+    [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
     bc(col,row) = 1;
 end
 

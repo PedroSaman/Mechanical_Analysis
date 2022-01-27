@@ -12,8 +12,7 @@ bc = zeros(9,9);
 for n = 1 : loop
    if(model(n, 4) == 1)
        count = count + 1; %Count the number of blocks in the first stage
-       col = floor(model(n, 5)/10);                             %block number of collums
-       row = round(10*((model(n, 5)/10)-floor(model(n, 5)/10))); %block number of rows
+       [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
        if(bc(col,row) == 0) %If this is the 1st time this block type appears
            bc(col,row) = 1;
            Pf = force_position(col,row,"fnz");
