@@ -1,6 +1,10 @@
 function y = putcolor(model)
-%�u���b�N���f���f�[�^�ɐF����^����
-%22 => 1, 12 => 2, 21 => 3, 11 => 4
+%Put up colors to the model loaded, this function is manual used to make
+%the blocks in the future simulations more recognizable. Also add to the
+%model matrix a collum with the block number.
+%input: model:(x, y, z, block_type)
+%output: y:(BlockNo., x, y, z, type, color)
+
 y = model;
 k = size(y);
 number = 1:1:k(1); 
