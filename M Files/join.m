@@ -1,6 +1,7 @@
 function y = join(knobs, line)
 %Find which knobs are snaped togheter. The order in the output vector is in regard to the upper block numeration
-%input: knobs: information of all knobs in the block model. (x,y,z,block_type,color,block_number,knob_index)
+%This function is working for up to 9x9 blocks
+%input: knobs: (x,y,z,block_type,color,block_number,knob_index)
 %       line = (layer number)
 %output: y = (*,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
 %        *: Number of other pair of snaped togheter knobs that are from the same block as the first pair

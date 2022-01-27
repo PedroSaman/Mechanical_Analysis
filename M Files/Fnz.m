@@ -1,8 +1,9 @@
 function Fnz = Fnz(join)
 %Find the normal forces position in the z axis of blocks that are in the second layer of higher of the block model in regard to its own coordinate axis.
+%This function is working for up to 9x9 blocks (remove part is missing)
 %input: join:(*,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
-%        *: Number of other pair of snaped togheter knobs that are from the same block as the first pair
-%output: Fnz:(Force_Number, Block_Number 1, Knob_Number 1, x1, y1, z1, 1, Block_Number 2, Knob_Number 2, x2, y2, z2, -1)
+%        *: Number of other pair of snaped togheter knobs that are from the same upper and lower blocks
+%output: Fnz:(Force_Number, Block_Number 1, 0, x1, y1, z1, 1, Block_Number 2, 0, x2, y2, z2, -1)
 
 loop = size(join,1);
 All_Forces = [];
