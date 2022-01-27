@@ -10,52 +10,16 @@ All_Forces = [];
 bc = zeros(9,9);
 for n = 1 : loop %Search every block type that exist in the join input to add to All_Forces matrix
     %Upper Block
-    col = floor(join(n, 2)/10);                               %block number of collums
-    row = round(10*((join(n, 2)/10)-floor(join(n, 2)/10)));   %block number of rows
+    [col,row] = col_row_converter(join(n, 2));
     if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
         bc(col,row) = 1; %Mark as visited
-        Pnz = force_position(col,row,"fnz"); %Load the forces
-        count = 1;
-        for i = 1 : col %Find all combination of different forces that exist in a block and add a identifier in the All_Forces matrix
-            for j = 1 : row 
-                for l = 0 : col
-                    if(i+l > col) 
-                        break;
-                    end
-                    for k = 0 : row
-                        if(k+j > row) 
-                            break;
-                        end
-                        All_Forces = [All_Forces;Pnz(count:count+3,:),[10*col+row;10*(l+1)+i+l;10*(k+1)+j+k;0]]; %Add the force to the matrix with block type and adjoin type information
-                        count = count + 4;
-                    end
-                end
-            end
-        end
+        All_Forces = [All_Forces;force_position(col,row,"fnz")];
     end
     %Lower Block
-    col = floor(join(n, 5)/10);                             %block number of collums
-    row = round(10*((join(n, 5)/10)-floor(join(n, 5)/10))); %block number of rows
+    [col,row] = col_row_converter(join(n, 5));
     if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
         bc(col,row) = 1; %Mark as visited
-        Pnz = force_position(col,row,"fnz"); %Load the forces
-        count = 1;
-        for i = 1 : col %Find all combination of different forces that exist in a block and add a identifier in the All_Forces matrix
-            for j = 1 : row 
-                for l = 0 : col
-                    if(i+l > col)
-                        break;
-                    end
-                    for k = 0 : row
-                        if(k+j > row)
-                            break;
-                        end
-                        All_Forces = [All_Forces;Pnz(count:count+3,:),[10*col+row;10*(l+1)+i+l;10*(k+1)+j+k;0]]; %Add the force to the matrix with block type and adjoin type information
-                        count = count + 4;
-                    end
-                end
-            end
-        end
+        All_Forces = [All_Forces;force_position(col,row,"fnz")];
     end
 end
 
@@ -76,9 +40,9 @@ count = 1;
 while(n <= loop) %Add to Fnz the correct force position of blocks touching in the Z axis
     
     upper_type = join(n, 2); %Upper block type
-    upper_row = round(10*((upper_type/10)-floor(upper_type/10))); %Upper block number of rows
+    [~,upper_row] = col_row_converter(upper_type);%Upper block number of rows
     lower_type = join(n, 5); %Lower block_type
-    lower_row = round(10*((lower_type/10)-floor(lower_type/10))); %Lower block number of rows
+    [~,lower_row] = col_row_converter(lower_type);%Lower block number of rows
     same_pair = join(n,1); %How many knobs share the same pair of connecting blocks
     upper_knob_1 = join(n, 4); %First upper knob_index
     upper_knob_2 = join(n+same_pair-1, 4); %Last upper knob_index

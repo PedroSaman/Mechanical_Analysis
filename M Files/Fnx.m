@@ -22,39 +22,17 @@ else
     for n = 1 : nx %for every adjoin block duo
         
         %First Block
-        col = floor(adjoin(n, 3)/10);                               %block number of collums
-        row = round(10*((adjoin(n, 3)/10)-floor(adjoin(n, 3)/10))); %block number of rows
+        [col,row] = col_row_converter(adjoin(n, 3)); %block number of collums and rows
         if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix
             bc(col,row) = 1; %Mark as visited
-            Pnx = force_position(col,row,"fnx"); %Load the forces
-            count = 1;
-            for i = 1 : row %Iterate every set of 4 forces (every kind of normal force comes in sets of 4)
-                for j = 1 : row 
-                    if(j<i)
-                        continue;
-                    end
-                    All_Forces = [All_Forces;Pnx(count:count+3,:),[10*col+row;10*i+j;0;0]]; %Add the force to the matrix with block type and adjoin type information
-                    count = count + 4;
-                end
-            end
+            All_Forces = [All_Forces;force_position(col,row,"fnx")];
         end
         
         %Second Block
-        col = floor(adjoin(n, 5)/10);                               %block number of collums
-        row = round(10*((adjoin(n, 5)/10)-floor(adjoin(n, 5)/10))); %block number of rows
+        [col,row] = col_row_converter(adjoin(n, 5)); %block number of collums and rows
         if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix
             bc(col,row) = 1; %Mark as visited
-            Pnx = force_position(col,row,"fnx"); %Load the forces
-            count = 1;
-            for i = 1 : row %Iterate every set of 4 forces (every kind of normal force comes in sets of 4)
-                for j = 1 : row 
-                    if(j<i)
-                        continue;
-                    end
-                    All_Forces = [All_Forces;Pnx(count:count+3,:),[10*col+row;10*i+j;0;0]]; %Add the force to the matrix with block type and adjoin type information
-                    count = count + 4;
-                end
-            end
+            All_Forces = [All_Forces;force_position(col,row,"fnx")];
         end
     end
    

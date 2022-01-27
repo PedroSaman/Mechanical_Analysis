@@ -15,7 +15,7 @@ function FP = force_position(col,row,force_type)
 if(force_type == "fnx")
     force_index = 1; %force index in FP matrix
     sum_row=row*(1+row)/2; %number of terms (optimization)
-    FP = zeros(sum_row,3); %preallocation (optimization)
+    FP = zeros(sum_row,4); %preallocation (optimization)
     
     for i=0:row %first of the force pair
         for j=1:row %second of the force pair
@@ -27,14 +27,14 @@ if(force_type == "fnx")
             f2 = 4*[col/2,j-row/2];
             
             %Adding z axis value to f
-            FP(force_index:force_index+3,:) = [[f1,-1.5];[f2,-1.5];[f1,1.5];[f2,1.5]];
+            FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+j];[f1,1.5,0];[f2,1.5,0]];
             force_index = force_index + 4;
         end
     end  
 elseif(force_type == "fny")
     force_index = 1; %force index in FP matrix
     sum_col=col*(1+col)/2; %number of terms (optimization)
-    FP = zeros(sum_col,3); %preallocation (optimization)
+    FP = zeros(sum_col,4); %preallocation (optimization)
     
     for i=0:col %first of the force pair
         for j=1:col %second of the force pair
@@ -45,8 +45,8 @@ elseif(force_type == "fny")
             f1 = 4*[i-col/2,row/2];
             f2 = 4*[j-col/2,row/2];
             
-            %Adding z axis value to f
-            FP(force_index:force_index+3,:) = [[f1,-1.5];[f2,-1.5];[f1,1.5];[f2,1.5]];
+            %Adding z axis value to f [10*col+row;10*i+j;0;0]
+            FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+j];[f1,1.5,0];[f2,1.5,0]];
             force_index = force_index + 4;
         end
     end
@@ -54,7 +54,7 @@ elseif(force_type == "fnz")
     force_index = 1; %force index in FP matrix
     sum_row=row*(1+row)/2; %number of terms in Y axis (optimization)
     sum_col=col*(1+col)/2; %number of terms in X axis (optimization)
-    FP = zeros(2*sum_row*sum_col,3); %preallocation (optimization)
+    FP = zeros(2*sum_row*sum_col,4); %preallocation (optimization)
 
     for i=1:col %increases the block size in the X axis
         for j=1:row %increases the block size in the Y axis
@@ -79,7 +79,7 @@ elseif(force_type == "fnz")
                     f4 = 4*[f4(1)-col/2,f4(2)-row/2];
 
                     %Adding z axis value to f
-                    FP(force_index:force_index+3,:) = [[f1,1.5];[f2,1.5];[f3,1.5];[f4,1.5]];
+                    FP(force_index:force_index+3,:) = [[f1,1.5,10*col+row];[f2,1.5,10*(l+1)+i+l];[f3,1.5,10*(k+1)+j+k];[f4,1.5,0]];
                     force_index = force_index + 4;
                 end
             end
