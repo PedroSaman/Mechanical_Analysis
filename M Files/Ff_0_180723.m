@@ -10,23 +10,50 @@ function Ff = Ff_0_180723(model)
 %touching the entire block. a "_" after the Pf, mean that this position is 
 %the negative one.
 
-All_Forces = block_loader(model);
+All_Forces = [];
+bc = zeros(9,9);
 loop = size(model,1);
 count = 0;
-for n = 1 : loop %Count the number of blocks in the first stage
-   if(model(n, 4) == 1)
-       count = count + 1;
-   else
+for n = 1 : loop %Count the number of frictional forces for each connecting convex part
+    if(model(n, 4) == 1)
+        count = count + 1;
+        [col,row] = col_row_converter(model(n, 5));
+        if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
+            bc(col,row) = 1; %Mark as visited
+            All_Forces = [All_Forces;force_position(col,row,"ff")];
+        end
+    else
        break;
-   end
+    end
 end
 
 force = 1;
-max_force_number = 40; %Maximum number of forces that can appear in a block. (for a 2x4 block is 40)
+max_force_number = 80; %Maximum number of forces that can appear in a block. (for a 2x9 block is 80)
 F = zeros(count*max_force_number, 13);
 F(1:(count*max_force_number), 1) = 1: (count*max_force_number);  %Force Number
 for n = 1 : count %for each block in the 1st layer
     [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+    i = 1;
+    while(i<size(All_Forces,1))
+        if(model(n, 5) == All_Forces(i,4))
+            start = force;
+            j = 1;
+            while(j <= col*row)
+                force_number = All_Forces(i+2,4) - 1;
+                F(start:start+force_number, 4:5) = All_Forces(i:i+force_number,1:2); %Force X and Y Position
+                F(start:start+force_number, 6) = -All_Forces(i:i+force_number,3);
+                F(start:start+force_number,2) = model(n, 1); %Block Number
+                
+                start = start + force_number + 1;
+                j = j + 1;
+                i = i + 4;
+            end
+            
+            break;
+        end
+        i = i + 4;
+    end
+
     if(col > row) %To correctly count the force numbers, row number needs to be higher than col
         temp_c = row;
         temp_r = col;
@@ -44,14 +71,11 @@ for n = 1 : count %for each block in the 1st layer
         for j = 1:temp_r
             if(j == 1 || j == temp_r) %the first and the last knob in a row have 6 friction forces
                 block_force = block_force + 6;
-                
             else
                 block_force = block_force + 4; %the other ones have 4 friction forces
             end
         end
     end
-    
-    F(force:force+block_force-1,2) = model(n, 1);  %Block Number
     
     counter = 0; 
     if(col<=row) %Knob Number
@@ -95,21 +119,8 @@ for n = 1 : count %for each block in the 1st layer
            end
         end
     end
-    F(force+block_force/2:force+block_force,3:4:7) = F(force:force+block_force/2,3:4:7); %double the force coordinate and ub/lb information 
-                                                                                         %(for the second force in each position)
-    i = 1;
-    while(i < size(All_Forces,1)) %Force Coordinates
-        %Iterate the All_Forces matrix to find the current block force
-        %coordinate information
-        if(All_Forces(i,4) == model(n, 5)) 
-            F(force:(force+All_Forces(i+1,4)-1), 4:6) = All_Forces(i:i+(All_Forces(i+1,4))-1,1:3); %Coordinate z = -1.5
-            F((force+All_Forces(i+1,4)):(force+2*All_Forces(i+1,4)-1), 4:6) = All_Forces(i:i+(All_Forces(i+1,4))-1,1:3);  
-            F((force+All_Forces(i+1,4)):(force+2*All_Forces(i+1,4)-1), 6) = -0.5 * ones(All_Forces(i+1,4), 1);  %Cordinate z = -0.5
-            break;
-        end
-        i = i + All_Forces(i+1,4);
-    end
-   
+    F(force+block_force/2:force+block_force,2:7) = F(force:force+block_force/2,2:7); %Double the vector
+    F(force+block_force/2:force+block_force,6) = -0.5;
     force = force + block_force; %Update force value
 end
 
