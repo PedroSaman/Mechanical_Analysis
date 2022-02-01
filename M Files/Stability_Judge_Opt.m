@@ -8,7 +8,7 @@ T=70*g;  %Maximum static friction force of one set of convex part
 M=2/60; %Mass of a 1x1 block
 
 %% Load the block model data
-filename = '../Dat Files/fail_30.dat' %Specify the data file name
+filename = '../Dat Files/tower.dat' %Specify the data file name
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 
@@ -112,26 +112,24 @@ end
 
 %%Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 for i = 1 : force_f
-   if(((F(i, 4) == -0.75)||(F(i, 4) == 0.75))&&((F(i, 5) == -2)||(F(i, 5) == 2)))
-      if(lb(3*i-2) ~= 0)
-        lb(3*i-2) = -1*T;
-      elseif(lb(3*i-1) ~= 0 )
-        lb(3*i-1) = -1*T;
-      elseif( ub(3*i-1) ~= 0 )
-        ub(3*i-1) = 1*T;
-      elseif( ub(3*i-2) ~= 0 )
-        ub(3*i-2) = 1*T;
-      end
-   end
+    if(F(i, 4) == -0.75) %lb(3*i-2)
+        lb(3*i-2) = -T;
+    elseif(F(i, 4) == 0.75) %ub(3*i-2)
+        ub(3*i-2) = T;
+    elseif(F(i, 5) == -0.75) %lb(3*i-1)
+        lb(3*i-1) = -T;
+    elseif(F(i, 5) == 0.75) %ub(3*i-1)
+        ub(3*i-1) = T;
+    end
 end
-
+%Up too this point the stability judge is working up to 2x9 or 9x2 blocks
 %% Linear inequalities
 % Capacity Ci is evaluated by the number of connecting knobs
 n_knob = size(knobs,1);
 A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 collums is one force.
 b  = ones(n_knob, 1) * T;
 count = 1;  check = 0;
-max_m = 39; %Maximum number of friction forces that can appear in a block -1 (currently 2x4 block with 39)
+max_m = 79; %Maximum number of friction forces that can appear in a block -1 (currently 2x9 block)
 n = 1;
 while(n <= force_f) %for each friction force fill the A matrix
     block_1 = F(n, 2);
