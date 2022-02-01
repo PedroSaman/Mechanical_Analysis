@@ -60,6 +60,21 @@ for n = 1 : loop %for each knob connection
             if(type_1 ~= 11)
                 exclude_knob_1 = All_Forces(i+3,3);
                 exclude_knob_2 = All_Forces(i+3,4);
+                if(exclude_knob_1 == 0 && exclude_knob_2 == 3)
+                    Ff(count:count+2, 7) = [1; 2; -1];
+                elseif(exclude_knob_1 == 0 && exclude_knob_2 == 2)
+                    Ff(count:count+2, 7) = [1; -2; -1];
+                elseif(exclude_knob_1 == 0 && exclude_knob_2 == 4)
+                    Ff(count:count+2, 7) = [1; 2; -2];
+                elseif(exclude_knob_1 == 0 && exclude_knob_2 == 1)
+                    Ff(count:count+2, 7) = [2; -2; -1];
+                elseif(exclude_knob_1 == 1 && exclude_knob_2 == 4)
+                    Ff(count:count+1, 7) = [2; -2];
+                elseif(exclude_knob_1 == 2 && exclude_knob_2 == 3)
+                    Ff(count:count+1, 7) = [1; -1];
+                end
+            else
+                Ff(count:count+3, 7) = [1; 2; -2; -1];
             end
             for j = 0: force_number
                 Ff(count+j, 2:6:8) = join(n, 3:3:6);  %Block No.

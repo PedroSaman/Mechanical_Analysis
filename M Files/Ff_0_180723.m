@@ -79,23 +79,23 @@ for n = 1 : count %for each block in the 1st layer
     
     counter = 0; 
     if(col<=row) %Knob Number
-        for i = 1:col %if the block have more collumns than rows
+        for i = 1:col %if the block have more rows than collumns
             for j = 1:row
                 if(row == 1 && col == 1)
                     F(force+counter:force+counter+3, 3) = ones(1,4); %Knobs that have 4 forces (1x1 blocks)
-                    F(force+counter:force+counter+3, 7) = [10; 20; -20; -10];
+                    F(force+counter:force+counter+3, 7) = [1; 2; -2; -1];
                     counter = counter + 4;
                 elseif(j == 1)
                     F(force+counter:force+counter+2, 3) = [row*(i-1)+j,row*(i-1)+j,row*(i-1)+j]; %Knobs that have 3 forces
-                    F(force+counter:force+counter+2, 7) = [10; 20; -10];
+                    F(force+counter:force+counter+2, 7) = [1; 2; -1];
                     counter = counter + 3;
                 elseif(j == row)
                     F(force+counter:force+counter+2, 3) = [row*(i-1)+j,row*(i-1)+j,row*(i-1)+j]; %Knobs that have 3 forces
-                    F(force+counter:force+counter+2, 7) = [10; -20; -10];
+                    F(force+counter:force+counter+2, 7) = [1; -2; -1];
                     counter = counter + 3;
                 else
                     F(force+counter:force+counter+1, 3) = [row*(i-1)+j,row*(i-1)+j]; %Knobs that have 2 forces
-                    F(force+counter:force+counter+1, 7) = [10; -10];
+                    F(force+counter:force+counter+1, 7) = [1; -1];
                     counter = counter + 2;
                 end
             end
@@ -105,15 +105,15 @@ for n = 1 : count %for each block in the 1st layer
            for j = 1:col
               if(j == 1)
                   F(force+counter:force+counter+2, 3) = [(row*j)+1-1,(row*j)+1-1,(row*j)+1-1]; %Knobs that have 3 forces
-                  F(force+counter:force+counter+2, 7) = [10; 20; -20];
+                  F(force+counter:force+counter+2, 7) = [1; 2; -2];
                   counter = counter + 3;
-              elseif( j == col)
+              elseif(j == col)
                   F(force+counter:force+counter+2, 3) = [(row*j)+1-1,(row*j)+1-1,(row*j)+1-1]; %Knobs that have 3 forces
-                  F(force+counter:force+counter+2, 7) = [20; -20; -10];
+                  F(force+counter:force+counter+2, 7) = [2; -2; -1];
                   counter = counter + 3;
               else
                   F(force+counter:force+counter+1, 3) = [(row*j)+1-1,(row*j)+1-1]; %Knobs that have 2 forces
-                  F(force+counter:force+counter+1, 7) = [20; -20];
+                  F(force+counter:force+counter+1, 7) = [2; -2];
                   counter = counter + 2;
               end
            end
