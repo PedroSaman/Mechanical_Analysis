@@ -26,10 +26,10 @@ end
 
 count = 1;
 join = zeros(count_u, 7); %(1,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
-for n = 1 : (count_u - 1) %for every upper knob found
-    for m = 1 : (count_l - 1) %for every lower knob found
-        if((upper(n, 1) == lower(m, 1)) && (upper(n, 2) == lower(m, 2)) ) %if x and y axis value from the upper knob is equal from the lower knob
-            join(count,  1:7) = [1, upper(n, 4), upper(n, 6:7), lower(m, 4), lower(m, 6:7)];
+for n = 1 : (count_l - 1) %for every upper knob found
+    for m = 1 : (count_u - 1) %for every lower knob found
+        if((lower(n, 1) == upper(m, 1)) && (lower(n, 2) == upper(m, 2))) %if x and y axis value from the upper knob is equal from the lower knob
+            join(count,  1:7) = [1, upper(m, 4), upper(m, 6:7), lower(n, 4), lower(n, 6:7)];
             count = count + 1;
             break
         end
