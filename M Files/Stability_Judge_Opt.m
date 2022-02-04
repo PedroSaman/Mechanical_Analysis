@@ -208,13 +208,9 @@ for n = 1 : N   %for each block in the model
     end
     Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i; %[W1*A1;W2*A2,...,Wn*An]
     %Mass changes depending on block type [b1;b2;...;bn]
-    if(model(n, 5) == 22)
-        beq((6*n - 5) : 6*n, 1) = [0; 0; 4*M*g; 0; 0; 0];
-    elseif((model(n, 5) == 12) || (model(n, 5) == 21))
-        beq((6*n - 5) : 6*n, 1) = [0; 0; 2*M*g; 0; 0; 0];
-    elseif(model(n, 5) == 11)
-        beq((6*n - 5) : 6*n, 1) = [0; 0; M*g; 0; 0; 0];
-    end
+    [col,row] = col_row_converter(model(n, 5));
+    beq((6*n - 5) : 6*n, 1) = [0; 0; col*row*M*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
+    
 end
 %% Solve problem
 f = zeros(3*force+1, 1);
