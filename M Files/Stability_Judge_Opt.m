@@ -122,61 +122,84 @@ for i = 1 : force_f
         ub(3*i-1) = T;
     end
 end
-%Up too this point the stability judge is working up to 2x9 or 9x2 blocks
 %% Linear inequalities
 % Capacity Ci is evaluated by the number of connecting knobs
 n_knob = size(knobs,1);
 A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 collums is one force.
 b  = ones(n_knob, 1) * T;
-count = 1;  check = 0;
-max_m = 79; %Maximum number of friction forces that can appear in a block -1 (currently 2x9 block)
+knob_counter = 1;
 n = 1;
 while(n <= force_f) %for each friction force fill the A matrix
-    block_1 = F(n, 2);
-    block_2 = F(n, 8);
-    n_block = 1;
-
+    force_counter = 0;    
+    type_1 = model(F(n,2),5); %current upper block type    
+    [col,row] = col_row_converter(type_1);
     if(F(n, 8) == 0) %z = 1
-        for m = 1:max_m %Count every force in the current block
-            if(m >= force_f)   ,break;   end
-            if((F(n+m, 2)~=block_1))
-                break;
-            else
-                n_block = n_block + 1;
+        if(type_1 == 11) %special case for 1x1 block
+            A(knob_counter,3*n:3:3*(n+7)) = 1; %Add 4 forces to A and duplicate it
+            knob_counter = knob_counter + 1;   %go to the next knob
+            force_counter = force_counter + 6; %iterate to the next force
+        else
+            starting_knob = knob_counter; %need to store which ware the first knob to later duplicate the A matrix
+            if(row>=col) %if the block is taller than wide or square
+                for i = 1:col %for each collumn
+                    for j = 1:row %for each row
+                        if(j==1 || j==row) %if this knob is from the first or last row
+                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+2)) = 1; %Add 3 forces to A
+                            force_counter = force_counter + 3; %iterate to the next force
+                        else %if this knob is from a middle row
+                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+1)) = 1; %Add 2 forces to A
+                            force_counter = force_counter + 2; %iterate to the next force
+                        end
+                        knob_counter = knob_counter + 1; %go to the next knob
+                    end
+                end
+            else %if the block is wider than tall
+                for j = 1:col %for each collumn
+                    for i = 1:row %for each row
+                        if(j==1 || j==col) %if this is the first or the last collumn
+                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+2)) = 1; %Add 3 forces to A
+                            force_counter = force_counter + 3; %iterate to the next force
+                        else %if this is a middle collumn
+                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+1)) = 1; %Add 2 forces to A
+                            force_counter = force_counter + 2; %iterate to the next force
+                        end
+                        knob_counter = knob_counter + 1; %iterate to the next knob
+                    end
+                end
+            end
+            %Need to double the A matrix as there are pairs of friction
+            %forces
+            A(starting_knob:(knob_counter-1),3*(n+force_counter):3:3*(n+(force_counter)*2-1)) = A(starting_knob:knob_counter-1,3*n:3:3*(n+force_counter-1));
+            force_counter = force_counter*2;
+        end
+    else %z > 1 Here there is no need to duplicate the force aftwards 
+        if(row>=col) %if the block is taller than wide
+            while(F(n+force_counter,2) == F(n,2)) %while in the same block
+                m = F(n+force_counter,3); %store the block number
+                if(rem(m,row) == 1 || rem(m,row) == 0) %if this is the first or the last row
+                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+5)) = 1; %Add 6 forces to A
+                    force_counter = force_counter + 6; %iterate to the next force
+                else %if this is a middle row
+                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+3)) = 1; %Add 4 forces to A
+                    force_counter = force_counter + 4; %iterate to the next force
+                end
+                knob_counter = knob_counter + 1; %iterate to the next knob
+            end
+        else
+            while(F(n+force_counter,2) == F(n,2)) %while in the same block
+                m = F(n+force_counter,3); %store the block number
+                if(m == 1 || m == 2 || m == col*row-1 || m == col*row) %if this is the first or the last row
+                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+5)) = 1; %Add 6 forces to A
+                    force_counter = force_counter + 6; %iterate to the next force
+                else %if this is a middle row
+                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+3)) = 1; %Add 4 forces to A
+                    force_counter = force_counter + 4; %iterate to the next force
+                end
+                knob_counter = knob_counter + 1; %iterate to the next knob
             end
         end
-        
-        if(n_block==8) %1x1 block
-            A(count+1,3*n:3:3*(n+7)) = 1;
-            count = count + 1;
-        elseif(n_block==12) %1x2 or 2x1 block
-            A(count+1,3*n:3:3*(n+2))     = 1; A(count+1,3*(n+6):3:3*(n+8))  = 1;
-            A(count+2,3*(n+3):3:3*(n+5)) = 1; A(count+2,3*(n+9):3:3*(n+11)) = 1;
-            count = count + 2;
-        elseif(n_block==24) %2x2 block
-            A(count+1,3*n:3:3*(n+2))      = 1; A(count+1,3*(n+12):3:3*(n+14)) = 1;
-            A(count+2,3*(n+3):3:3*(n+5))  = 1; A(count+2,3*(n+15):3:3*(n+17)) = 1;
-            A(count+3,3*(n+6):3:3*(n+8))  = 1; A(count+3,3*(n+18):3:3*(n+20)) = 1;
-            A(count+4,3*(n+9):3:3*(n+11)) = 1; A(count+4,3*(n+21):3:3*(n+23)) = 1;
-            count = count + 4;
-        end
-    else %z ~= 1
-        for m = 1:max_m %Count every force in the current block
-            if(m >= force_f)   ,break;   end
-            if((F(n+m, 2)~=block_1))
-                break;
-            else
-                n_block = n_block + 1;
-            end
-        end
-        if(n_block == 8) %upper block is 1x1
-            A(count+1,3*n:3:3*(n+7)) = 1;
-        elseif(n_block == 6) %upper block is not a 1x1
-            A(count+1,3*n:3:3*(n+5)) = 1;
-        end
-        count = count + 1;
     end
-    n = n + n_block;
+    n = n + force_counter; %update n value
 end
 A(1:n_knob, 3*force+1) = -1; %Only the last collum of the A matrix
 
@@ -187,6 +210,8 @@ for n = 1 : N   %for each block in the model
     K_i = zeros(3, 3*force+1); %This is the upper portion of the "Wj" matrix from the formulation
     p_i = zeros(force, 3); %This is all the "pk" vectors from the formulation into one matrix
     PN_i = eye(3*force + 1); %This is the "A" matrix from the formulation. (A = diag(A1,A2,...,An))
+                             %Here the Zero matrix inside A, case the kth force does not appear in 
+                             %the block is not in A but in Wj.
     for m = 1 : force 
        if(F(m, 2) == n) %if the current force first block is the current one
            K_i(1:3, (3*m - 2):3*m) = eye(3); %Force Balance 
