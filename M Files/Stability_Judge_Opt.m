@@ -137,7 +137,7 @@ while(n <= force_f) %for each friction force fill the A matrix
         if(type_1 == 11) %special case for 1x1 block
             A(knob_counter,3*n:3:3*(n+7)) = 1; %Add 4 forces to A and duplicate it
             knob_counter = knob_counter + 1;   %go to the next knob
-            force_counter = force_counter + 6; %iterate to the next force
+            force_counter = force_counter + 8; %iterate to the next force
         else
             starting_knob = knob_counter; %need to store which ware the first knob to later duplicate the A matrix
             if(row>=col) %if the block is taller than wide or square
