@@ -4,11 +4,11 @@ clear; clc; tic;
 
 %% constant numbers
 g = 9.81;
-T=70*g;  %Maximum static friction force of one set of convex part
-M=2/60; %Mass of a 1x1 block
+T= 70*g;  %Maximum static friction force of one set of convex part
+M= 2/60; %Mass of a 1x1 block
 
 %% Load the block model data
-filename = '../Dat Files/tower.dat' %Specify the data file name
+filename = '../Dat Files/Pedro Functionality Tests/Dat_Tests/23 - Heavy4LayerBetterBridge.dat'; %Specify the data file name
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 
@@ -139,7 +139,7 @@ while(n <= force_f) %for each friction force fill the A matrix
             knob_counter = knob_counter + 1;   %go to the next knob
             force_counter = force_counter + 8; %iterate to the next force
         else
-            starting_knob = knob_counter; %need to store which ware the first knob to later duplicate the A matrix
+            starting_knob = knob_counter; %need to store which knonb were the first one to later duplicate the A matrix
             if(row>=col) %if the block is taller than wide or square
                 for i = 1:col %for each collumn
                     for j = 1:row %for each row
@@ -173,7 +173,11 @@ while(n <= force_f) %for each friction force fill the A matrix
             force_counter = force_counter*2;
         end
     else %z > 1 Here there is no need to duplicate the force aftwards 
-        if(row>=col) %if the block is taller than wide
+        if(type_1 == 11) %special case for 1x1 block
+            A(knob_counter,3*n:3:3*(n+7)) = 1; %Add 4 forces to A and duplicate it
+            knob_counter = knob_counter + 1;   %go to the next knob
+            force_counter = force_counter + 8; %iterate to the next force
+        elseif(row>=col) %if the block is taller than wide
             while(F(n+force_counter,2) == F(n,2)) %while in the same block
                 m = F(n+force_counter,3); %store the block number
                 if(rem(m,row) == 1 || rem(m,row) == 0) %if this is the first or the last row
@@ -199,7 +203,11 @@ while(n <= force_f) %for each friction force fill the A matrix
             end
         end
     end
+    
     n = n + force_counter; %update n value
+    if(knob_counter == 83)
+        n = n;
+    end
 end
 A(1:n_knob, 3*force+1) = -1; %Only the last collum of the A matrix
 
@@ -235,15 +243,15 @@ for n = 1 : N   %for each block in the model
     %Mass changes depending on block type [b1;b2;...;bn]
     [col,row] = col_row_converter(model(n, 5));
     beq((6*n - 5) : 6*n, 1) = [0; 0; col*row*M*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
-    
 end
+
 %% Solve problem
 f = zeros(3*force+1, 1);
 f((3*force + 1), 1) = 1;
 [x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Linear programming problem
 if(~isempty(x))
     fprintf('Solution found');
-    XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]  %Force acting on the block model 
+    XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
     CM = -x(3*force+1) %Capacity CM 
 else
     fprintf('No feasible solution found \n');
