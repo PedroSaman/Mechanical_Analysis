@@ -4,8 +4,8 @@ clear; clc; tic;
 
 %% constant numbers
 g = 9.81;
-T= 70*g;  %Maximum static friction force of one set of convex part
-M= 2/60; %Mass of a 1x1 block
+T = 70*g;  %Maximum static friction force of one set of convex part
+M = 2/60; %Mass of a 1x1 block
 
 %% Load the block model data
 filename = '../Dat Files/Pedro Functionality Tests/Dat_Tests/23 - Heavy4LayerBetterBridge.dat'; %Specify the data file name
@@ -122,6 +122,7 @@ for i = 1 : force_f
         ub(3*i-1) = T;
     end
 end
+
 %% Linear inequalities
 % Capacity Ci is evaluated by the number of connecting knobs
 n_knob = size(knobs,1);
