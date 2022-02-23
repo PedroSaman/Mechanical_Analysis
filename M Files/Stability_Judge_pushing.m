@@ -1,45 +1,43 @@
 %% Stability_Judg_pushing.m
-% ƒuƒƒbƒNƒ‚ƒfƒ‹‚Ì—ÍŠw‰ğÍ(ƒuƒƒbƒN‘}“ü‚ÌuŠÔ)
-tic; %ŠÔŒv‘ªƒXƒ^[ƒg
-%% constant number
-g = 9.81; %d—Í‰Á‘¬“x
-T=70*g;  %1‘g‚Ì“Ê•”‚ğÚ‘±‚·‚é‚Ì‚É•K—v‚È—Í(Å‘åÃ~–€C—Í)
-M=2/15; %2*2ƒuƒƒbƒN‚Ì¿—Ê
-%% ƒuƒƒbƒNƒ‚ƒfƒ‹‚Ìƒf[ƒ^‚ğ“Ç‚İ‚İ
-%   ¨ model_original = (x, y, z, type)
-filename = 'D_5.dat'
-model_original = feval('load',filename);
-%% Fî•ñ‚ğ’Ç‰Á % 22 => 1, 12 => 2, 21 => 3, 11 => 4
-%   ¨ model = (BlockNo., x, y, z, type, color)
-model = putcolor(model_original);
-%% Fî•ñ•t‚«‚Ìƒf[ƒ^‚ğ“ü—Í
-% model = feval('load',filename);
-% model = putnumber(model);
-%% ƒuƒƒbƒNƒ‚ƒfƒ‹ƒf[ƒ^ÅIs‚ÌƒuƒƒbƒN‚ğ‘}“ü
-SIZE = size(model);  N = SIZE(1);
-% ‰Ÿ‚µ‚İ—Í‚Ì‰Á‚í‚éƒuƒƒbƒN‚Ì”Ô†C‰Ÿ‚µ‚Ü‚ê‚é‚±‚Æ‚ÅƒuƒƒbƒN‚É‰Á‚í‚é—Í‚Æƒ‚[ƒƒ“ƒg‚ğ’²‚×‚é
-%   ¨ b_push = (Block_No., Fx, Fy, Fz, Mx, My, Mz)
+
+clear; clc; tic;
+
+%% constant numbers
+g = 9.81;
+T= 70*g;  %Maximum static friction force of one set of convex part
+M= 2/60; %Mass of a 1x1 block
+
+%% Load the block model data
+filename = '../Dat Files/Pedro Functionality Tests/Dat_Tests/23 - Heavy4LayerBetterBridge.dat'; %Specify the data file name
+model_original = load(filename); % model_original = (x, y, z, type)
+model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
+
+%% Model and knobs information
+N = size(model,1); %Total number of blocks
+z_max = lines(model); % Structure height
+knobs = knob(model,0); % Knobs information (entire block model)
+
+% ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ—Í‚Ì‰ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½Ì”Ôï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½é‚±ï¿½Æ‚Åƒuï¿½ï¿½ï¿½bï¿½Nï¿½É‰ï¿½ï¿½ï¿½ï¿½Í‚Æƒï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ğ’²‚×‚ï¿½
+%   ï¿½ï¿½ b_push = (Block_No., Fx, Fy, Fz, Mx, My, Mz)
 b_push = pushing(model, N);
-%‘}“ü‚·‚éƒuƒƒbƒN‚ğƒuƒƒbƒNƒ‚ƒfƒ‹ƒf[ƒ^‚©‚çíœ
+%ï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½fï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½íœ
 model = model(1:(N - 1), :);
-%% ‘ƒuƒƒbƒN” N, ‚‚³ z_max, “Ê•”î•ñ knobs
+%% ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ N, ï¿½ï¿½ï¿½ï¿½ z_max, ï¿½Ê•ï¿½ï¿½ï¿½ï¿½ knobs
 N = N - 1;
-z_max = lines(model);
-knobs = knob(model);
-%% 1’i–Ú‚©‚ç‡‚ÉƒuƒƒbƒNƒ‚ƒfƒ‹‚É“­‚­—Í‚ğ‹‚ß‚é
-F_nx = [ ];  F_ny = [ ];  %‹ós—ñ
+%% 1ï¿½iï¿½Ú‚ï¿½ï¿½ç‡ï¿½Éƒuï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½fï¿½ï¿½ï¿½É“ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
+F_nx = [ ];  F_ny = [ ];  %ï¿½ï¿½sï¿½ï¿½
 for n = 1 : z_max
-   if(n == 1) % 1’i–Ú
-       %“Ê•” knob_i, —×ÚƒuƒƒbƒN adjoin_i
+   if(n == 1) % 1ï¿½iï¿½ï¿½
+       %ï¿½Ê•ï¿½ knob_i, ï¿½×Úƒuï¿½ï¿½ï¿½bï¿½N adjoin_i
        knob_i = knob_line(model, 1);
        adjoin_i = adjoin(knob_i)
-       %–€C—Í Ff, –@ü—Í Fn
+       %ï¿½ï¿½ï¿½Cï¿½ï¿½ Ff, ï¿½@ï¿½ï¿½ï¿½ï¿½ Fn
        F_f = Ff_0_180723(model);
        F_nz = Fnz_0(model);
-       if(adjoin_i == -1) % —×Ú‚·‚éƒuƒƒbƒN‚È‚µ
+       if(adjoin_i == -1) % ï¿½×Ú‚ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½È‚ï¿½
            F_nx = -1;  F_ny = -1;
            force_nx = 0;  force_ny = 0;
-       else % —×Ú‚·‚éƒuƒƒbƒN‚ ‚è
+       else % ï¿½×Ú‚ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½
            Fnx_i = Fnx(adjoin_i);
            Fny_i = Fny(adjoin_i);
            if(Fnx_i(1) ~= -1)
@@ -55,20 +53,20 @@ for n = 1 : z_max
                force_ny = 0;
            end
        end
-   else % n’i–Ú (n >= 2)
-       %“Ê•” knob_i, —×ÚƒuƒƒbƒN adjoin_i, Ú‘±“Ê•” join_i
+   else % nï¿½iï¿½ï¿½ (n >= 2)
+       %ï¿½Ê•ï¿½ knob_i, ï¿½×Úƒuï¿½ï¿½ï¿½bï¿½N adjoin_i, ï¿½Ú‘ï¿½ï¿½Ê•ï¿½ join_i
        knob_i = knob_line(model, n);
        adjoin_i = adjoin(knob_i);
        join_i = join(knobs, n);
-       %–€C—Í Ff, –@ü—Í Fn
+       %ï¿½ï¿½ï¿½Cï¿½ï¿½ Ff, ï¿½@ï¿½ï¿½ï¿½ï¿½ Fn
        Ff_i = Ff_180723(join_i);
        Fnz_i = Fnz(join_i);
        Fnx_i = Fnx(adjoin_i);
        Fny_i = Fny(adjoin_i);
-       %’Ç‰Á
+       %ï¿½Ç‰ï¿½
        F_f = [F_f; Ff_i];
        F_nz = [F_nz; Fnz_i];
-       if(Fnx_i(1) ~= -1) % —×Ú‚·‚éƒuƒƒbƒN‚ ‚è(x²•ûŒü)
+       if(Fnx_i(1) ~= -1) % ï¿½×Ú‚ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½(xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
            if(force_nx == 0)
                F_nx = Fnx_i;
                force_nx = -1;
@@ -76,7 +74,7 @@ for n = 1 : z_max
                F_nx = [F_nx; Fnx_i];
            end
        end
-       if(Fny_i(1) ~= -1) % —×Ú‚·‚éƒuƒƒbƒN‚ ‚è(y²•ûŒü)
+       if(Fny_i(1) ~= -1) % ï¿½×Ú‚ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½(yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
            if(force_ny == 0)
                F_ny = Fny_i;
                force_ny = -1;
@@ -86,7 +84,7 @@ for n = 1 : z_max
        end
    end
 end
-%% —Í‚Ì”‚ğ‹‚ß‚é
+%% ï¿½Í‚Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
 force_number = size(F_f);  force_f = force_number(1);
 force_number = size(F_nz);  force_nz = force_number(1);
 if((force_nx == 0) && (force_ny == 0))
@@ -104,11 +102,11 @@ else
 end
 force = force_f + force_nx + force_ny + force_nz;
 %% Lower bounds (Ff, Fn)
-lb = -Inf(3*force+1, 1);  % —Í‚Ì” ~ 3 (x, y, z) + ƒLƒƒƒpƒVƒeƒB
+lb = -Inf(3*force+1, 1);  % ï¿½Í‚Ìï¿½ ï¿½~ 3 (x, y, z) + ï¿½Lï¿½ï¿½ï¿½pï¿½Vï¿½eï¿½B
 lb(3:3:3*force_f, 1) = 0;  %Ff(z) > 0
 lb(3*force_f+1:3*force, 1) = 0;  %Fn > 0
 %% Upper bounds (Ff, Fn)
-ub = Inf(3*force+1, 1);  % —Í‚Ì” ~ 3 (x, y, z) + ƒLƒƒƒpƒVƒeƒB
+ub = Inf(3*force+1, 1);  % ï¿½Í‚Ìï¿½ ï¿½~ 3 (x, y, z) + ï¿½Lï¿½ï¿½ï¿½pï¿½Vï¿½eï¿½B
 ub( (3*force_f + 1):3:(3*(force_f+force_nz) - 2), 1) = 0;  %Fnz(x) = 0
 ub( (3*force_f + 2):3:(3*(force_f+force_nz) - 1), 1) = 0;  %Fnz(y) = 0
 ub( (3*(force_f+force_nz) + 2):3:(3*(force_f+force_nz+force_nx) - 1), 1) = 0;  %Fnx(y) = 0
@@ -135,8 +133,8 @@ for i = 1 : force_f
        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0;
        check = 1;
    end
-   if(check == 1) %Fn' ‚ÌŒü‚«(+-)‚Í‚‚³‚ÅŒˆ‚Ü‚é
-      if(F_f(i,8) == 0) %‰º’i‚ª“y‘ä
+   if(check == 1) %Fn' ï¿½ÌŒï¿½ï¿½ï¿½(+-)ï¿½Íï¿½ï¿½ï¿½ï¿½ÅŒï¿½ï¿½Ü‚ï¿½
+      if(F_f(i,8) == 0) %ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½yï¿½ï¿½
           F(i, 7) = -1;
       else
           F(i, 7:6:13) = [-1, 1];
@@ -144,7 +142,7 @@ for i = 1 : force_f
    end
    check = 0;
 end
-%% Fn' ãŒÀ’lİ’è (2*2‚ÌdØ‚è‚Ì‚İ)
+%% Fn' ï¿½ï¿½ï¿½ï¿½lï¿½İ’ï¿½ (2*2ï¿½Ìdï¿½Ø‚ï¿½Ì‚ï¿½)
 for i = 1 : force_f
    if( ((F(i, 4) == -0.75)||(F(i, 4) == 0.75))&&((F(i, 5) == -2)||(F(i, 5) == 2)) )
       if( lb(3*i-2) ~= 0 )
@@ -158,11 +156,11 @@ for i = 1 : force_f
       end
    end
 end
-% ã‰ºŒÀ’l Šm”F—p LB, UB
+% ï¿½ã‰ºï¿½ï¿½ï¿½l ï¿½mï¿½Fï¿½p LB, UB
 LB = [lb(1:3:3*force_f-2), lb(2:3:3*force_f-1), lb(3:3:3*force_f)];
 UB = [ub(1:3:3*force_f-2), ub(2:3:3*force_f-1), ub(3:3:3*force_f)];
 %% Linear inequalities
-% ƒLƒƒƒpƒVƒeƒBCi‚ğ•]‰¿‚·‚é‚Ì‚ÍÚ‘±“Ê•”‚Ì”
+% ï¿½Lï¿½ï¿½ï¿½pï¿½Vï¿½eï¿½BCiï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ÍÚ‘ï¿½ï¿½Ê•ï¿½ï¿½Ìï¿½
 SIZE = size(knobs);  n_knob = SIZE(1);
 A = zeros(n_knob, 3*force+1);
 b  = ones(n_knob, 1) * T;
@@ -182,13 +180,13 @@ for n = 1 : force_f
                 n_block = n_block + 1;
             end
         end
-        if(n_block == 8) %“Ê 1
+        if(n_block == 8) %ï¿½ï¿½ 1
             A(count, 3*n : 3 : 3*n+21) = 1;
             check = 8;  count = count + 1;
-        elseif(n_block == 6) %“Ê 1
+        elseif(n_block == 6) %ï¿½ï¿½ 1
             A(count, 3*n : 3 : 3*n+15) = 1;
             check = 6;  count = count + 1;
-        elseif(n_block == 12) %“Ê 2
+        elseif(n_block == 12) %ï¿½ï¿½ 2
             if(F(n, 8) == 0) % z = 1
                 A(count, 3*n : 3 : 3*(n+2)) = 1;        A(count, 3*(n+6) : 3 : 3*(n+8)) = 1;
                 A(count+1, 3*(n+3) : 3 : 3*(n+5)) = 1;  A(count+1, 3*(n+9) : 3 : 3*(n+11)) = 1;
@@ -197,7 +195,7 @@ for n = 1 : force_f
                  A(count+1, 3*n+18 : 3 : 3*n+33) = 1;
             end
             check = 12;  count = count + 2;
-        elseif(n_block == 24) %“Ê 4
+        elseif(n_block == 24) %ï¿½ï¿½ 4
             if(F(n, 8) == 0) % z = 1
                 A(count, 3*n : 3 : 3*(n+2)) = 1;        A(count, 3*(n+12) : 3 : 3*(n+14)) = 1;
                 A(count+1, 3*(n+3) : 3 : 3*(n+5)) = 1;  A(count+1, 3*(n+15) : 3 : 3*(n+17)) = 1;
@@ -218,35 +216,35 @@ A( 1 : n_knob, 3*force+1) = -1;
 %% Linear equalities
 Aeq = zeros(6*N, 3*force+1);
 beq = zeros(6*N, 1);
-for n = 1 : N   % n”Ô–ÚƒuƒƒbƒN‚É‚Â‚¢‚Ä’²‚×‚é
+for n = 1 : N   % nï¿½Ô–Úƒuï¿½ï¿½ï¿½bï¿½Nï¿½É‚Â‚ï¿½ï¿½Ä’ï¿½ï¿½×‚ï¿½
     K_i = zeros(3, 3*force+1);
     p_i = zeros(force, 3);
     PN_i = eye(3*force + 1);
-    for m = 1 : force   % n”Ô–ÚƒuƒƒbƒN‚É“­‚­—Í‚ª‚ ‚ê‚Î‚Â‚è‡‚¢®‚É’Ç‰Á
+    for m = 1 : force   % nï¿½Ô–Úƒuï¿½ï¿½ï¿½bï¿½Nï¿½É“ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½Î‚Â‚è‡ï¿½ï¿½ï¿½ï¿½ï¿½É’Ç‰ï¿½
        if(F(m, 2) == n)
-           K_i(1:3, (3*m - 2):3*m) = eye(3);   % —Í‚Ì‚Â‚è‡‚¢
-           p_i(m, 1 : 3) = F(m, 4:6);   % n“_À•W
+           K_i(1:3, (3*m - 2):3*m) = eye(3);   % ï¿½Í‚Ì‚Â‚è‡ï¿½ï¿½
+           p_i(m, 1 : 3) = F(m, 4:6);   % ï¿½nï¿½_ï¿½ï¿½ï¿½W
            P_i = zeros(3, 3*force + 1);
-           for l = 3 : 3 : 3*force   % ƒ‚[ƒƒ“ƒg‚Ì‚Â‚è‡‚¢
+           for l = 3 : 3 : 3*force   % ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Ì‚Â‚è‡ï¿½ï¿½
                P_i(1:3, (l-2):l) = [0, -p_i(l/3, 3), p_i(l/3, 2); p_i(l/3, 3), 0, -p_i(l/3, 1); -p_i(l/3, 2), p_i(l/3, 1), 0];
            end
-           if(F(m, 7) == -1)   %—Í‚ÌŒü‚«‚ğC³
+           if(F(m, 7) == -1)   %ï¿½Í‚ÌŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½
                PN_i((3*m - 2) : 3*m, (3*m - 2) : 3*m) = -eye(3);
            end
        elseif(F(m, 8) == n)
-           K_i(1:3, (3*m - 2):3*m) = eye(3);   % —Í‚Ì‚Â‚è‡‚¢
-           p_i(m, 1 : 3) = F(m, 10:12);   % n“_À•W
+           K_i(1:3, (3*m - 2):3*m) = eye(3);   % ï¿½Í‚Ì‚Â‚è‡ï¿½ï¿½
+           p_i(m, 1 : 3) = F(m, 10:12);   % ï¿½nï¿½_ï¿½ï¿½ï¿½W
            P_i = zeros(3, 3*force + 1);
-           for l = 3 : 3 : 3*force   % ƒ‚[ƒƒ“ƒg‚Ì‚Â‚è‡‚¢
+           for l = 3 : 3 : 3*force   % ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Ì‚Â‚è‡ï¿½ï¿½
                P_i(1:3, (l-2):l) = [0, -p_i(l/3, 3), p_i(l/3, 2); p_i(l/3, 3), 0, -p_i(l/3, 1); -p_i(l/3, 2), p_i(l/3, 1), 0];
            end
-           if(F(m, 13) == -1)   %—Í‚ÌŒü‚«‚ğC³
+           if(F(m, 13) == -1)   %ï¿½Í‚ÌŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½
                PN_i((3*m - 2) : 3*m, (3*m - 2) : 3*m) = -eye(3);
            end
        end
     end
     Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i;
-    % type‚É‚æ‚Á‚Ä¿—Ê‚ª•Ï‚í‚é
+    % typeï¿½É‚ï¿½ï¿½ï¿½Äï¿½ï¿½Ê‚ï¿½ï¿½Ï‚ï¿½ï¿½
     if(model(n, 5) == 22)
         beq((6*n - 5) : 6*n, 1) = [0; 0; M*g; 0; 0; 0];
     elseif((model(n, 5) == 12) || (model(n, 5) == 21))
@@ -255,12 +253,12 @@ for n = 1 : N   % n”Ô–ÚƒuƒƒbƒN‚É‚Â‚¢‚Ä’²‚×‚é
         beq((6*n - 5) : 6*n, 1) = [0; 0; M*g/4; 0; 0; 0];
     end
 end
-%% ‰Ÿ‚µ‚İ—Í‚¨‚æ‚Ñƒ‚[ƒƒ“ƒg‚ğ beq ‚É’Ç‰Á
+%% ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ—Í‚ï¿½ï¿½ï¿½Ñƒï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ beq ï¿½É’Ç‰ï¿½
 SIZE = size(b_push);
-N_push = SIZE(1);   % ‰Ÿ‚µ‚İ—Í‚Ì‰Á‚í‚éƒuƒƒbƒN‚Ì”
+N_push = SIZE(1);   % ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ—Í‚Ì‰ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½Ìï¿½
 for n = 1 : N_push
-    pbn = b_push(n, 1);   % ‰Ÿ‚µ‚İ—Í‚Ì‰Á‚í‚éƒuƒƒbƒN‚Ì”Ô†
-    b_push(n, 4) = b_push(n, 4) + beq(6*pbn-3);   % ‰Ÿ‚µ‚İ—Í + d—Í
+    pbn = b_push(n, 1);   % ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ—Í‚Ì‰ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½Ì”Ôï¿½
+    b_push(n, 4) = b_push(n, 4) + beq(6*pbn-3);   % ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ—ï¿½ + ï¿½dï¿½ï¿½
     b_dummy = b_push(n, 2:7).';
     beq(6*pbn-5 : 6*pbn) = b_dummy;
 end
@@ -268,7 +266,7 @@ beq;
 %% Solve problem
 f = zeros(3*force+1, 1);
 f((3*force + 1), 1) = 1;
-[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub)  %üŒ`Œv‰æ–â‘è
-XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]  %ƒuƒƒbƒNƒ‚ƒfƒ‹‚É“­‚­—Í
-CM = x(3*force+1) %ƒLƒƒƒpƒVƒeƒBCM
-time = toc  %Œv‘ªŠÔ•\¦
+[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub)  %ï¿½ï¿½ï¿½`ï¿½vï¿½ï¿½ï¿½ï¿½
+XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]  %ï¿½uï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½fï¿½ï¿½ï¿½É“ï¿½ï¿½ï¿½ï¿½ï¿½
+CM = x(3*force+1) %ï¿½Lï¿½ï¿½ï¿½pï¿½Vï¿½eï¿½BCM
+time = toc  %ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½Ô•\ï¿½ï¿½
