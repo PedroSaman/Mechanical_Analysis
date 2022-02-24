@@ -1,9 +1,13 @@
 function beq = pushing(model, N)
-% beq = (Block_Number, Fx, Fy, Fz, Mx, My, Mz)
-% 押し込み力の加わるブロックの番号，押し込まれることでブロックに加わる力とモーメント
-% 押し込まれるブロックの個数が N_push ならば beq は大きさ (N_push × 7) の行列
-%% constant number
+%
+%input: model:(block_number, x, y, z, Block_type, color)
+%       N:(Number of blocks of model) 
+%output: beq:(Block_Number, Fx, Fy, Fz, Mx, My, Mz)
+
+%% constant numbers
 g = 9.81; T=70*g;
+
+%Not generic LOOK AT THIS
 % 1*1
 pf1 = [-1.25,     0, 1.5];  pf2 = [    0, -1.25, 1.5];  pf3 = [    0,  1.25, 1.5];  pf4 = [ 1.25,     0, 1.5];
 Pf11 = [pf1; pf2; pf3; pf4];
@@ -26,19 +30,23 @@ pf1 = [0.75,    -2, 1.5];  pf2 = [   2, -3.25, 1.5];  pf3 = [   2, -0.75, 1.5]; 
 Pf22_3 = [pf1; pf2; pf3; pf4];
 pf1 = [0.75,    2, 1.5];  pf2 = [   2, 0.75, 1.5];  pf3 = [    2 3.25, 1.5];  pf4 = [3.25,    2, 1.5];
 Pf22_4 = [pf1; pf2; pf3; pf4];
-%% 押し込むブロックの情報
+
+%Information on the block to be pushed (Upper Block)
 model_pushing = model(N, 1:6);
 knob_pushing = knob(model_pushing);
 z_max = model_pushing(4);
-%押し込まれるブロックの情報
-knob_push = knob_line(model, z_max - 1);
-%押し込まれる凸部を求める
+
+%Information on the block to be pushed into (Lower Block)
+knob_push = knob(model, z_max - 1);
+
+%Find the convex part to be pushed in
 knob_push = [knob_push; knob_pushing];
 join_push = join(knob_push, z_max);
-%押し込み力のかかるブロック数 block_number, 凸部数 knob_number(1) を求める
-block_number = 0;  knob_number = size(join_push);
-b = zeros(knob_number(1));
-for n = 1 : knob_number(1)
+
+%Find the number of blocks to which the pushing force is applied, block_number, and the number of convex parts knob_number (1). 
+block_number = 0;  knob_number = size(join_push,1);
+b = zeros(knob_number);
+for n = 1 : knob_number
     if(n == 1)
        block_number = 1;
        b(1) = join_push(1, 6);
@@ -55,15 +63,17 @@ for n = 1 : knob_number(1)
         end
     end
 end
-% beq を求める
+
+%Ask for beq 
 beq = zeros(block_number, 7);
 for m = 1 : block_number
     beq(m, 1) = b(m);
     block = b(m); 
     Mx = 0; My = 0;
-    for n = 1 : knob_number(1)
+    for n = 1 : knob_number
         type_u = join_push(n, 2);
         knob_u = join_push(n, 4);
+        %not generic LOOK AT THIS
         if(type_u == 11)
             T_push = 4;
             knobs = [1, 2, 3, 4];
@@ -96,6 +106,7 @@ for m = 1 : block_number
         if(join_push(n, 6) ==  block)
             type_l = join_push(n, 5);
             knob_l = join_push(n,7);
+            %not generic LOOK AT THIS
             if(type_l == 11)
                 for l = 1 : T_push
                     Mx = Mx + Pf11(knobs(l), 2) * T / T_push;
