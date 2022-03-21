@@ -7,7 +7,7 @@ function beq = pushing(model, N)
 %% constant numbers
 g = 9.81; T=70*g;
 
-%Not generic LOOK AT THIS
+%Not generic, use force_position(col,row,"ff") insted
 % 1*1
 pf1 = [-1.25,     0, 1.5];  pf2 = [    0, -1.25, 1.5];  pf3 = [    0,  1.25, 1.5];  pf4 = [ 1.25,     0, 1.5];
 Pf11 = [pf1; pf2; pf3; pf4];
@@ -31,6 +31,18 @@ Pf22_3 = [pf1; pf2; pf3; pf4];
 pf1 = [0.75,    2, 1.5];  pf2 = [   2, 0.75, 1.5];  pf3 = [    2 3.25, 1.5];  pf4 = [3.25,    2, 1.5];
 Pf22_4 = [pf1; pf2; pf3; pf4];
 
+All_Forces = [];
+bc = zeros(9,9);
+loop = size(model,1);
+for n = 1 : loop %Count the number of frictional forces for each connecting convex part
+    [col,row] = col_row_converter(model(n, 5));
+    if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
+        bc(col,row) = 1; %Mark as visited
+        All_Forces = [All_Forces;force_position(col,row,"ffc")];
+    end
+end
+All_Forces(:,3) = -All_Forces(:,3);
+
 %Information on the block to be pushed (Upper Block)
 model_pushing = model(N, 1:6);
 knob_pushing = knob(model_pushing);
@@ -52,7 +64,7 @@ for n = 1 : knob_number
        b(1) = join_push(1, 6);
     else
         check = 0;
-        for m = 1 : (n - 1);
+        for m = 1 : (n - 1)
            if(join_push(n, 6) == b(m))
               check = -1; 
            end
@@ -159,7 +171,7 @@ for m = 1 : block_number
                     end
                 end
             end
-            beq(m, 4:6) = [beq(m, 4) + T, beq(m, 5) + Mx, beq(m, 6) + My]
+            beq(m, 4:6) = [beq(m, 4) + T, beq(m, 5) + Mx, beq(m, 6) + My];
             Mx = 0;  My = 0;
         end
     end

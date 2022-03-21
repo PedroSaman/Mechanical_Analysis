@@ -11,7 +11,6 @@ bc = zeros(9,9);
 All_Forces2 = [];
 bc2 = zeros(9,9);
 loop = size(join,1);
-force = 0;
 for n = 1 : loop %Count the number of frictional forces for each connecting convex part
     [col,row] = col_row_converter(join(n, 2));
     if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
@@ -35,7 +34,7 @@ for n = 1 : loop %for each knob connection
     knob_1 = join(n, 4); %upper knob_index
     knob_2 = join(n, 7); %lower knob_index
     
-    [~,row] = col_row_converter(join(n, 2));
+    [~,row] = col_row_converter(type_1);
     upper_row_i = rem(knob_1,row);
     if(upper_row_i == 0)
         upper_row_i = row;
@@ -43,7 +42,7 @@ for n = 1 : loop %for each knob connection
     upper_col_i = (knob_1 - upper_row_i)/row + 1;
     knob1 = 10*upper_col_i + upper_row_i;
     
-    [~,row] = col_row_converter(join(n, 5));
+    [~,row] = col_row_converter(type_2);
     upper_row_i = rem(knob_2,row);
     if(upper_row_i == 0)
         upper_row_i = row;

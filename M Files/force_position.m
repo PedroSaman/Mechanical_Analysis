@@ -90,8 +90,8 @@ elseif(force_type == "ff") %friction force (excluding the necessary forces)
     b = 2; %half block size
     pf_index = 1; %force index in pf matrix
     
-    %These force vector Pf are have the forces excluding the ones that
-    %doesnt exist in the block.
+    %That force vector Pf have the forces excluding the ones that doesnt 
+    %exist in the block (only the ones that actually appears in the knobs)
     if(row == 1 && col == 1)
         Pf = zeros(4,4);
     elseif(row>=col)
@@ -161,9 +161,9 @@ elseif(force_type == "ffc") %complete friction force matrix
             
             %The output: first 3 collumns in each row is the coordinates of
             %a force, the forth collumn is a special information relevant
-            %to each force: 1st collumn = block type, 2nd collumn = knob
-            %number, 3rd collum = the number of a knob that to be excluded,
-            %4th collumn = the number of a knob that to be excluded.
+            %to each force: 1st row = block type, 2nd row = knob number, 
+            %3rd row = the number of a knob that would need to be excluded,
+            %4th row = the number of a knob that would need to be excluded.
             if(row==1 && col==1) %Special case for 1x1 blocks
                 FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,0];[f4,-1.5,0]];
             elseif(row>=col) %if the block is taller than wide
