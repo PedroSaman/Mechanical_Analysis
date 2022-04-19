@@ -1,0 +1,50 @@
+Aqui deixarei anotados informações úteis para quando for adaptar e expandir os conceitos do código da SUGIMOTO
+
+Stability_Judge_Pushing.m:
+	-> Entender melhor que que a função pushing faz
+	-> Logo no início ela retira o último bloco do modelo passado. CREIO que seja porque o último bloco n recebe a força de um próximo bloco sendo inserido pelo robô.
+	
+
+Stability_Judge.m:
+	-> Na seção que começa na linha 144, é determinado que as forças F' interiores do bloco 2x2 tem 'T' de módulo máximo. Isso porque são forças que estão atuando na parte "pontilhada"
+	   do bloco. (ver a ilustração do bloco 2x2).
+		-> Quando for adicionar novos blocos que tambem tenham tal "pontilhado" será necessário adicionar nesta seção o caso.
+	-> Na seção de determinar as igualdadades e as inequações é preciso adicionar os casos novos para cada bloco a ser adicionado
+
+knob.m:
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+adjoin.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Ff_0_180723.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Ff_180723.m
+	-> Completei essa função e testei para casos de até 2x2 blocos, deu o mesmo resultado da sugimoto. Falta testar para blocos maiores. "TO DO"
+
+Block_loader.m
+	-> É preciso adicionar manualmente as informações para cada block_type nessa função.
+
+force_position.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Fny.m e Fnx.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+	-> Porém essa função é dependente da force_position.m que não aceita qualquer tipo de bloco.
+ 	-> Essas duas funções podem ser juntas em uma única com algumas modificações. "TO DO"
+
+join.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Fnz_0.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+	-> Pensar em como remover essa função e colocá-la junto da Fnz.m "TO DO"
+
+Fnz.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+		-> Porém a parte de remover \/ foi ignorada. Pensar ainda em como fazer isso, vou deixar esses comentários antigos já que podem ser úteis. "TO DO"
+			-> O vetor remove diz quais forças adicionadas em Fnz devem ser removidas pois o bloco não faz contato nequele ponto dado a configuração definida
+				-> Os blocos 2x2 tem uma cavidade que impede o toque, no código é checado os casos que essa cavidade impede o toque dado o bloco que está 
+				   em cima e embaixo e armazena no vetor remove quai índe de Fnz para retirar.
+			-> O for duplo de remoção (linhaa 227 a 239) pode ser otimizado. Se "m" é maior q "n" não faz sentido continuar somando m até o final.
