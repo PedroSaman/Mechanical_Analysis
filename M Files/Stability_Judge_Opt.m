@@ -6,9 +6,10 @@ clear; clc; tic;
 g = 9.81;
 T = 70*g;  %Maximum static friction force of one set of convex part
 M = 2/60; %Mass of a 1x1 block
+good_margin = 590; %arbitrary minimum value for stability
 
 %% Load the block model data
-filename = '../Dat Files/Pedro Functionality Tests/Dat_Tests/23 - Heavy4LayerBetterBridge.dat'; %Specify the data file name
+filename = '../Dat Files/tower.dat'; %Specify the data file name
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 
@@ -80,7 +81,7 @@ ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; %Fnx upper bou
 ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %Fny upper bound component in x is 0
 ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny upper bound component in z is 0
 
-%%Fn_line Lower and Upper bounds 
+%% Fn_line Lower and Upper bounds 
 check = 0;
 for i = 1 : force_f
    if((F_f(i, 7) == -1))
@@ -110,7 +111,7 @@ for i = 1 : force_f
    check = 0;
 end
 
-%%Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
+%% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 for i = 1 : force_f
     if(F(i, 4) == -0.75) %lb(3*i-2)
         lb(3*i-2) = -T;
@@ -206,9 +207,6 @@ while(n <= force_f) %for each friction force fill the A matrix
     end
     
     n = n + force_counter; %update n value
-    if(knob_counter == 83)
-        n = n;
-    end
 end
 A(1:n_knob, 3*force+1) = -1; %Only the last collum of the A matrix
 
@@ -253,8 +251,13 @@ f((3*force + 1), 1) = 1;
 if(~isempty(x))
     fprintf('Solution found');
     XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
-    CM = -x(3*force+1) %Capacity CM 
+    CM = -x(3*force+1); %Capacity CM 
+    if(CM >= good_margin)
+        fprintf('Stability with good security margin. CM = %.4f \n',CM);
+    else
+        fprintf('Stability can not be guaranteed. CM = %.4f \n',CM);
+    end
 else
     fprintf('No feasible solution found \n');
 end
-time = toc
+fprintf('Time elapsed: %.2d \n',toc);
