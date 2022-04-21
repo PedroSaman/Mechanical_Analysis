@@ -1,10 +1,11 @@
 function beq = pushing(model, N)
-%
-%input: model:(block_number, x, y, z, Block_type, color)
-%       N:(Number of blocks of model) 
+%Calculate the forces and torques that the insertion of the last block
+%in the model would applies in the structure.
+%input:  model:(block_number, x, y, z, Block_type, color)
+%        N:(number of the block being inserted) 
 %output: beq:(Block_Number, Fx, Fy, Fz, Mx, My, Mz)
 
-%% constant numbers
+%constant numbers
 g = 9.81; T=70*g;
 
 %Not generic, use force_position(col,row,"ff") insted
@@ -44,16 +45,16 @@ end
 All_Forces(:,3) = -All_Forces(:,3);
 
 %Information on the block to be pushed (Upper Block)
-model_pushing = model(N, 1:6);
-knob_pushing = knob(model_pushing);
-z_max = model_pushing(4);
+model_pushing = model(N, 1:6); %Block being inserted information
+knob_pushing = knob(model_pushing,0); %Knobs information of the block being inserted
+z_max = model_pushing(4); %Height of the inserted block
 
 %Information on the block to be pushed into (Lower Block)
-knob_push = knob(model, z_max - 1);
+knob_push = knob(model, z_max - 1); %Previous layer knobs information
 
 %Find the convex part to be pushed in
-knob_push = [knob_push; knob_pushing];
-join_push = join(knob_push, z_max);
+knob_push = [knob_push; knob_pushing]; %Merge last layer knobs and the inserted block
+join_push = join(knob_push, z_max); %Find out the knobs that are snaped together
 
 %Find the number of blocks to which the pushing force is applied, block_number, and the number of convex parts knob_number (1). 
 block_number = 0;  knob_number = size(join_push,1);
@@ -78,11 +79,11 @@ end
 
 %Ask for beq 
 beq = zeros(block_number, 7);
-for m = 1 : block_number
-    beq(m, 1) = b(m);
-    block = b(m); 
+for m = 1 : block_number %for each block that is being applied force
+    block = b(m);
+    beq(m, 1) = block;
     Mx = 0; My = 0;
-    for n = 1 : knob_number
+    for n = 1 : knob_number %for each knob that is being aplied force
         type_u = join_push(n, 2);
         knob_u = join_push(n, 4);
         %not generic LOOK AT THIS
