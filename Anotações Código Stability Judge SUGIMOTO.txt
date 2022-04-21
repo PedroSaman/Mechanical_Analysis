@@ -1,9 +1,16 @@
 Aqui deixarei anotados informações úteis para quando for adaptar e expandir os conceitos do código da SUGIMOTO
 
 Stability_Judge_Pushing.m:
-	-> Entender melhor que que a função pushing faz
 	-> Logo no início ela retira o último bloco do modelo passado. CREIO que seja porque o último bloco n recebe a força de um próximo bloco sendo inserido pelo robô.
-	
+	-> A logica do pushing da sugimoto nao faz o menor sentido. Ela so adiciona forcas e torques so no ultimo bloco a ser adicionado no modelo e nao a cada bloco.
+		-> Modificar a funcao pushing para calcular o beq com as forcas e torques para todos blocos e nao so o ultimo
+		-> Apos o ponto anterior /\ ser feito, verificar a necessidade de modificar a secao "Add pushing force and moment to beq" da Stability_Judge_Pushing (acho que nao sera preciso)
+pushing.m:
+	-> Essa funcao calcula quais forcas e torques sao aplicadas em cada bloco no momento que ele e inserido. Criando como saida a matriz beq que tem [Fnx Fny Fnz Mx My Mz]
+	para cada bloco do modelo. Essa matriz e usada como o beq da condicao de equilibrio ao final.
+	-> Ainda e necessário automatizar essa funcao para a minha estrategia de criacao de blocos.
+	-> Modificar essa função completamente, para calcular as forças e torques para todos os blocos e nao so o ultimo.
+
 
 Stability_Judge.m:
 	-> Na seção que começa na linha 144, é determinado que as forças F' interiores do bloco 2x2 tem 'T' de módulo máximo. Isso porque são forças que estão atuando na parte "pontilhada"
