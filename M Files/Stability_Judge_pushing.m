@@ -12,12 +12,15 @@ good_margin = 590; %arbitrary minimum value for stability
 filename = '../Dat Files/A_1.dat'; %Specify the data file name
 model_original = load(filename); % model_original = (x, y, z, type)
 model_original = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
+model_size = size(model_original,1);
 
 %% Model Iterator
-if (size(model_original,1)<2)
+
+if (model_size < 2)
     %if there is only one block in the model, it is stable
 else
-    for Current = 2 : size(model_original,1) %starting from the block number 2 to the last one
+    CM_Matrix = zeros(model_size,1);
+    for Current = 2 : model_size %starting from the block number 2 to the last one
     %% Model and knobs information
         model = model_original(1:Current,:); %Narrow down the model to end it in the current iteration
         b_push = pushing(model, Current); % Forces and Torques that the insertion of the current iteration block causes
@@ -269,6 +272,7 @@ else
             XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
             CM = -x(3*force+1); %Capacity CM 
             fprintf('Intermediary block number %d CM value is %.4f \n',Current,CM);
+            CM_Matrix(Current) = CM;
             if(CM < good_margin)
                 fprintf('Stability can not be guaranteed \n');
                 break;
@@ -278,4 +282,8 @@ else
         end
     end
 end
-fprintf('Time elapsed: %.2d \n',toc);
+
+%% Final Information
+fprintf('Final CM Matrix:\n');
+fprintf('%.4f \n',CM_Matrix);
+fprintf('Time elapsed: %.5f \n',toc);
