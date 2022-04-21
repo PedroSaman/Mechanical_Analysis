@@ -1,0 +1,30 @@
+Essa função NÃO retorna um vetor com o efeito da inserção de todos os blocos do modelo. Apenas do último bloco.
+
+model_pushing: Info de APENAS o último bloco do modelo.
+knob_pushing: Info dos knobs de APENAS o último bloco do modelo.
+knob_push: Info de todos os knobs da penultima camada + knob_pushing.
+knob_number: Quantos knobs do último bloco estão em contato com a penultima camada.
+
+Problema: O código pushing da sugimoto só verifica a estabilidade de inserção do último bloco.
+
+Pensamento: Acho q a estratégia da sugimoto faz sentido se for chamado para cada bloco novo em um loop que pega todo o programa. Isso porque faz sentido a conta q ela faz, porém é feito 
+apenas para o último bloco do modelo. 
+
+Sugestão: A partir do segundo bloco rodar todo o algoritmo até a parte de resolver o sistema linear verificando a estabilidade e, então, se for estável, passar para o próximo bloco e 
+repetir o processo até o último bloco.
+
+Obstáculos: Já demora para verificar um modelo grande, se tiver que fazer absolutamente tudo do inicio para cada bloco, o algoritmo vai ser muito lendo.
+
+O que fazer: Primeiramente, tentar implementar a sugestão, mesmo que torne lento, e, uma vez funcionando corretamente, implementar as otimizações.
+
+
+teste do pushing
+
+1: 686.7
+2: 686.7
+3: 686.7
+4: 686.7
+5: 607.4654
+6: 686.7
+7: -238.5088
+8: 686.7
