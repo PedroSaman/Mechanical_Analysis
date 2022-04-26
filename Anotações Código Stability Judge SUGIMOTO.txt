@@ -7,6 +7,7 @@ pushing.m:
 	-> Essa funcao calcula quais forças e torques são aplicados em cada bloco do modelo no momento que um novo bloco é inserido. Criando como
 	   saida a matriz beq: [Fnx Fny Fnz Mx My Mz] para cada bloco.
 	-> Necessário automatizar essa função para a minha estratégia de criação de blocos.
+    -> Mudei o codigo da sugimoto para nao retirar 2 forcas de blocos 2x2 e sim so 1. Para ficar igual ao meu.
 
 Stability_Judge.m:
 	-> Entender porque que é determinado que as forças F' interiores do bloco 2x2 tem T de módulo máximo ou -T de módulo mínimo. Isso porque
