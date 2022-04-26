@@ -35,14 +35,14 @@ Pf22_4 = [pf1; pf2; pf3; pf4];
 All_Forces = [];
 bc = zeros(9,9);
 loop = size(model,1);
-for n = 1 : loop %Count the number of frictional forces for each connecting convex part
+for n = 1 : loop %Number of blocks in the model. Space to improve here, search only the blocks in the necessary layers
     [col,row] = col_row_converter(model(n, 5));
     if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
         bc(col,row) = 1; %Mark as visited
-        All_Forces = [All_Forces;force_position(col,row,"ffc")];
+        All_Forces = [All_Forces;force_position(col,row,"ff")];
     end
 end
-All_Forces(:,3) = -All_Forces(:,3);
+All_Forces(:,3) = -All_Forces(:,3); %All forces hardcoded is correct here (erase this after)
 
 %Information on the block to be pushed (Upper Block)
 model_pushing = model(N, 1:6); %Block being inserted information
@@ -84,88 +84,132 @@ for m = 1 : block_number %for each block that is being applied force
     beq(m, 1) = block;
     Mx = 0; My = 0;
     for n = 1 : knob_number %for each knob that is being aplied force
-        type_u = join_push(n, 2);
-        knob_u = join_push(n, 4);
+        
+        %%Start pedro way 
+        type_1 = join_push(n, 2); %upper block type
+        knob_1 = join_push(n, 4); %upper knob_index
+        type_2 = join_push(n, 5); %lower block type
+        knob_2 = join_push(n,7); %lower knob_index
+        
+        [~,row] = col_row_converter(type_1);
+        upper_row_i = rem(knob_1,row);
+        if(upper_row_i == 0)
+            upper_row_i = row;
+        end
+        upper_col_i = (knob_1 - upper_row_i)/row + 1;
+        knob1 = 10*upper_col_i + upper_row_i;
+
+        [~,row] = col_row_converter(type_2);
+        upper_row_i = rem(knob_2,row);
+        if(upper_row_i == 0)
+            upper_row_i = row;
+        end
+        upper_col_i = (knob_2 - upper_row_i)/row + 1;
+        knob2 = 10*upper_col_i + upper_row_i;
+        
+        i = 0;
+        while(i<size(All_Forces,1)) %complicado aqui. tenho q saber quais forcas pular com o type1 mas as forcas com o type2
+            if(type_1 == All_Forces(i,4) && knob1 == All_Forces(i+1,4))
+                T_push = All_Forces(i+2,4);
+                Forces = All_Forces(i:i+T_push-1,1:3); %Select the forces that exist for this block type for this knob
+                break;
+            end
+            i = i + 4;
+        end
+        
+        i = 0;
+        while(i<size(All_Forces,1))
+            if()
+                for l = 1 : T_push
+                    Mx = Mx + Forces(l, 2) * T / T_push;
+                    My = My - Forces(l, 1) * T / T_push;
+                end
+            end
+        end
+        %Finish pedro way
+        
+        type_1 = join_push(n, 2); %upper block type
+        knob_1 = join_push(n, 4); %upper knob_index
         %not generic LOOK AT THIS
-        if(type_u == 11)
+        if(type_1 == 11)
             T_push = 4;
             knobs = [1, 2, 3, 4];
-        elseif(type_u == 12)
+        elseif(type_1 == 12)
             T_push = 3;
-            if(knob_u == 1) 
+            if(knob_1 == 1) 
                 knobs = [1, 2, 4];
-            elseif(knob_u == 2)
+            elseif(knob_1 == 2)
                 knobs = [1, 3, 4];
             end
-        elseif(type_u == 21)
+        elseif(type_1 == 21)
             T_push = 3;
-            if(knob_u == 1) 
+            if(knob_1 == 1) 
                 knobs = [1, 2, 3];
-            elseif(knob_u == 2)
+            elseif(knob_1 == 2)
                 knobs = [2, 3, 4];
             end
         else
             T_push = 2;
-            if(knob_u == 1) 
+            if(knob_1 == 1) 
                 knobs = [1, 2];
-            elseif(knob_u == 2)
+            elseif(knob_1 == 2)
                 knobs = [1, 3];
-            elseif(knob_u == 3) 
+            elseif(knob_1 == 3) 
                 knobs = [2, 4];
-            elseif(knob_u == 4)
+            elseif(knob_1 == 4)
                 knobs = [3, 4];
             end
         end
         if(join_push(n, 6) ==  block)
-            type_l = join_push(n, 5);
-            knob_l = join_push(n,7);
+            type_2 = join_push(n, 5);
+            knob_2 = join_push(n,7);
             %not generic LOOK AT THIS
-            if(type_l == 11)
+            if(type_2 == 11)
                 for l = 1 : T_push
                     Mx = Mx + Pf11(knobs(l), 2) * T / T_push;
                     My = My - Pf11(knobs(l), 1) * T / T_push;
                 end
-            elseif(type_l == 12)
-                if(knob_l == 1)
+            elseif(type_2 == 12)
+                if(knob_2 == 1)
                     for l = 1 : T_push
                         Mx = Mx + Pf12_1(knobs(l), 2) * T / T_push;
                         My = My - Pf12_1(knobs(l), 1) * T / T_push;
                     end
-                elseif(knob_l == 2)
+                elseif(knob_2 == 2)
                     for l = 1 : T_push
                         Mx = Mx + Pf12_2(knobs(l), 2) * T / T_push;
                         My = My - Pf12_2(knobs(l), 1) * T / T_push;
                     end
                 end
-            elseif(type_l == 21)
-                if(knob_l == 1)
+            elseif(type_2 == 21)
+                if(knob_2 == 1)
                     for l = 1 : T_push
                         Mx = Mx + Pf21_1(knobs(l), 2) * T / T_push;
                         My = My - Pf21_1(knobs(l), 1) * T / T_push;
                     end
-                elseif(knob_l == 2)
+                elseif(knob_2 == 2)
                     for l = 1 : T_push
                         Mx = Mx + Pf21_2(knobs(l), 2) * T / T_push;
                         My = My - Pf21_2(knobs(l), 1) * T / T_push;
                     end
                 end
             else
-                if(knob_l == 1)
+                if(knob_2 == 1)
                     for l = 1 : T_push
                         Mx = Mx + Pf22_1(knobs(l), 2) * T / T_push;
                         My = My - Pf22_1(knobs(l), 1) * T / T_push;
                     end
-                elseif(knob_l == 2)
+                elseif(knob_2 == 2)
                     for l = 1 : T_push
                         Mx = Mx + Pf22_2(knobs(l), 2) * T / T_push;
                         My = My - Pf22_2(knobs(l), 1) * T / T_push;
                     end
-                elseif(knob_l == 3)
+                elseif(knob_2 == 3)
                     for l = 1 : T_push
                         Mx = Mx + Pf22_3(knobs(l), 2) * T / T_push;
                         My = My - Pf22_3(knobs(l), 1) * T / T_push;
                     end
-                elseif(knob_l == 4)
+                elseif(knob_2 == 4)
                     for l = 1 : T_push
                         Mx = Mx + Pf22_4(knobs(l), 2) * T / T_push;
                         My = My - Pf22_4(knobs(l), 1) * T / T_push;
