@@ -113,13 +113,13 @@ end
 
 %% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 for i = 1 : force_f
-    if(F(i, 4) == -0.75) %lb(3*i-2)
+    if(F(i, 4) == -0.75)
         lb(3*i-2) = -T;
-    elseif(F(i, 4) == 0.75) %ub(3*i-2)
+    elseif(F(i, 4) == 0.75)
         ub(3*i-2) = T;
-    elseif(F(i, 5) == -0.75) %lb(3*i-1)
+    elseif(F(i, 5) == -0.75)
         lb(3*i-1) = -T;
-    elseif(F(i, 5) == 0.75) %ub(3*i-1)
+    elseif(F(i, 5) == 0.75)
         ub(3*i-1) = T;
     end
 end
@@ -127,7 +127,7 @@ end
 %% Linear inequalities
 % Capacity Ci is evaluated by the number of connecting knobs
 n_knob = size(knobs,1);
-A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 collums is one force.
+A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 columns is one force.
 b  = ones(n_knob, 1) * T;
 knob_counter = 1;
 n = 1;
@@ -143,7 +143,7 @@ while(n <= force_f) %for each friction force fill the A matrix
         else
             starting_knob = knob_counter; %need to store which knonb were the first one to later duplicate the A matrix
             if(row>=col) %if the block is taller than wide or square
-                for i = 1:col %for each collumn
+                for i = 1:col %for each column
                     for j = 1:row %for each row
                         if(j==1 || j==row) %if this knob is from the first or last row
                             A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+2)) = 1; %Add 3 forces to A
@@ -156,12 +156,12 @@ while(n <= force_f) %for each friction force fill the A matrix
                     end
                 end
             else %if the block is wider than tall
-                for j = 1:col %for each collumn
+                for j = 1:col %for each column
                     for i = 1:row %for each row
-                        if(j==1 || j==col) %if this is the first or the last collumn
+                        if(j==1 || j==col) %if this is the first or the last column
                             A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+2)) = 1; %Add 3 forces to A
                             force_counter = force_counter + 3; %iterate to the next force
-                        else %if this is a middle collumn
+                        else %if this is a middle column
                             A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+1)) = 1; %Add 2 forces to A
                             force_counter = force_counter + 2; %iterate to the next force
                         end
@@ -208,7 +208,7 @@ while(n <= force_f) %for each friction force fill the A matrix
     
     n = n + force_counter; %update n value
 end
-A(1:n_knob, 3*force+1) = -1; %Only the last collum of the A matrix
+A(1:n_knob, 3*force+1) = -1; %Only the last column of the A matrix
 
 %% Linear equalities
 Aeq = zeros(6*N, 3*force+1);

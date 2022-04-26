@@ -22,14 +22,14 @@ else
     for n = 1 : nx %for every adjoin block duo
         
         %First Block
-        [col,row] = col_row_converter(adjoin(n, 3)); %block number of collums and rows
+        [col,row] = col_row_converter(adjoin(n, 3)); %block number of columns and rows
         if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix
             bc(col,row) = 1; %Mark as visited
             All_Forces = [All_Forces;force_position(col,row,"fnx")];
         end
         
         %Second Block
-        [col,row] = col_row_converter(adjoin(n, 5)); %block number of collums and rows
+        [col,row] = col_row_converter(adjoin(n, 5)); %block number of columns and rows
         if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix
             bc(col,row) = 1; %Mark as visited
             All_Forces = [All_Forces;force_position(col,row,"fnx")];

@@ -7,10 +7,10 @@ function FP = force_position(col,row,force_type)
 %         col: number of columns of the desired block
 %         force_type: friction force (ff), X axis normal force (fnx),
 %                     Y axis normal force (fny) or Z axis normal force (fnz)
-%output: FP = a matrix with 3 columns with the coordiante (x,y,z) of a force.
-%        this depends on which force and block is passed as argument. For
-%        the correct usage, it is necessary a carrefull analysis to
-%        separete which force is which in the function that call this one
+%                     friction force complete (ffc).
+%output: FP = a matrix with 4 columns with the coordiante (x,y,z) of a force
+%        and a column with relevant information. More details about the output
+%        in each if below.
 
 if(force_type == "fnx")
     force_index = 1; %force index in FP matrix
@@ -109,10 +109,10 @@ elseif(force_type == "ff") %friction force (excluding the necessary forces)
             f4 = [pos(1)+b+r,pos(2)+b]; %knob friction force number four
             
             %The output: first 3 collumns in each row is the coordinates of
-            %a force, the forth collumn is a special information relevant
-            %to each force: 1st collumn = block type, 2nd collumn = knob
-            %number, 3rd collum = how many forces exists in this knob, 4th
-            %collumn = which force was excluded.
+            %a force, the forth column is a special information relevant
+            %to each force: 1st column = block type, 2nd column = knob
+            %number, 3rd column = how many forces exists in this knob, 4th
+            %column = which force was excluded.
             if(row==1 && col==1) %Special case for 1x1 blocks
                 Pf(pf_index:pf_index+3,:) = [[f1,1.5,11];[f2,1.5,11];[f3,1.5,4];[f4,1.5,0]];
                 pf_index = pf_index + 4;
@@ -160,7 +160,7 @@ elseif(force_type == "ffc") %complete friction force matrix
             f4 = [pos(1)+b+r,pos(2)+b]; %knob friction force number four
             
             %The output: first 3 collumns in each row is the coordinates of
-            %a force, the forth collumn is a special information relevant
+            %a force, the forth column is a special information relevant
             %to each force: 1st row = block type, 2nd row = knob number, 
             %3rd row = the number of a knob that would need to be excluded,
             %4th row = the number of a knob that would need to be excluded.

@@ -1,11 +1,12 @@
 function All_Forces = block_loader(model)
+%Probably this function is not needed anymore.
 
 bc = zeros(9,9); %block checker matrix, support up to 9 b 9 blocks
 All_Forces = [];
 
 loop = size(model,1);
 for n = 1 : loop
-    [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+    [col,row] = col_row_converter(model(n, 5)); %block number of columns and rows
     bc(col,row) = 1;
 end
 

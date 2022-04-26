@@ -11,7 +11,7 @@ k = 0;  %Number of knobs
 %Count how many knobs it is needed to be iterated
 if(layer == 0) %if it is searching for all layers knobs
     for n = 1 : loop(1) %uses the block type nomenclature to calculate k
-        [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+        [col,row] = col_row_converter(model(n, 5)); %block number of columns and rows
         k = k + col*row;
     end
     k_min = 1;
@@ -23,7 +23,7 @@ else %if it is searching for only one layer knobs
             if(k_min == 0) 
                 k_min = n; %Store the first block in the model that is in the layer
             end
-            [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+            [col,row] = col_row_converter(model(n, 5)); %block number of columns and rows
             k = k + col*row;
             k_max = n; %Store the last block in the model that is in the layer so far.
         elseif(model(n, 4) > layer) %if the block model z value is less than the layer argument
@@ -37,7 +37,7 @@ k = round(k);
 y = zeros(k, 7); %y(x,y,z,block_type,color,block_number,knob_index)
 m = 1;  %Count the number of stored convex parts
 for n = k_min : k_max %for each block
-    [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+    [col,row] = col_row_converter(model(n, 5)); %block number of columns and rows
     for i = 0:col*row-1 %for each knob in the block
         y(m+i, 1:5) = model (n, 2:6); %Copy the model data to y
         y(m+i, 6) = model(n, 1); %Block number inside the block model

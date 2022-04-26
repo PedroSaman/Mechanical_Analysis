@@ -21,7 +21,7 @@ for n = 1 : knobs(1) %for every knob in this layer
         same_block = same_block - 1; %Generic subtractor
     else %If this is the first knob in a block
         
-        [col,row] = col_row_converter(line(n, 4)); %block number of collums and rows
+        [col,row] = col_row_converter(line(n, 4)); %block number of columns and rows
         x = -ones(row,5); y = -ones(col,5); %Initialize the x and y matrices
         check = row+col;
         same_block = row*col-1;
@@ -110,7 +110,7 @@ if(A(1) ~= -1)
         if(A(i,7)<10) %If the adjoin block 1 is only one number duplicate this number (x -> xx)
             A(i,7) = A(i,7)*10+A(i,7);
         end
-        [col,row] = col_row_converter(A(i, 7)); %block number of collums and rows        
+        [col,row] = col_row_converter(A(i, 7)); %block number of columns and rows        
         d = A(i,6) + abs(col-row);
         A(i,6) = A(i,6)*10 + d; %Second block knob
     end 

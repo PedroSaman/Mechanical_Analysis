@@ -32,7 +32,7 @@ max_force_number = 80; %Maximum number of forces that can appear in a block. (fo
 F = zeros(count*max_force_number, 13);
 F(1:(count*max_force_number), 1) = 1: (count*max_force_number);  %Force Number
 for n = 1 : count %for each block in the 1st layer
-    [col,row] = col_row_converter(model(n, 5)); %block number of collums and rows
+    [col,row] = col_row_converter(model(n, 5)); %block number of columns and rows
     i = 1;
     while(i<size(All_Forces,1))
         if(model(n, 5) == All_Forces(i,4))

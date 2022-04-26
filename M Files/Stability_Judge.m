@@ -164,7 +164,7 @@ end
 %% Linear inequalities
 % Capacity Ci is evaluated by the number of connecting knobs
 n_knob = size(knobs,1);
-A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 collums is one force.
+A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 columns is one force.
 b  = ones(n_knob, 1) * T;
 count = 0;
 max_m = 23;
@@ -266,7 +266,7 @@ for n = 1 : force_f
     check = check - 1;
 end
 %}
-A(1:n_knob, 3*force+1) = -1; %Only the last collum of the A matrix (Capacity)
+A(1:n_knob, 3*force+1) = -1; %Only the last column of the A matrix (Capacity)
 
 %% Linear equalities
 Aeq = zeros(6*N, 3*force+1);
