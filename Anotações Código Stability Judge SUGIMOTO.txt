@@ -1,22 +1,16 @@
 Aqui deixarei anotados informações úteis para quando for adaptar e expandir os conceitos do código da SUGIMOTO
 
 Stability_Judge_Pushing.m:
-	-> Logo no início ela retira o último bloco do modelo passado. CREIO que seja porque o último bloco n recebe a força de um próximo bloco sendo inserido pelo robô.
-	-> A logica do pushing da sugimoto nao faz o menor sentido. Ela so adiciona forcas e torques so no ultimo bloco a ser adicionado no modelo e nao a cada bloco.
-		-> Modificar a funcao pushing para calcular o beq com as forcas e torques para todos blocos e nao so o ultimo
-		-> Apos o ponto anterior /\ ser feito, verificar a necessidade de modificar a secao "Add pushing force and moment to beq" da Stability_Judge_Pushing (acho que nao sera preciso)
-pushing.m:
-	-> Essa funcao calcula quais forcas e torques sao aplicadas em cada bloco no momento que ele e inserido. Criando como saida a matriz beq que tem [Fnx Fny Fnz Mx My Mz]
-	para cada bloco do modelo. Essa matriz e usada como o beq da condicao de equilibrio ao final.
-	-> Ainda e necessário automatizar essa funcao para a minha estrategia de criacao de blocos.
-	-> Modificar essa função completamente, para calcular as forças e torques para todos os blocos e nao so o ultimo.
+	-> Procurar otimizações para o código, tendo em vista q este é execudato para cada bloco do modelo.
 
+pushing.m:
+	-> Essa funcao calcula quais forças e torques são aplicados em cada bloco do modelo no momento que um novo bloco é inserido. Criando como
+	   saida a matriz beq: [Fnx Fny Fnz Mx My Mz] para cada bloco.
+	-> Necessário automatizar essa função para a minha estratégia de criação de blocos.
 
 Stability_Judge.m:
-	-> Na seção que começa na linha 144, é determinado que as forças F' interiores do bloco 2x2 tem 'T' de módulo máximo. Isso porque são forças que estão atuando na parte "pontilhada"
-	   do bloco. (ver a ilustração do bloco 2x2).
-		-> Quando for adicionar novos blocos que tambem tenham tal "pontilhado" será necessário adicionar nesta seção o caso.
-	-> Na seção de determinar as igualdadades e as inequações é preciso adicionar os casos novos para cada bloco a ser adicionado
+	-> Entender porque que é determinado que as forças F' interiores do bloco 2x2 tem T de módulo máximo ou -T de módulo mínimo. Isso porque
+	   são forças que estão atuando na parte "pontilhada" do bloco. (linha 114).
 
 knob.m:
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
@@ -31,7 +25,7 @@ Ff_180723.m
 	-> Completei essa função e testei para casos de até 2x2 blocos, deu o mesmo resultado da sugimoto. Falta testar para blocos maiores. "TO DO"
 
 Block_loader.m
-	-> É preciso adicionar manualmente as informações para cada block_type nessa função.
+	-> Provavelmente inútil.
 
 force_position.m
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
