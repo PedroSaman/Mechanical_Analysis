@@ -1,4 +1,4 @@
-Aqui deixarei anotados informações úteis para quando for adaptar e expandir os conceitos do código da SUGIMOTO
+﻿Aqui deixarei anotados informações úteis para quando for adaptar e expandir os conceitos do código da SUGIMOTO
 
 Stability_Judge_Pushing.m:
 	-> Procurar otimizações para o código, tendo em vista q este é execudato para cada bloco do modelo.
@@ -45,8 +45,3 @@ Fnz_0.m
 
 Fnz.m
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
-		-> Porém a parte de remover \/ foi ignorada. Pensar ainda em como fazer isso, vou deixar esses comentários antigos já que podem ser úteis. "TO DO"
-			-> O vetor remove diz quais forças adicionadas em Fnz devem ser removidas pois o bloco não faz contato nequele ponto dado a configuração definida
-				-> Os blocos 2x2 tem uma cavidade que impede o toque, no código é checado os casos que essa cavidade impede o toque dado o bloco que está 
-				   em cima e embaixo e armazena no vetor remove quai índe de Fnz para retirar.
-			-> O for duplo de remoção (linhaa 227 a 239) pode ser otimizado. Se "m" é maior q "n" não faz sentido continuar somando m até o final.
