@@ -35,12 +35,12 @@ force_z = force_z - 1;
 Fnz = zeros(force_z, 13);  Fnz(1:force_z, 1) = 1:force_z; %Force_Number
 Fnz(1:force_z, 7:6:13) = [ones(force_z, 1), -ones(force_z, 1)]; %Force direction for each block snaped
 Fnz(1:force_z, 2:6:8) = Z(1:force_z, 1:2); %Block_Number
-n = 1;
-count = 1;
+remove = zeros(1, force_z);
+n = 1; count = 1; count_remove = 0;
 while(n <= loop) %Add to Fnz the correct force position of blocks touching in the Z axis
     
     upper_type = join(n, 2); %Upper block type
-    [~,upper_row] = col_row_converter(upper_type);%Upper block number of rows
+    [upper_col,upper_row] = col_row_converter(upper_type);%Upper block number of rows and columns
     lower_type = join(n, 5); %Lower block_type
     [~,lower_row] = col_row_converter(lower_type);%Lower block number of rows
     same_pair = join(n,1); %How many knobs share the same pair of connecting blocks
@@ -70,6 +70,74 @@ while(n <= loop) %Add to Fnz the correct force position of blocks touching in th
     while(i<size(All_Forces,1))
         if(upper_type == All_Forces(i,4) && upper_width == All_Forces(i+1,4) && upper_height == All_Forces(i+2,4))
             Fnz(count:count+3, 4:6) = [All_Forces(i:i+3,1), All_Forces(i:i+3,2), -All_Forces(i:i+3,3)];
+            
+            %Verify which force to remove
+            if(upper_type == 22 && upper_knob_1 == upper_knob_2) %if only one knob is from the same block && upper block is 2x2
+                count_remove = count_remove + 1;
+                remove(count_remove) = count+4-upper_knob_1;
+            elseif(upper_col> 1 && upper_row > 1) %if not nx1 or 1xn (has at least 2 knobs in each direction)
+                if(upper_col > 2) %if it is the columns that have more than 2 knobs
+                    if(upper_row_i == upper_row_f && upper_col_f-upper_col_i ~= upper_col - 1) %if only one row (of the two) is snapped && not all columns knobs is snaped 
+                        if(upper_row_i == 1) %if the row with snaped knobs are the 1st one
+                            if(upper_col_i ~= 1 && upper_col_f ~= upper_col) %if the first && the last column knobs are not snaped
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+1; %force 2 is removed
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+3; %force 4 is removed
+                            elseif(upper_col_i ~= 1) %if the first column knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+1; %force 2 is removed
+                            elseif(upper_col_f ~= upper_col) %if the last column knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+3; %force 4 is removed
+                            end
+                        elseif(upper_row_i == 2) %if the row with snaped knobs are the 2nd one
+                            if(upper_col_i ~= 1 && upper_col_f ~= upper_col) %if the first && the last column knobs are not snaped
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count; %force 1 is removed
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+2; %force 3 is removed
+                            elseif(upper_col_i ~= 1) %if the first column knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count; %force 1 is removed
+                            elseif(upper_col_f ~= upper_col) %if the last column knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+2; %force 3 is removed
+                            end
+                        end
+                    end
+                elseif(upper_row > 2) %if it is the rows that have more than 2 knobs
+                    if(upper_col_i == upper_col_f && upper_row_f-upper_row_i ~= upper_row - 1) %if only one column (of the two) is snapped && not all rows knobs is snaped 
+                        if(upper_col_i == 1) %if the column with snaped knobs are the 1st one
+                            if(upper_row_i ~= 1 && upper_row_f ~= upper_row) %if the first && the last row knobs are not snaped
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+2; %force 3 is removed
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+3; %force 4 is removed
+                            elseif(upper_row_i ~= 1) %if the first row knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+2; %force 3 is removed
+                            elseif(upper_row_f ~= upper_row) %if the last row knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+3; %force 4 is removed
+                            end
+                        elseif(upper_col_i == 2) %if the column with snaped knobs are the 2nd one
+                            if(upper_row_i ~= 1 && upper_row_f ~= upper_row) %if the first && the last row knob is not snaped
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count; %force 1 is removed
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+1; %force 2 is removed
+                            elseif(upper_row_i ~= 1) %if the first row knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count; %force 1 is removed
+                            elseif(upper_row_f ~= upper_row) %if the last row knob is not snaped 
+                                count_remove = count_remove + 1;
+                                remove(count_remove) = count+1; %force 2 is removed
+                            end
+                        end
+                    end
+                end
+            end
             break;
         end
         i = i + 4;
@@ -103,4 +171,13 @@ while(n <= loop) %Add to Fnz the correct force position of blocks touching in th
     
     count = count + 4;
     n = n + same_pair;
+end
+
+%Remove the necessary Fnz forces
+remove(count_remove+1:end) = [];
+if(size(remove ~= 0))
+    while(count_remove ~= 0)
+        Fnz(remove(count_remove),:) = [];
+        count_remove = count_remove - 1;
+    end
 end
