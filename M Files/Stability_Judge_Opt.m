@@ -5,7 +5,7 @@ clear; clc; tic;
 %% constant numbers
 g = 9.81;
 T = 70*g;  %Maximum static friction force of one set of convex part
-M = 2/60; %Mass of a 1x1 block
+M = [11,17/448;12,139/2000;21,139/2000;13,17/175;31,17/175;14,103/800;41,103/800;22,81/640;24,39/160;42,39/160;28,11/24;82,11/24]; %Mass of each registered block
 good_margin = 590; %arbitrary minimum value for stability
 
 %% Load the block model data
@@ -241,7 +241,16 @@ for n = 1 : N   %for each block in the model
     Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i; %[W1*A1;W2*A2,...,Wn*An]
     %Mass changes depending on block type [b1;b2;...;bn]
     [col,row] = col_row_converter(model(n, 5));
-    beq((6*n - 5) : 6*n, 1) = [0; 0; col*row*M*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
+    mass = col*row*2/60; %if the block does not have a registered mass
+    
+    for i = 1:size(M) %Search for the registered mass
+        if(model(n, 5) == M(i,1))
+           mass =  M(i,2);
+           break;
+        end
+    end
+    
+    beq((6*n - 5) : 6*n, 1) = [0; 0; mass*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
 end
 
 %% Solve problem
