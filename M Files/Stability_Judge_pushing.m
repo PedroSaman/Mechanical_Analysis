@@ -5,11 +5,12 @@ clear; clc; tic;
 %% constant numbers
 g = 9.81;
 T = 70*g;  %Maximum static friction force of one set of convex part
-M = 2/60; %Mass of a 1x1 block
+M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; %Mass of each registered block
 good_margin = 590; %arbitrary minimum value for stability
 
 %% Load the block model data
-filename = '../Dat Files/A_1.dat'; %Specify the data file name
+filename = '../Dat Files/tower.dat'; %Specify the data file name
+fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 model_size = size(model_original,1);
@@ -63,7 +64,7 @@ for n = 2 : z_max %from layer number 2 and ahead
     end
 end
 
-%% Find the number of forces
+% Find the number of forces
 force_f = size(F_f,1);
 force_nz = size(F_nz,1);
 force_nx = size(F_nx,1);
@@ -71,12 +72,14 @@ force_ny = size(F_ny,1);
 F = [F_f; F_nz; F_nx; F_ny];
 force = force_f + force_nz + force_nx + force_ny;
 
-%% Lower bounds (Ff, Fn)
+%% Force values bounds
+
+%Lower Bounds
 lb = -Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
 lb(3:3:3*force_f) = 0;  %F_f lower bound component in z is 0
 lb(3*force_f+1:3*force) = 0; %lower bound of the F_n is 0 in all 3 axis
 
-%% Upper bounds (Ff, Fn)
+%Upper bounds
 ub = Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
 ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; %Fnz upper bound component in x is 0
 ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; %Fnz upper bound component in y is 0
@@ -85,7 +88,7 @@ ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; %Fnx upper bou
 ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %Fny upper bound component in x is 0
 ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny upper bound component in z is 0
 
-%% Fn_line Lower and Upper bounds 
+% Fn_line bounds (look for optimizations here)
 check = 0;
 for i = 1 : force_f
 if((F_f(i, 7) == -1))
@@ -115,7 +118,7 @@ end
 check = 0;
 end
 
-%% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
+% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 for i = 1 : force_f
     if(F(i, 4) == -0.75) %lb(3*i-2)
         lb(3*i-2) = -T;
@@ -214,15 +217,19 @@ while(n <= force_f) %for each friction force fill the A matrix
 end
 A(1:n_knob, 3*force+1) = -1; %Only the last column of the A matrix
 
-%% Linear equalities
+%% Linear equalities(Bottle neck 99% of the execution time)
 Aeq = zeros(6*N, 3*force+1);
 beq = zeros(6*N, 1);
+um = zeros(1,N);
+dois = zeros(1,N);
+tres = zeros(1,N);
 for n = 1 : N   %for each block in the model
     K_i = zeros(3, 3*force+1); %This is the upper portion of the "Wj" matrix from the formulation
     p_i = zeros(force, 3); %This is all the "pk" vectors from the formulation into one matrix
     PN_i = eye(3*force + 1); %This is the "A" matrix from the formulation. (A = diag(A1,A2,...,An))
                             %Here the Zero matrix inside A, case the kth force does not appear in 
                             %the block is not in A but in Wj.
+    
     for m = 1 : force 
         if(F(m, 2) == n) %if the current force first block is the current one
             K_i(1:3, (3*m - 2):3*m) = eye(3); %Force Balance 
@@ -238,14 +245,25 @@ for n = 1 : N   %for each block in the model
             end
         end
     end
+    
+    %Bottle Neck Starts here
     P_i = zeros(3, 3*force + 1); %This is the botton portion of the "Wj" matrix from the formulation 
     for l = 3 : 3 : 3*force
         P_i(1:3, (l-2):l) = [0, -p_i(l/3, 3), p_i(l/3, 2); p_i(l/3, 3), 0, -p_i(l/3, 1); -p_i(l/3, 2), p_i(l/3, 1), 0];
     end
     Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i; %[W1*A1;W2*A2,...,Wn*An]
+    %Bottle Neck Ends here
+    
     %Mass changes depending on block type [b1;b2;...;bn]
     [col,row] = col_row_converter(model(n, 5));
-    beq((6*n - 5) : 6*n, 1) = [0; 0; col*row*M*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
+    mass = col*row*2/60; %if the block does not have a registered mass
+    for i = 1:size(M) %Search for the registered mass
+        if(model(n, 5) == M(i,1))
+           mass =  M(i,2);
+           break;
+        end
+    end
+    beq((6*n - 5) : 6*n, 1) = [0; 0; mass*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
 end
 
 %% Add pushing force and moment to beq 
@@ -257,8 +275,9 @@ for n = 1 : N_push
     beq(6*pbn-5 : 6*pbn) = b_dummy;
 end
 
-%% Solve problem
+%% Solve problem (Small throttle)
 f = zeros(3*force+1, 1);
+CM = 0;
 f((3*force + 1), 1) = 1;
 options = optimoptions('linprog','Display','none');
 [x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub,options);  %Linear programming problem
