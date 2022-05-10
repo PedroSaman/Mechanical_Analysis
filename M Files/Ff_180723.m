@@ -1,5 +1,5 @@
 function Ff = Ff_180723(join)
-%Find the friction force position in blocks that are in the second layer of higher of the block model in regard to its own coordinate axis.
+%Find the friction force position in blocks that are in the second layer or higher of the block model in regard to its own coordinate axis.
 %This function is working for up to 9x9 blocks
 %input: join = (1 or 2,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
 %               *: Number of other pair of snaped togheter knobs that are from the same block as the first pair

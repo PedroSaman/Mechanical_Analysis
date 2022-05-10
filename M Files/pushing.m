@@ -1,6 +1,6 @@
 function beq = pushing(model, N)
 %Calculate the forces and torques that the insertion of the last block
-%in the model would applies in the structure.
+%in the model would apply in the structure.
 %input:  model:(block_number, x, y, z, Block_type, color)
 %        N:(number of the block being inserted) 
 %output: beq:(Block_Number, Fx, Fy, Fz, Mx, My, Mz)
@@ -13,7 +13,7 @@ model_pushing = model(N, 1:6); %Block being inserted information
 knob_pushing = knob(model_pushing,0); %Knobs information of the block being inserted
 z_max = model_pushing(4); %Height of the inserted block
 
-%This function is not neede If this model has only blocks in the 1st layer
+%This function is not needed if the model has only blocks in the 1st layer
 if(z_max == 1)
     beq = [];
    return;
@@ -35,7 +35,7 @@ bc = zeros(9,9);
 loop = size(model,1);
 All_Forces = [];
 
-for n = 1 : loop %Number of blocks in the model. Space to improve here, search only the blocks in the necessary layers
+for n = 1 : loop
     if(model(n, 4) == z_max)
         break;
     elseif(model(n, 4) < z_max-1)
@@ -51,7 +51,7 @@ All_Forces(:,3) = -All_Forces(:,3);
 
 %Find the number of blocks to which the pushing force is applied, block_number, and the number of convex parts knob_number (1). 
 block_number = 0;  knob_number = size(join_push,1);
-b = zeros(knob_number);
+b = zeros(knob_number,1);
 for n = 1 : knob_number
     if(n == 1)
        block_number = 1;

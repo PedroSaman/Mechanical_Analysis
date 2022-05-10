@@ -9,7 +9,7 @@ M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,
 good_margin = 590; %arbitrary minimum value for stability
 
 %% Load the block model data
-filename = '../Dat Files/tower.dat'; %Specify the data file name
+filename = '../Dat Files/A_1.dat'; %Specify the data file name
 fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
@@ -54,13 +54,13 @@ for n = 2 : z_max %from layer number 2 and ahead
     Fny_i = Fny(adjoin_i); %Normal force in the y axis in the second layer or higher
 
     %Add the forces determined in the current iteration in the final forces matrix
-    F_f = [F_f; Ff_i];
-    F_nz = [F_nz; Fnz_i];
+    F_f = [F_f; Ff_i]; %#ok<AGROW>
+    F_nz = [F_nz; Fnz_i]; %#ok<AGROW>
     if(Fnx_i(1) ~= -1) %If there is normal force in X axis
-        F_nx = [F_nx; Fnx_i];
+        F_nx = [F_nx; Fnx_i]; %#ok<AGROW>
     end
     if(Fny_i(1) ~= -1) %If there is normal force in Y axis
-        F_ny = [F_ny; Fny_i];
+        F_ny = [F_ny; Fny_i]; %#ok<AGROW>
     end
 end
 
@@ -120,13 +120,13 @@ end
 
 % Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 for i = 1 : force_f
-    if(F(i, 4) == -0.75) %lb(3*i-2)
+    if(F(i, 4) == -0.75)
         lb(3*i-2) = -T;
-    elseif(F(i, 4) == 0.75) %ub(3*i-2)
+    elseif(F(i, 4) == 0.75)
         ub(3*i-2) = T;
-    elseif(F(i, 5) == -0.75) %lb(3*i-1)
+    elseif(F(i, 5) == -0.75)
         lb(3*i-1) = -T;
-    elseif(F(i, 5) == 0.75) %ub(3*i-1)
+    elseif(F(i, 5) == 0.75)
         ub(3*i-1) = T;
     end
 end
@@ -220,9 +220,6 @@ A(1:n_knob, 3*force+1) = -1; %Only the last column of the A matrix
 %% Linear equalities(Bottle neck 99% of the execution time)
 Aeq = zeros(6*N, 3*force+1);
 beq = zeros(6*N, 1);
-um = zeros(1,N);
-dois = zeros(1,N);
-tres = zeros(1,N);
 for n = 1 : N   %for each block in the model
     K_i = zeros(3, 3*force+1); %This is the upper portion of the "Wj" matrix from the formulation
     p_i = zeros(force, 3); %This is all the "pk" vectors from the formulation into one matrix
@@ -275,7 +272,7 @@ for n = 1 : N_push
     beq(6*pbn-5 : 6*pbn) = b_dummy;
 end
 
-%% Solve problem (Small throttle)
+%% Solve problem
 f = zeros(3*force+1, 1);
 CM = 0;
 f((3*force + 1), 1) = 1;
