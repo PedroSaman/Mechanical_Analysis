@@ -1,47 +1,48 @@
-﻿Aqui deixarei anotados informações úteis para quando for adaptar e expandir os conceitos do código da SUGIMOTO
-
 Stability_Judge_Pushing.m:
-	-> Procurar otimizações para o código, tendo em vista q este é execudato para cada bloco do modelo.
-
-pushing.m:
-	-> Essa funcao calcula quais forças e torques são aplicados em cada bloco do modelo no momento que um novo bloco é inserido. Criando como
-	   saida a matriz beq: [Fnx Fny Fnz Mx My Mz] para cada bloco.
-	-> Necessário automatizar essa função para a minha estratégia de criação de blocos.
-    -> Mudei o codigo da sugimoto para nao retirar 2 forcas de blocos 2x2 e sim so 1. Para ficar igual ao meu.
+	-> Procurar otimizações para o código.
 
 Stability_Judge.m:
-	-> Entender porque que é determinado que as forças F' interiores do bloco 2x2 tem T de módulo máximo ou -T de módulo mínimo. Isso porque
-	   são forças que estão atuando na parte "pontilhada" do bloco. (linha 114).
+	-> Entender porque que é determinado que as forças F' interiores do bloco 2x2 tem T de módulo máximo ou -T de 
+	   módulo mínimo. Isso porque são forças que estão atuando na parte "pontilhada" do bloco. (linha 122).
+
+putcolor.m 
+	-> Função não depende do tipo de bloco.
+
+pushing.m:
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+lines.m
+	-> Função não depende do tipo de bloco.
 
 knob.m:
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
 
-adjoin.m
+join.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+force_position.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Fnz_0.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Fnz.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Fny.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Fnx.m
+	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
+
+Ff_180723.m
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
 
 Ff_0_180723.m
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
 
-Ff_180723.m
-	-> Completei essa função e testei para casos de até 2x2 blocos, deu o mesmo resultado da sugimoto. Falta testar para blocos maiores. "TO DO"
+col_row_converter.m
+	-> Função não depende do tipo de bloco.
 
-Block_loader.m
-	-> Provavelmente inútil.
-
-force_position.m
-	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
-
-Fny.m e Fnx.m
-	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
-	-> Porém essa função é dependente da force_position.m que não aceita qualquer tipo de bloco.
- 	-> Essas duas funções podem ser juntas em uma única com algumas modificações. "TO DO"
-
-join.m
-	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
-
-Fnz_0.m
-	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
-	-> Pensar em como remover essa função e colocá-la junto da Fnz.m "TO DO"
-
-Fnz.m
+adjoin.m
 	-> Função completamente automatizada para qualquer bloco de 1 a 9 linhas e 1 a 9 colunas.
