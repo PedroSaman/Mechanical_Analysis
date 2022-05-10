@@ -1,3 +1,5 @@
+﻿To save a mat file as dat file: save "file_name.dat model_original -ascii"
+
 Stability_Judge_Pushing.m:
 	-> Procurar otimizações para o código.
 
