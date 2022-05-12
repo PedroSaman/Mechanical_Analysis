@@ -8,10 +8,19 @@ T = 70*g;  %Maximum static friction force of one set of convex part
 M = [11,17/448;12,139/2000;21,139/2000;13,17/175;31,17/175;14,103/800;41,103/800;22,81/640;24,39/160;42,39/160;28,11/24;82,11/24]; %Mass of each registered block
 good_margin = 590; %arbitrary minimum value for stability
 
-%% Load the block model data
+%% Load the block model data and search for structural problems
 filename = '../Dat Files/tower.dat'; %Specify the data file name
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
+
+check = model_check(model,M);
+if(check == -1 ) %If returns 1, this model is not supported
+    fprintf('This model has a block that is not currently available in the laboratory. \n');
+    return;
+elseif(check == -2)
+    fprintf('This model has multiples blocks occupying the same spot. \n');
+    return;
+end
 
 %% Model and knobs information
 N = size(model,1); %Total number of blocks
