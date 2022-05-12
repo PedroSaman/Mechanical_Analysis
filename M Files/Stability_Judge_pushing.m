@@ -9,10 +9,18 @@ M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,
 good_margin = 590; %arbitrary minimum value for stability
 
 %% Load the block model data
-filename = '../Dat Files/A_1.dat'; %Specify the data file name
+filename = '../Dat Files/brasil_completo.dat'; %Specify the data file name
 fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
+check = model_check(model,M);
+if(check == -1 ) %If returns 1, this model is not supported
+    fprintf('This model has a block that is not currently available in the laboratory. \n');
+    return;
+elseif(check == -2)
+    fprintf('This model has multiples blocks occupying the same spot. \n');
+    return;
+end
 model_size = size(model_original,1);
 
 %% Model and knobs information
@@ -292,4 +300,4 @@ if(CM > good_margin)
 else
     fprintf('This model is Unstable!\n');
 end
-fprintf('Time elapsed: %.5f \n',toc);
+fprintf('Time elapsed: %.2f \n',toc);
