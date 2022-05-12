@@ -8,7 +8,7 @@ T = 70*g;  %Maximum static friction force of one set of convex part
 M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; %Mass of each registered block
 good_margin = 590; %arbitrary minimum value for stability
 
-%% Load the block model data
+%% Load the block model data and search for structural problems
 filename = '../Dat Files/brasil_completo.dat'; %Specify the data file name
 fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
@@ -21,7 +21,6 @@ elseif(check == -2)
     fprintf('This model has multiples blocks occupying the same spot. \n');
     return;
 end
-model_size = size(model_original,1);
 
 %% Model and knobs information
 N = size(model,1);
