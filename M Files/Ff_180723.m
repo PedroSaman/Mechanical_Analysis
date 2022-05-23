@@ -3,7 +3,7 @@ function Ff = Ff_180723(join)
 %This function is working for up to 9x9 blocks
 %input: join = (1 or 2,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
 %               *: Number of other pair of snaped togheter knobs that are from the same block as the first pair
-%output: Ff = (Force_Number, Block_Number 1, Knob_Number 1, x1, y1, z1, *, Block_Number 2, Knob_Number 2, x2, y2, z2, 0)
+%output: Ff = (Force_Number, Upper Block_Number, Upper Knob_Number , x1, y1, z1, *, Lower Block_Number, Lower Knob_Number, x2, y2, z2, 0)
 %             *: upper and lower limits of the normal force
 
 All_Forces = [];
