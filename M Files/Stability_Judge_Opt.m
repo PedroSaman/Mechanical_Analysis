@@ -217,7 +217,7 @@ while(n <= force_f) %for each friction force fill the A matrix
     
     n = n + force_counter; %update n value
 end
-A(1:n_knob, 3*force+1) = -1; %Only the last column of the A matrix
+A(1:n_knob, 3*force+1) = 1; %Only the last column of the A matrix
 
 %% Linear equalities
 Aeq = zeros(6*N, 3*force+1);
@@ -264,12 +264,12 @@ end
 
 %% Solve problem
 f = zeros(3*force+1, 1);
-f((3*force + 1), 1) = 1;
+f((3*force + 1), 1) = -1;
 [x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Linear programming problem
 if(~isempty(x))
     fprintf('Solution found');
     XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
-    CM = -x(3*force+1); %Capacity CM 
+    CM = x(3*force+1); %Capacity CM 
     if(CM >= good_margin)
         fprintf('Stability with good security margin. CM = %.4f \n',CM);
     else
