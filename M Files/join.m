@@ -1,9 +1,9 @@
-function y = join(knobs, line)
+function z = join(knobs, line)
 %Find which knobs are snaped togheter. The order in the output vector is in regard to the upper block numeration
 %This function is working for up to 9x9 blocks
 %input: knobs: (x,y,z,block_type,color,block_number,knob_index)
 %       line = (layer number)
-%output: y = (*,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
+%output: z = (*,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
 %        *: Number of other pair of snaped togheter knobs that are from the same block as the first pair
 
 loop = size(knobs,1);
@@ -37,6 +37,8 @@ for n = 1 : (count_l - 1) %for every upper knob found
 end
 
 y = join(1:(count - 1), 1:7);
+z = join(1:(count - 1), 1:7);
+c = 1;
 max_knob_number = 81; %(9x9 block have 81 knobs)
 block_number = zeros(max_knob_number, 1); %This vector stores all knobs connections that is also from the same block pair as the current one
 
@@ -53,6 +55,8 @@ for n = 1 : (count-1) %for each line of y matrix
        if(same_block > 1) %If have found any knob pair from the same block pair
            for l = 1 : same_block
                y(block_number(l), 1) = same_block; %Save in the matrix how many knob pairs share the same block pair
+               z(c,:) = y(block_number(l),:); %Organize the vector
+               c = c + 1;
            end
        end
    end
