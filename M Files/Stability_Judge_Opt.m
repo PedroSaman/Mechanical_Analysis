@@ -91,37 +91,30 @@ ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %Fny upper bound compon
 ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny upper bound component in z is 0
 
 %% Fn_line Lower and Upper bounds 
-check = 0;
 for i = 1 : force_f
-   if((F_f(i, 7) == -1))
-       %x points to -infinite, y = 0 
-       lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
-       check = 1;
-   elseif((F_f(i, 7) == -2)) 
-       %x = 0, y points to -infinite 
-       lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
-       check = 1;
-   elseif((F_f(i, 7) == 2))
-       %x = 0, y points to +infinite
-       lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
-       check = 1;
-   elseif((F_f(i, 7) == 1))
-       %x points to +infinite, y = 0
-       lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0; %no force component in Y axis and in X axis = [0,+inf]
-       check = 1;
-   end
-   if(check == 1) %The Fn_line orientation is determined by the height 
-      if(F_f(i,8) == 0) %If this force is from a n==1 layer
-          F(i, 7) = -1; %The bottom is the foundation
-      else
-          F(i, 7:6:13) = [-1, 1];
-      end
-   end
-   check = 0;
+    if((F_f(i, 7) == -1))
+        %x points to -infinite, y = 0 
+        lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
+    elseif((F_f(i, 7) == -2)) 
+        %x = 0, y points to -infinite 
+        lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
+    elseif((F_f(i, 7) == 2))
+        %x = 0, y points to +infinite
+        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
+    elseif((F_f(i, 7) == 1))
+        %x points to +infinite, y = 0
+        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) = 0; %no force component in Y axis and in X axis = [0,+inf]
+    end
+    if(F_f(i,8) == 0) %If this force is from a n==1 layer
+        F(i, 7) = -1; %The bottom is the foundation
+    else
+        F(i, 7:6:13) = [-1, 1];
+    end %The Fn_line orientation is determined by the height 
 end
 
 %% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 for i = 1 : force_f
+    %taller blocks
     if(F(i, 4) == -0.75)
         lb(3*i-2) = -T;
     elseif(F(i, 4) == 0.75)
@@ -217,7 +210,7 @@ while(n <= force_f) %for each friction force fill the A matrix
     
     n = n + force_counter; %update n value
 end
-A(1:n_knob, 3*force+1) = -1; %Only the last column of the A matrix
+A(1:n_knob, 3*force+1) = 1; %Only the last column of the A matrix
 
 %% Linear equalities
 Aeq = zeros(6*N, 3*force+1);
@@ -264,12 +257,12 @@ end
 
 %% Solve problem
 f = zeros(3*force+1, 1);
-f((3*force + 1), 1) = 1;
+f((3*force + 1), 1) = -1;
 [x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Linear programming problem
 if(~isempty(x))
     fprintf('Solution found');
     XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
-    CM = -x(3*force+1); %Capacity CM 
+    CM = x(3*force+1); %Capacity CM 
     if(CM >= good_margin)
         fprintf('Stability with good security margin. CM = %.4f \n',CM);
     else
