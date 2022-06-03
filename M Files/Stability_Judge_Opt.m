@@ -17,7 +17,6 @@ filename = '../Dat Files/A_1.dat'; %Specify the data file name
 fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
-
 check = model_check(model,M);
 if(check == -1 ) %If returns 1, this model is not supported
     fprintf('This model has a block that is not currently available in the laboratory. \n');
@@ -117,10 +116,8 @@ for i = 1 : force_f
     end %The Fn_line orientation is determined by the height 
 end
 
-%% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
 %% Fn_line upper limit setting (Only the inner Fn_line from the nx2/2xn blocks)
 for i = 1 : force_f
-    %taller blocks
     if(F(i, 4) == -0.75)
         lb(3*i-2) = -T;
     elseif(F(i, 4) == 0.75)
@@ -132,139 +129,13 @@ for i = 1 : force_f
     end
 end
 
-%% Linear inequalities
-% Capacity Ci is evaluated by the number of connecting knobs
-n_knob = size(knobs,1);
-A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 columns is one force.
-b  = ones(n_knob, 1) * T;
-knob_counter = 1;
-n = 1;
-while(n <= force_f) %for each friction force fill the A matrix
-    force_counter = 0;    
-    type_1 = model(F(n,2),5); %current upper block type    
-    [col,row] = col_row_converter(type_1);
-    if(F(n, 8) == 0) %z = 1
-        if(type_1 == 11) %special case for 1x1 block
-            A(knob_counter,3*n:3:3*(n+7)) = 1; %Add 4 forces to A and duplicate it
-            knob_counter = knob_counter + 1;   %go to the next knob
-            force_counter = force_counter + 8; %iterate to the next force
-        else
-            starting_knob = knob_counter; %need to store which knonb were the first one to later duplicate the A matrix
-            if(row>=col) %if the block is taller than wide or square
-                for i = 1:col %for each column
-                    for j = 1:row %for each row
-                        if(j==1 || j==row) %if this knob is from the first or last row
-                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+2)) = 1; %Add 3 forces to A
-                            force_counter = force_counter + 3; %iterate to the next force
-                        else %if this knob is from a middle row
-                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+1)) = 1; %Add 2 forces to A
-                            force_counter = force_counter + 2; %iterate to the next force
-                        end
-                        knob_counter = knob_counter + 1; %go to the next knob
-                    end
-                end
-            else %if the block is wider than tall
-                for j = 1:col %for each column
-                    for i = 1:row %for each row
-                        if(j==1 || j==col) %if this is the first or the last column
-                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+2)) = 1; %Add 3 forces to A
-                            force_counter = force_counter + 3; %iterate to the next force
-                        else %if this is a middle column
-                            A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+1)) = 1; %Add 2 forces to A
-                            force_counter = force_counter + 2; %iterate to the next force
-                        end
-                        knob_counter = knob_counter + 1; %iterate to the next knob
-                    end
-                end
-            end
-            %Need to double the A matrix as there are pairs of friction
-            %forces
-            A(starting_knob:(knob_counter-1),3*(n+force_counter):3:3*(n+(force_counter)*2-1)) = A(starting_knob:knob_counter-1,3*n:3:3*(n+force_counter-1));
-            force_counter = force_counter*2;
-        end
-    else %z > 1 Here there is no need to duplicate the force aftwards 
-        if(type_1 == 11) %special case for 1x1 block
-            A(knob_counter,3*n:3:3*(n+7)) = 1; %Add 4 forces to A and duplicate it
-            knob_counter = knob_counter + 1;   %go to the next knob
-            force_counter = force_counter + 8; %iterate to the next force
-        elseif(row>=col) %if the block is taller than wide
-            while(F(n+force_counter,2) == F(n,2)) %while in the same block
-                m = F(n+force_counter,3); %store the block number
-                if(rem(m,row) == 1 || rem(m,row) == 0) %if this is the first or the last row
-                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+5)) = 1; %Add 6 forces to A
-                    force_counter = force_counter + 6; %iterate to the next force
-                else %if this is a middle row
-                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+3)) = 1; %Add 4 forces to A
-                    force_counter = force_counter + 4; %iterate to the next force
-                end
-                knob_counter = knob_counter + 1; %iterate to the next knob
-            end
-        else
-            while(F(n+force_counter,2) == F(n,2)) %while in the same block
-                m = F(n+force_counter,3); %store the block number
-                if(m == 1 || m == 2 || m == col*row-1 || m == col*row) %if this is the first or the last row
-                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+5)) = 1; %Add 6 forces to A
-                    force_counter = force_counter + 6; %iterate to the next force
-                else %if this is a middle row
-                    A(knob_counter,3*(n+force_counter):3:3*((n+force_counter)+3)) = 1; %Add 4 forces to A
-                    force_counter = force_counter + 4; %iterate to the next force
-                end
-                knob_counter = knob_counter + 1; %iterate to the next knob
-            end
-        end
-    end
-    
-    n = n + force_counter; %update n value
-end
-A(1:n_knob, 3*force+1) = 1; %Only the last column of the A matrix
+%% Linear programming problem
+[A,b] = A_b_matrices_assembler(F,force_f,model,T); %Linear Inequalities
+[Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M); %Linear equalities
+f = zeros(3*force+1, 1); %Evaluate function
+f((3*force + 1), 1) = -1; %To minimize the evaluate function result
+[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Solve the problem
 
-%% Linear equalities
-Aeq = zeros(6*N, 3*force+1);
-beq = zeros(6*N, 1);
-for n = 1 : N   %for each block in the model
-    K_i = zeros(3, 3*force+1); %This is the upper portion of the "Wj" matrix from the formulation
-    p_i = zeros(force, 3); %This is all the "pk" vectors from the formulation into one matrix
-    PN_i = eye(3*force + 1); %This is the "A" matrix from the formulation. (A = diag(A1,A2,...,An))
-                             %Here the Zero matrix inside A, case the kth force does not appear in 
-                             %the block is not in A but in Wj.
-    for m = 1 : force 
-       if(F(m, 2) == n) %if the current force first block is the current one
-           K_i(1:3, (3*m - 2):3*m) = eye(3); %Force Balance 
-           p_i(m, 1 : 3) = F(m, 4:6); %Start point coordinates 
-           if(F(m, 7) == -1) %Correct the direction of force 
-               PN_i((3*m - 2) : 3*m, (3*m - 2) : 3*m) = -eye(3);
-           end
-        elseif(F(m, 8) == n) %if the current force second block is the current one
-           K_i(1:3, (3*m - 2):3*m) = eye(3); %Force Balance
-           p_i(m, 1 : 3) = F(m, 10:12); %Start point coordinates
-           if(F(m, 13) == -1) %Correct the direction of force
-               PN_i((3*m - 2) : 3*m, (3*m - 2) : 3*m) = -eye(3);
-           end
-       end
-    end
-    P_i = zeros(3, 3*force + 1); %This is the botton portion of the "Wj" matrix from the formulation 
-    for l = 3 : 3 : 3*force
-        P_i(1:3, (l-2):l) = [0, -p_i(l/3, 3), p_i(l/3, 2); p_i(l/3, 3), 0, -p_i(l/3, 1); -p_i(l/3, 2), p_i(l/3, 1), 0];
-    end
-    Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i; %[W1*A1;W2*A2,...,Wn*An]
-    %Mass changes depending on block type [b1;b2;...;bn]
-    [col,row] = col_row_converter(model(n, 5));
-    mass = col*row*2/60; %if the block does not have a registered mass
-    
-    for i = 1:size(M) %Search for the registered mass
-        if(model(n, 5) == M(i,1))
-           mass =  M(i,2);
-           break;
-        end
-    end
-    
-    beq((6*n - 5) : 6*n, 1) = [0; 0; mass*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
-end
-
-%% Solve problem
-f = zeros(3*force+1, 1);
-f((3*force + 1), 1) = -1;
-[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Linear programming problem
 if(~isempty(x))
     fprintf('Solution found\n');
     XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
