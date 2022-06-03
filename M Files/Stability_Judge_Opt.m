@@ -1,15 +1,20 @@
 %% Stability_Judge.m
+% T - A*x will show how much force is overflowing (case negative) or still
+% can be applied (case positive) for each knob in the given model.
+%(need to understand and explain better what knob is which)
 
+%% Initialization
 clear; clc; tic;
 
 %% constant numbers
-g = 9.81;
-T = 70*g;  %Maximum static friction force of one set of convex part
-M = [11,17/448;12,139/2000;21,139/2000;13,17/175;31,17/175;14,103/800;41,103/800;22,81/640;24,39/160;42,39/160;28,11/24;82,11/24]; %Mass of each registered block
-good_margin = 590; %arbitrary minimum value for stability
+g = 9.8;
+T = 307*g; %Maximum static friction force of one set of convex part
+M = [11,100;12,1.39/20;21,10000;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24];
+good_margin = T*0.8; %arbitrary minimum value for stability
 
 %% Load the block model data and search for structural problems
-filename = '../Dat Files/tower.dat'; %Specify the data file name
+filename = '../Dat Files/A_1.dat'; %Specify the data file name
+fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
 
@@ -113,6 +118,7 @@ for i = 1 : force_f
 end
 
 %% Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
+%% Fn_line upper limit setting (Only the inner Fn_line from the nx2/2xn blocks)
 for i = 1 : force_f
     %taller blocks
     if(F(i, 4) == -0.75)
@@ -260,7 +266,7 @@ f = zeros(3*force+1, 1);
 f((3*force + 1), 1) = -1;
 [x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Linear programming problem
 if(~isempty(x))
-    fprintf('Solution found');
+    fprintf('Solution found\n');
     XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
     CM = x(3*force+1); %Capacity CM 
     if(CM >= good_margin)
