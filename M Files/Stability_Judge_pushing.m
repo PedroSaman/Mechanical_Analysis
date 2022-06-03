@@ -3,13 +3,13 @@
 clear; clc; tic;
 
 %% constant numbers
-g = 9.81;
-T = 70*g;  %Maximum static friction force of one set of convex part
+g = 9.8;
+T = 308*g;  %Maximum static friction force of one set of convex part
 M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; %Mass of each registered block
-good_margin = 590; %arbitrary minimum value for stability
+good_margin = T*0.8; %arbitrary minimum value for stability
 
 %% Load the block model data and search for structural problems
-filename = '../Dat Files/brasil_completo.dat'; %Specify the data file name
+filename = '../Dat Files/A_1.dat'; %Specify the data file name
 fprintf('Filename: %s \n',filename);
 model_original = load(filename); % model_original = (x, y, z, type)
 model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
@@ -82,7 +82,7 @@ force = force_f + force_nz + force_nx + force_ny;
 %% Force values bounds
 
 %Lower Bounds
-lb = -Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
+lb = -Inf(3*force+1, 1); %Number of forces times 3 (x, y, z) + Capacity
 lb(3:3:3*force_f) = 0;  %F_f lower bound component in z is 0
 lb(3*force_f+1:3*force) = 0; %lower bound of the F_n is 0 in all 3 axis
 
@@ -95,34 +95,26 @@ ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; %Fnx upper bou
 ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %Fny upper bound component in x is 0
 ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny upper bound component in z is 0
 
-% Fn_line bounds (look for optimizations here)
-check = 0;
+%Fn_line bounds
 for i = 1 : force_f
-if((F_f(i, 7) == -1))
-    %x points to -infinite, y = 0 
-    lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
-    check = 1;
-elseif((F_f(i, 7) == -2)) 
-    %x = 0, y points to -infinite 
-    lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
-    check = 1;
-elseif((F_f(i, 7) == 2))
-    %x = 0, y points to +infinite
-    lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
-    check = 1;
-elseif((F_f(i, 7) == 1))
-    %x points to +infinite, y = 0
-    lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0; %no force component in Y axis and in X axis = [0,+inf]
-    check = 1;
-end
-if(check == 1) %The Fn_line orientation is determined by the height 
-    if(F_f(i,8) == 0) %If this force is from a n==1 layer
-        F(i, 7) = -1; %The bottom is the foundation
-    else
-        F(i, 7:6:13) = [-1, 1];
+    if((F_f(i, 7) == -1))
+        %x points to -infinite, y = 0 
+        lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
+    elseif((F_f(i, 7) == -2)) 
+        %x = 0, y points to -infinite 
+        lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
+    elseif((F_f(i, 7) == 2))
+        %x = 0, y points to +infinite
+        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
+    elseif((F_f(i, 7) == 1))
+        %x points to +infinite, y = 0
+        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) =  0; %no force component in Y axis and in X axis = [0,+inf]
     end
-end
-check = 0;
+    if(F_f(i,8) == 0) %If this force is from the first layer
+        F(i, 7) = -1; %The bottom is the base
+    else
+        F(i, 7:6:13) = [-1, 1]; %Force orientation info
+    end
 end
 
 % Fn_line upper limit setting (Only the inner Fn_line from the 2x2 blocks)
@@ -139,7 +131,7 @@ for i = 1 : force_f
 end
 
 %% Linear inequalities
-% Capacity Ci is evaluated by the number of connecting knobs
+% Capacity Ci is calculated for each knob
 n_knob = size(knobs,1);
 A = zeros(n_knob, 3*force+1); %each line represents one knob, end each set of 3 columns is one force.
 b  = ones(n_knob, 1) * T;
