@@ -1,40 +1,36 @@
-function beq = pushing(model, N)
-%Calculate the forces and torques that the insertion of the last block
-%in the model would apply in the structure.
+function beq = pushing(model, N, T)
+%Compute the force and torque that the model last block insertion would
+%apply in the structure.
 %input:  model:(block_number, x, y, z, Block_type, color)
-%        N:(number of the block being inserted) 
+%        N:(number of the block being inserted)
+%        T:(maximum friction force to snap out one connection point)
 %output: beq:(Block_Number, Fx, Fy, Fz, Mx, My, Mz)
 
-%constant numbers
-g = 9.81; T=70*g;
+%Information on the block being inserted (Upper Block)
+model_pushing = model(N, 1:6); % Block being inserted information
+knob_pushing = knob(model_pushing,0); % Block being inserted knob information
+z_max = model_pushing(4); % Height of the inserted block
 
-%Information on the block to be pushed (Upper Block)
-model_pushing = model(N, 1:6); %Block being inserted information
-knob_pushing = knob(model_pushing,0); %Knobs information of the block being inserted
-z_max = model_pushing(4); %Height of the inserted block
-
-%This function is not needed if the model has only blocks in the 1st layer
+%Return if the model has only blocks in the 1st layer
 if(z_max == 1)
     beq = [];
    return;
 end
 
-%Information on the block to be pushed into (Lower Block)
-knob_push = knob(model, z_max - 1); %Previous layer knobs information
-
-%Find the convex part to be pushed in
-knob_push = [knob_push; knob_pushing]; %Merge last layer knobs and the inserted block
-join_push = join(knob_push, z_max); %Find out the knobs that are snaped together
+%Find out which knob from the previous layer is snapped with the block being inserted
+knob_push = knob(model, z_max - 1); % Previous layer knobs information
+knob_push = [knob_push; knob_pushing]; % Merge last layer knobs and the inserted block
+join_push = join(knob_push, z_max); % Find out the knobs that are snapped together
 
 %Get the upper block forces position
 [col,row] = col_row_converter(model(N, 5));
 UpperBlock_Forces = force_position(col,row,"ff");
 UpperBlock_Forces(:,3) = -UpperBlock_Forces(:,3); %Need to invert the z value (needs to be positive)
 
+%Fills the All_Forces Matrix
 bc = zeros(9,9);
 loop = size(model,1);
 All_Forces = [];
-
 for n = 1 : loop
     if(model(n, 4) == z_max)
         break;
@@ -49,8 +45,8 @@ for n = 1 : loop
 end
 All_Forces(:,3) = -All_Forces(:,3);
 
-%Find the number of blocks to which the pushing force is applied, block_number, and the number of convex parts knob_number (1). 
-block_number = 0;  knob_number = size(join_push,1);
+%Find the number of blocks and knobs being pushed and create a matix with the block number
+block_number = 0; knob_number = size(join_push,1);
 b = zeros(knob_number,1);
 for n = 1 : knob_number
     if(n == 1)
@@ -70,7 +66,7 @@ for n = 1 : knob_number
     end
 end
 
-%Ask for beq 
+%Calculate the forces and momentous to all blocks caused by the insertion
 beq = zeros(block_number, 7);
 for m = 1 : block_number %for each block that is being applied force
     block = b(m);

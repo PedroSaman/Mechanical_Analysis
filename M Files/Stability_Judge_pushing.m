@@ -4,7 +4,7 @@ clear; clc; tic;
 
 %% constant numbers
 g = 9.8;
-T = 308*g;  %Maximum static friction force of one set of convex part
+T = 151*g;  %Maximum static friction force of one set of convex part
 M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; %Mass of each registered block
 good_margin = T*0.8; %arbitrary minimum value for stability
 
@@ -24,7 +24,7 @@ end
 
 %% Model and knobs information
 N = size(model,1);
-b_push = pushing(model, N); % Forces and Torques that the insertion of the last block causes
+b_push = pushing(model, N, T); % Forces and Torques that the insertion of the last block causes
 N = N - 1; % Ignore the last block in the usual stability judge. If it stay stable during the insertion, it will be in a static scenario.
 model = model(1:N,:); %Narrow down the model. Exclude the last block.
 z_max = model(end,4); % Structure height
