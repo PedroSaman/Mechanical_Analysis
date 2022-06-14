@@ -6,7 +6,7 @@ function Fnx = Fnx(adjoin)
 %output: Fnx = (Force_Number, Block_Number 1, Knob_Number 1, x1, y1, z1, -1, Block_Number 2, Knob_Number 2, x2, y2, z2, 1)
 
 if(adjoin == -1)
-    Fnx = -1;
+    Fnx = [];
 else
     loop = size(adjoin,1);
     nx = loop; %Number of contact surfaces in the x direction 
@@ -38,7 +38,7 @@ else
    
     force_x = 4 * nx; %Number of Fnx forces
     if(force_x == 0) %if all contact surfaces in adjoin are in the y direction 
-        Fnx = -1;
+        Fnx = [];
     else 
         Fnx = zeros(force_x, 13);  Fnx(1:force_x, 1) = 1:force_x; %create a matrix to store each force data
         Fnx(:, 7:6:13) = [-ones(force_x, 1), ones(force_x, 1)]; %set column 7 as -1 and column 13 as 1
