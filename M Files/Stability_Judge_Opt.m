@@ -40,34 +40,24 @@ z_max = model(end,4); % Structure height
 knobs = knob(model,0); % Knob information (entire block model)
 
 %% Find the forces acting on the model
-F_nx = [ ];  F_ny = [ ];
+% For the first layer
+knob_i = knob(model, 1); % Layer knob information
+adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
+F_f = Ff_0_180723(model); % First layer friction forces
+F_nz = Fnz_0(model); % First layer z axis normal forces
+F_nx = Fnx(adjoin_i); % Layer X axis normal forces 
+F_ny = Fny(adjoin_i); % Layer Y axis normal forces
 
-%for the first layer
-knob_i = knob(model, 1); %knobs in this layer information
-adjoin_i = adjoin(knob_i); %adjoint blocks information
-F_f = Ff_0_180723(model); %Friction force of blocks in the first layer
-F_nz = Fnz_0(model); %Normal force in the z axis in the first layer
+% For second layer onwards 
+for n = 2 : z_max 
+    knob_i = knob(model, n); % Layer knob information
+    adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
+    join_i = join(knobs, n); % Connected knobs information
 
-if(adjoin_i ~= -1) %There are adjacent blocks 
-    Fnx_i = Fnx(adjoin_i); %Normal force in the x axis
-    Fny_i = Fny(adjoin_i); %Normal force in the y axis
-    if(Fnx_i(1) ~= -1) %If there is normal force in X axis
-        F_nx = Fnx_i;
-    end
-    if(Fny_i(1) ~= -1) %If there is normal force in Y axis
-        F_ny = Fny_i;
-    end
-end
-
-for n = 2 : z_max %for layer = 2 to the end 
-    knob_i = knob(model, n); %knobs in this layer information
-    adjoin_i = adjoin(knob_i); %adjoint blocks information
-    join_i = join(knobs, n); %knobs are snaped togheter
-
-    Ff_i = Ff_180723(join_i); %Friction force of blocks in the second layer or higher
-    Fnz_i = Fnz(join_i);   %Normal force in the z axis in the second layer or higher
-    Fnx_i = Fnx(adjoin_i); %Normal force in the x axis in the second layer or higher
-    Fny_i = Fny(adjoin_i); %Normal force in the y axis in the second layer or higher
+    Ff_i = Ff_180723(join_i); % Layer friction forces
+    Fnz_i = Fnz(join_i);   % Layer z axis normal forces
+    Fnx_i = Fnx(adjoin_i); % Layer X axis normal forces
+    Fny_i = Fny(adjoin_i); % Layer Y axis normal forces
     
     % Add the computed forces to the final forces matrix
     F_f = [F_f; Ff_i];
