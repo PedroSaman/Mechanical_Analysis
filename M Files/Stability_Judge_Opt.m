@@ -26,10 +26,10 @@ elseif(check == -2)
     return;
 end
 
-%% Model and knobs information
-N = size(model,1); %Total number of blocks
-z_max = lines(model); % Structure height
-knobs = knob(model,0); % Knobs information (entire block model)
+%% Model and knob information
+N = size(model,1); % Total block number
+z_max = model(end,4); % Structure height
+knobs = knob(model,0); % Knob information (entire block model)
 
 %% Find the forces acting on the model
 F_nx = [ ];  F_ny = [ ];

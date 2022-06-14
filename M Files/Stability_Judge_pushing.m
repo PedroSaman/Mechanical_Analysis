@@ -27,7 +27,7 @@ N = size(model,1);
 b_push = pushing(model, N); % Forces and Torques that the insertion of the last block causes
 N = N - 1; % Ignore the last block in the usual stability judge. If it stay stable during the insertion, it will be in a static scenario.
 model = model(1:N,:); %Narrow down the model. Exclude the last block.
-z_max = lines(model); % Structure height
+z_max = model(end,4); % Structure height
 knobs = knob(model,0); % Knobs information (entire block model)
 
 %% Find the forces acting on the model
