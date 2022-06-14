@@ -1,24 +1,32 @@
 %% Stability_Judge.m
-% T - A*x will show how much force is overflowing (case negative) or still
-% can be applied (case positive) for each knob in the given model.
-%(need to understand and explain better what knob is which)
+% This script will take the datfile specified in "filename" and compute
+% where each force appear in the structure. After that, it will run a
+% linear programing problem trying to minimize the minimum capacity.
+% Input: Filename(is the location of a datfile in the correct format)
+                 % dat file format: each line is one block. All coordinates
+                 % are related to the FIRST knob of the block. Being it:
+                 % (x, y, z, block type). The dat file MUST be sorted to be
+                 % increasing in the value of Z from 1 to z_max.
+% Output: CapacityMargin(CM): The stability judge.
+% OBS: T - A*x will show how much force is overflowing (case negative) or 
+% still can be applied (case positive) for each knob in the model.
 
 %% Initialization
 clear; clc; tic;
-
-%% constant numbers
-g = 9.8;
-T = 307*g; %Maximum static friction force of one set of convex part
-M = [11,100;12,1.39/20;21,10000;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24];
-good_margin = T*0.8; %arbitrary minimum value for stability
-
-%% Load the block model data and search for structural problems
-filename = '../Dat Files/A_1.dat'; %Specify the data file name
+filename = '../Dat Files/brasil_completo_3layers.dat'; % Specify the data file name
 fprintf('Filename: %s \n',filename);
-model_original = load(filename); % model_original = (x, y, z, type)
-model = putcolor(model_original); % model = (BlockNo., x, y, z, type, color)
-check = model_check(model,M);
-if(check == -1 ) %If returns 1, this model is not supported
+
+%% Constant numbers
+g = 9.8;
+T = 151*g; % Maximum static friction force of one set of convex part
+M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
+good_margin = T*0.8; % Arbitrary minimum value for stability
+
+%% Load the model and search for obvious structural problems
+model_original = load(filename); % (x, y, z, type)
+model = putcolor(model_original); % (BlockNo., x, y, z, type, color)
+check = model_check(model,M); % Verify the datfile model
+if(check == -1 ) 
     fprintf('This model has a block that is not currently available in the laboratory. \n');
     return;
 elseif(check == -2)
@@ -61,59 +69,55 @@ for n = 2 : z_max %for layer = 2 to the end
     Fnx_i = Fnx(adjoin_i); %Normal force in the x axis in the second layer or higher
     Fny_i = Fny(adjoin_i); %Normal force in the y axis in the second layer or higher
     
-    %Add the forces determined in the current iteration in the final forces matrix
+    % Add the computed forces to the final forces matrix
     F_f = [F_f; Ff_i];
     F_nz = [F_nz; Fnz_i];
-    if(Fnx_i(1) ~= -1) %If there is normal force in X axis
-        F_nx = [F_nx; Fnx_i];
-    end
-    if(Fny_i(1) ~= -1) %If there is normal force in Y axis
-        F_ny = [F_ny; Fny_i];
-    end
+    F_nx = [F_nx; Fnx_i];
+    F_ny = [F_ny; Fny_i];
 end
 
-%% Find the number of forces
-force_f = size(F_f,1);
-force_nz = size(F_nz,1);
-force_nx = size(F_nx,1);
-force_ny = size(F_ny,1);
+%% Count the number of forces
+force_f = size(F_f,1); % Friction force number
+force_nz = size(F_nz,1); % Z axis normal force number
+force_nx = size(F_nx,1); % X axis normal force number
+force_ny = size(F_ny,1); % Y axis normal force number
 F = [F_f; F_nz; F_nx; F_ny];
-force = force_f + force_nz + force_nx + force_ny;
+force = force_f + force_nz + force_nx + force_ny; % Total number of forces
 
-%% Lower bounds (Ff, Fn)
-lb = -Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
-lb(3:3:3*force_f) = 0;  %F_f lower bound component in z is 0
-lb(3*force_f+1:3*force) = 0; %lower bound of the F_n is 0 in all 3 axis
+%% Forces lower bounds values
+lb = -Inf(3*force+1, 1); % Number of forces times 3 (X, Y, Z) + Capacity
+lb(3:3:3*force_f) = 0;  % F_f Z axis lower bound value is 0
+lb(3*force_f+1:3*force) = 0; % F_n lower bound value in all 3 axis is 0
 
-%% Upper bounds (Ff, Fn)
-ub = Inf(3*force+1, 1); %Number of forces x 3 (x, y, z) + Capacity
-ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; %Fnz upper bound component in x is 0
-ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; %Fnz upper bound component in y is 0
-ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; %Fnx upper bound component in y is 0
-ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; %Fnx upper bound component in z is 0
-ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; %Fny upper bound component in x is 0
-ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny upper bound component in z is 0
+%% Forces Upper bounds values
+ub = Inf(3*force+1, 1); % Number of forces times 3 (X, Y, Z) + Capacity
+ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; % Fnz X axis upper bound value is 0
+ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; % Fnz Y axis upper bound value is 0
+ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; % Fnx Y axis upper bound value is 0
+ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; % Fnx z axis upper bound value is 0
+ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; % Fny X axis upper bound value is 0
+ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny Z axis upper bound value is 0
 
-%% Fn_line Lower and Upper bounds 
+%% Friction force X and Y axis bounds (Fn_line) and orientation correction
 for i = 1 : force_f
     if((F_f(i, 7) == -1))
-        %x points to -infinite, y = 0 
-        lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in Y axis and in X axis = [-inf,0]
+        % Ff X axis points to -infinite and does not have component in Y axis 
+        lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force in Y axis and in X axis bounds are [-inf,0]
     elseif((F_f(i, 7) == -2)) 
-        %x = 0, y points to -infinite 
-        lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force component in X axis and in Y axis = [-inf,0]
+        % Ff does not have component in X axis and Y axis points to -infinite 
+        lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force in X axis and in Y axis bounds are [-inf,0]
     elseif((F_f(i, 7) == 2))
-        %x = 0, y points to +infinite
-        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force component in X axis and in Y axis = [0,+inf]
+        % Ff does not have component in X axis and Y axis points to +infinite
+        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force in X axis and in Y axis bounds are [0,+inf]
     elseif((F_f(i, 7) == 1))
-        %x points to +infinite, y = 0
-        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) = 0; %no force component in Y axis and in X axis = [0,+inf]
+        % Ff X axis points to +infinite and does not have component in Y axis
+        lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) = 0; %no force in Y axis and in X axis bounds are [0,+inf]
     end
-    if(F_f(i,8) == 0) %If this force is from a n==1 layer
-        F(i, 7) = -1; %The bottom is the foundation
+    if(F_f(i,8) == 0) % If the force is from the first layer
+        F(i, 7) = -1;
     else
         F(i, 7:6:13) = [-1, 1];
-    end %The Fn_line orientation is determined by the height 
+    end
 end
 
 %% Fn_line upper limit setting (Only the inner Fn_line from the nx2/2xn blocks)
@@ -130,15 +134,16 @@ for i = 1 : force_f
 end
 
 %% Linear programming problem
-[A,b] = A_b_matrices_assembler(F,force_f,model,T); %Linear Inequalities
-[Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M); %Linear equalities
-f = zeros(3*force+1, 1); %Evaluate function
-f((3*force + 1), 1) = -1; %To minimize the evaluate function result
-[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub);  %Solve the problem
+[A,b] = A_b_matrices_assembler(F,force_f,model,T); % Linear Inequalities
+[Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M); % Linear equalities
+f = zeros(3*force+1, 1); % Evaluate function
+f((3*force + 1), 1) = -1; % Change the problem to minimization
+[x,fval,exitflag,output] = linprog(f,A,b,Aeq,beq,lb,ub); % Solve the problem
 
-if(~isempty(x))
+%% Final output messages
+if(~isempty(x)) % If there were a solution
     fprintf('Solution found\n');
-    XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)];  %Force acting on the block model 
+    XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
     CM = x(3*force+1); %Capacity CM 
     if(CM >= good_margin)
         fprintf('Stability with good security margin. CM = %.4f \n',CM);
