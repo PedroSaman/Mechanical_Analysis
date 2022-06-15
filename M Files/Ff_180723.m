@@ -1,8 +1,7 @@
 function Ff = Ff_180723(join)
-%Find the friction force position in blocks that are in the second layer or higher of the block model in regard to its own coordinate axis.
-%This function is working for up to 9x9 blocks
+%Compute the friction force position for blocks in the second layer or higher
 %input: join = (1 or 2,upper_block_type,upper_block_number,upper_knob_index,lower_block_type,lower_block_number,lower_knob_index)
-%               *: Number of other pair of snaped togheter knobs that are from the same block as the first pair
+%               *: Number of other pair of snaped together knobs that are from the same block as the first pair
 %output: Ff = (Force_Number, Upper Block_Number, Upper Knob_Number , x1, y1, z1, *, Lower Block_Number, Lower Knob_Number, x2, y2, z2, 0)
 %             *: upper and lower limits of the normal force
 
@@ -11,7 +10,8 @@ bc = zeros(9,9);
 All_Forces2 = [];
 bc2 = zeros(9,9);
 loop = size(join,1);
-for n = 1 : loop %Count the number of frictional forces for each connecting convex part
+for n = 1 : loop
+    %Upper Block
     [col,row] = col_row_converter(join(n, 2));
     if(bc(col,row) == 0) %If the first block type is not in the All_Forces matrix yet
         bc(col,row) = 1; %Mark as visited
@@ -25,14 +25,14 @@ for n = 1 : loop %Count the number of frictional forces for each connecting conv
     end
 end
 
-Ff = zeros(8*loop, 13); %Maximum number of friction force
-Ff(1:8*loop, 1) = 1 : 8*loop;  %Force_Number
+Ff = zeros(8*loop, 13); % Maximum possible number of friction force (If all blocks were 1x1)
+Ff(1:8*loop, 1) = 1 : 8*loop; % Force Number
 count = 1; 
-for n = 1 : loop %for each knob connection
-    type_1 = join(n, 2); %upper block type
-    type_2 = join(n, 5); %lower block_type
-    knob_1 = join(n, 4); %upper knob_index
-    knob_2 = join(n, 7); %lower knob_index
+for n = 1 : loop % For each knob connection
+    type_1 = join(n, 2); % Upper block type
+    type_2 = join(n, 5); % Lower block type
+    knob_1 = join(n, 4); % Upper knob index
+    knob_2 = join(n, 7); % Lower knob index
     
     [~,row] = col_row_converter(type_1);
     upper_row_i = rem(knob_1,row);
@@ -76,8 +76,8 @@ for n = 1 : loop %for each knob connection
                 Ff(count:count+3, 7) = [1; 2; -2; -1];
             end
             for j = 0: force_number
-                Ff(count+j, 2:6:8) = join(n, 3:3:6);  %Block No.
-                Ff(count+j, 3:6:9) = join(n, 4:3:7);  %Knob No.
+                Ff(count+j, 2:6:8) = join(n, 3:3:6); %Block Number
+                Ff(count+j, 3:6:9) = join(n, 4:3:7); %Knob Number
             end
             Ff(count:count+force_number, 4:6) = [All_Forces(i:i+force_number,1), All_Forces(i:i+force_number,2), -All_Forces(i:i+force_number,3)];
             break;
