@@ -1,7 +1,8 @@
 %% Stability_Judge.m
 % This script will take the datfile specified in "filename" and compute
-% where each force appear in the structure. After that, it will run a
-% linear programing problem trying to minimize the minimum capacity.
+% where each force would appear if the assembled structure is static.
+% After that, a linear programing problem will try to minimize the minimum 
+% capacity in the model.
 % Input: Filename(is the location of a datfile in the correct format)
                  % dat file format: each line is one block. All coordinates
                  % are related to the FIRST knob of the block. Being it:
@@ -22,7 +23,7 @@ T = 151*g; % Maximum static friction force of one set of convex part
 M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
 good_margin = T*0.8; % Arbitrary minimum value for stability
 
-%% Load the model and search for obvious structural problems
+%% Load the model and search for structural problems
 model_original = load(filename); % (x, y, z, type)
 model = putcolor(model_original); % (BlockNo., x, y, z, type, color)
 check = model_check(model,M); % Verify the datfile model
@@ -40,7 +41,7 @@ z_max = model(end,4); % Structure height
 knobs = knob(model,0); % Knob information (entire block model)
 
 %% Find the forces acting on the model
-% For the first layer
+%For the first layer
 knob_i = knob(model, 1); % Layer knob information
 adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
 F_f = Ff_0_180723(model); % First layer friction forces
@@ -48,7 +49,7 @@ F_nz = Fnz_0(model); % First layer z axis normal forces
 F_nx = Fnx(adjoin_i); % Layer X axis normal forces 
 F_ny = Fny(adjoin_i); % Layer Y axis normal forces
 
-% For second layer onwards 
+%For second layer onwards 
 for n = 2 : z_max 
     knob_i = knob(model, n); % Layer knob information
     adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
@@ -66,7 +67,7 @@ for n = 2 : z_max
     F_ny = [F_ny; Fny_i];
 end
 
-%% Count the number of forces
+% Count the number of forces
 force_f = size(F_f,1); % Friction force number
 force_nz = size(F_nz,1); % Z axis normal force number
 force_nx = size(F_nx,1); % X axis normal force number
@@ -74,12 +75,13 @@ force_ny = size(F_ny,1); % Y axis normal force number
 F = [F_f; F_nz; F_nx; F_ny];
 force = force_f + force_nz + force_nx + force_ny; % Total number of forces
 
-%% Forces lower bounds values
+%% Force value bounds
+%Lower Bounds
 lb = -Inf(3*force+1, 1); % Number of forces times 3 (X, Y, Z) + Capacity
-lb(3:3:3*force_f) = 0;  % F_f Z axis lower bound value is 0
+lb(3:3:3*force_f) = 0; % F_f Z axis lower bound value is 0
 lb(3*force_f+1:3*force) = 0; % F_n lower bound value in all 3 axis is 0
 
-%% Forces Upper bounds values
+%Upper bounds
 ub = Inf(3*force+1, 1); % Number of forces times 3 (X, Y, Z) + Capacity
 ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; % Fnz X axis upper bound value is 0
 ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; % Fnz Y axis upper bound value is 0
@@ -88,7 +90,7 @@ ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; % Fnx z axis u
 ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; % Fny X axis upper bound value is 0
 ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny Z axis upper bound value is 0
 
-%% Friction force X and Y axis bounds (Fn_line) and orientation correction
+% Friction force X and Y axis bounds (Fn_line) and orientation correction
 for i = 1 : force_f
     if((F_f(i, 7) == -1))
         % Ff X axis points to -infinite and does not have component in Y axis 
@@ -110,7 +112,7 @@ for i = 1 : force_f
     end
 end
 
-%% Fn_line upper limit setting (Only the inner Fn_line from the nx2/2xn blocks)
+% Fn_line upper limit setting (Only the inner Fn_line from the nx2/2xn blocks)
 for i = 1 : force_f
     if(F(i, 4) == -0.75)
         lb(3*i-2) = -T;
