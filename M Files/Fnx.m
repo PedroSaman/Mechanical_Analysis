@@ -7,19 +7,19 @@ if(adjoin == -1) % If there is no adjoin blocks in the
     Fnx = [];
 else
     loop = size(adjoin,1);
-    nx = loop; %Number of contact surfaces in the x direction 
+    nx = loop; % Number of contact surfaces in the x direction 
     for n = loop : -1 : 1
-        if(adjoin(n, 1) == 2) %Remove contact surfaces in the y direction from adjoin 
+        if(adjoin(n, 1) == 2) % Remove contact surfaces in the y direction from adjoin 
             adjoin(n, :) = [];
             nx = nx - 1;
         end
     end
    
-    force_x = 4 * nx; %Number of Fnx forces
-    if(force_x == 0) %if all contact surfaces in adjoin are in the y direction 
+    if(nx == 0) % If all contact surfaces in adjoin are in the y direction 
         Fnx = [];
     else
-
+        
+        force_x = 4 * nx; % Number of Fnx forces
         % Create the All_Forces matrix
         All_Forces = [];
         bc = zeros(9,9);
