@@ -9,8 +9,8 @@ function check = model_check(model,M)
 %map the blocks position. Those values can increase as much as it is
 %desirable.
 
-base_length = 20; % Max length of the base
-base_width = 20; % Max width of the base
+base_length = 250; % Max length of the base
+base_width = 250; % Max width of the base
 z_max = model(end,4); % Height
 model_size = size(model,1); 
 map = zeros(base_length,base_width,z_max);
