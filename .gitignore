@@ -5,3 +5,8 @@ Block_Printer_System/Software/ubuntu
 Block_Printer_System/Software/denso-RC7M-controller
 Block_Printer_System/Software/windows/BlockPainter-UnityExecutable
 Block_Printer_System/Software/windows/BlockPainter-UnityProject
+Block_Printer_System/Software/windows/BlockModelGenerator/bin
+Block_Printer_System/Software/windows/BlockModelGenerator/obj
+Block_Printer_System/Software/windows/VoxelModelConverter/bin
+Block_Printer_System/Software/windows/VoxelModelConverter/obj
+Block_Printer_System/Software/windows/xTests
