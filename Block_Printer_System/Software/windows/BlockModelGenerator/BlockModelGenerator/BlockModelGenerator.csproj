@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <LangVersion>7.2</LangVersion>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+    <Authors>Amelia10007</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Core\Blockalization\**" />
+    <EmbeddedResource Remove="Core\Blockalization\**" />
+    <None Remove="Core\Blockalization\**" />
+  </ItemGroup>
+
+</Project>

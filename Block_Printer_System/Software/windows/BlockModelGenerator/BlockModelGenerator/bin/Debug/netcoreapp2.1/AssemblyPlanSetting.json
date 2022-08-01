@@ -1,0 +1,21 @@
+{
+  "AssemblyAreaOrigin": {
+    "X": 0,
+    "Y": 0,
+    "Z": 1
+  },
+  "AssemblyAreaSize": {
+    "X": 20,
+    "Y": 20
+  },
+  "AvailableSupportBlockSizes": [
+    {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    }
+  ],
+  "MaxSandwichedSupportCount": 20,
+  "MaxSubassemblyCount": 4,
+  "MinSubassemblyLayerCount": 2
+}
