@@ -31,7 +31,7 @@ namespace BlockModelGenerator
             }
             catch
             {
-                Console.WriteLine("設定ファイルを開けませんでした．規定の設定ファイルを作成します");
+                Console.WriteLine("Could not open configuration file. Creating a default configuration file.");
                 try
                 {
                     using (var fileWriter = new FileStream(settingFilename, FileMode.Create))
@@ -41,11 +41,11 @@ namespace BlockModelGenerator
                             serializer.WriteObject(jsonWriter, PlannerSetting.Default);
                         }
                     }
-                    Console.WriteLine("規定の設定ファイルを作成しました");
+                    Console.WriteLine("Prescribed configuration files have been created.");
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"設定ファイルを作成できませんでした:{e.Message}");
+                    Console.WriteLine($"Could not create the configuration file:{e.Message}");
                 }
                 return PlannerSetting.Default;
             }
@@ -62,11 +62,11 @@ namespace BlockModelGenerator
                 if (g.Key.BlockAttributeCollection.Exists<Color>())
                 {
                     var color = g.Key.BlockAttributeCollection.Single<Color>().Index;
-                    Console.WriteLine($"サイズ{size} 色{color}のブロックは{count}個必要です．");
+                    Console.WriteLine($"A block of size {size} color {color} requires {count} pieces.");
                 }
                 else if (g.Key.BlockAttributeCollection.Exists<Support>())
                 {
-                    Console.WriteLine($"サイズ{size}のサポートブロックは{count}個必要です．");
+                    Console.WriteLine($"Support blocks of size {size} require {count} blocks.");
                 }
                 else
                 {
@@ -79,7 +79,7 @@ namespace BlockModelGenerator
         {
             if (!args.Any())
             {
-                Console.WriteLine("このプログラムには1つ以上のファイルを入力として渡してください");
+                Console.WriteLine("Please pass one or more files as input to this program.");
                 return;
             }
             var setting = GetProgramSetting();
@@ -97,9 +97,9 @@ namespace BlockModelGenerator
                 var header = $"[{index + 1}/{args.Length}] ";
                 try
                 {
-                    Console.WriteLine($"{header}{input}を読み込みます..");
+                    Console.WriteLine($"Loading the file {header}{input}...");
                     var components = reader.ReadComponentsFrom(input);
-                    Console.WriteLine($"{header}{input}を読み込みました．ブロック数:{components.Count()}");
+                    Console.WriteLine($"{header}{input} loaded. Number of blocks:{components.Count()}");
                     var plan = planner.GeneratePlan(components);
                     var arrangedPlan = plan.ArrangePlan(setting.AssemblyAreaSize, setting.AssemblyAreaOrigin);
                     //
@@ -110,15 +110,15 @@ namespace BlockModelGenerator
                     if (!Directory.Exists(outputDirectory)) Directory.CreateDirectory(outputDirectory);
                     var output = $"{outputDirectory}/{Path.GetFileNameWithoutExtension(input)}.csv";
                     writer.WritePlan(output, arrangedPlan);
-                    Console.WriteLine($"{header}\n{input}を\n{output}に保存しました．");
+                    Console.WriteLine($"{header}\n{input}file saved as \n{output}.");
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{header}{input}の組立計画に失敗しました:{e.Message}\n{e.StackTrace}");
-                    Console.WriteLine("次のファイルの組立計画を開始します");
+                    Console.WriteLine($"{header}{input} file assembly plan failed: {e.Message}\n{e.StackTrace}");
+                    Console.WriteLine("Start assembly planning for the following files");
                 }
             }
-            Console.WriteLine("すべての組立計画が終了しました");
+            Console.WriteLine("All assembly plans have been completed.");
         }
     }
 }

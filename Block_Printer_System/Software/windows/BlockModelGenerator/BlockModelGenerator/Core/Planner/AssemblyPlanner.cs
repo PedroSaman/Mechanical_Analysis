@@ -22,7 +22,7 @@ namespace Core.Planner
         {
             this.assemblabilityProvider = assemblabilityProvider;
             this.assemblyPlanEvaluator = assemblyPlanEvaluator;
-            //利用可能なサポートを大きい順に並べておく
+            //List available supports in order of largest to smallest
             this.availableSupportBlockSizes = availableSupportBlockSizes
                 .OrderByDescending(size => size.Z)
                 .ThenByDescending(size => size.X + size.Y)
@@ -36,7 +36,7 @@ namespace Core.Planner
                 .OrderBy(group => group.Key)
                 .ToArray();
             var plans = this.GenerateCandidates(new List<Assembly>(), 0, blockLayers, 0, int.MinValue, 0).ToArray();
-            Console.WriteLine($"{plans.Length}個の組立順候補を生成しました．最良の組立順を決定します...");
+            Console.WriteLine($"Generated {plans.Length} candidates. Determine the best assembly order...");
             return this.assemblyPlanEvaluator.SelectBestPlan(plans);
         }
         private IEnumerable<AssemblyPlan> GenerateCandidates(List<Assembly> currentAssemblies,
@@ -47,55 +47,55 @@ namespace Core.Planner
             int supportCountSum)
         {
             var header = new string(Enumerable.Repeat(' ', recursive).ToArray());
-            //組立中の部品．各段の全ブロックが組み立てられなかった場合は，その段の組立可能ブロックもこの変数に入る
+            // Parts under assembly. If all blocks in each tier have not been assembled, the assemblable blocks in that tier will also be entered into this variable
             var assembling = new Assembly();
-            //組立順が確定した部品．各段の全ブロックが組み立てられなかった場合は，その段の組立可能ブロックはこの変数に入らない
+            // Parts for which the assembly order has been determined. If all blocks in each tier are not assembled, the assembleable blocks in that tier do not enter this variable
             var assembled = new Assembly();
-            //組み立てられないブロックをここに記録する
+            // Record here the blocks that cannot be assembled
             IReadOnlyCollection<AssemblyComponent> unassembledComponents = new List<AssemblyComponent>();
             while (true)
             {
-                //未組立ブロックのうち，最下層にあるものを取り出す
+                // Remove the bottom layer of unassembled blocks
                 var remainingLayer = remainingLayers.First();
-                //1層組立
+                // Single layer assembly
                 this.AssembleLayer(remainingLayer, assembled, out assembling, out unassembledComponents);
-                //組み立てられなかったブロックが存在する場合
+                //If there are blocks that could not be assembled
                 if (unassembledComponents.Any())
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{header}{remainingLayer.Key}段目に組み立て不可能なブロックが{unassembledComponents.Count}個あります");
+                    Console.WriteLine($"There are {unassembledComponents.Count} blocks in the {header}{remainingLayer.Key} stage that cannot be assembled.");
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
                 }
-                //最後の段まで組み立て終わった場合
+                // If you have finished assembling to the last step
                 else if (remainingLayers.Count() == 1)
                 {
-                    Console.WriteLine($"{header}{remainingLayer.Key}段目の全ブロック({remainingLayer.Count()}個)を組み立てました");
+                    Console.WriteLine($"All blocks ({remainingLayer.Count()}) of the {header}{remainingLayer.Key} stage have been assembled");
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"{header}組立順候補を生成しました．サブアセンブリ:{currentAssemblies.Count} サポート:{supportCountSum}");
+                    Console.WriteLine($"{header} assembly order candidates generated. Subassemblies:{currentAssemblies.Count} Support:{supportCountSum}");
                     Console.ForegroundColor = ConsoleColor.White;
                     currentAssemblies.Add(assembling);
                     this.minSupportCount = supportCountSum;
                     yield return new AssemblyPlan(currentAssemblies);
                     yield break;
                 }
-                //この段の全ブロックを組み立てられた場合
+                // If all blocks in this tier are assembled
                 else
                 {
-                    Console.WriteLine($"{header}{remainingLayer.Key}段目の全ブロック({remainingLayer.Count()}個)を組み立てました");
+                    Console.WriteLine($"All blocks ({remainingLayer.Count()}) of the {header}{remainingLayer.Key} stage have been assembled");
                     assembled = assembling;
                     remainingLayers = remainingLayers.Skip(1).ToArray();
                 }
             }
-            //ここに到達したということは，組み立てられなかったブロックが存在するということ．ただしブロック同士の衝突といったどうやっても組み立てられないパターンは存在しない
-            //サブアセンブリを作成するプランへ分岐．ただし，高さが規定値未満のサブアセンブリは作成されないように弾く
+            // The fact that we have reached this point means that there are blocks that could not be assembled. However, there are no patterns such as collisions between blocks that cannot be assembled in any way.
+            // Branches to a plan to create subassemblies. However, subassemblies with a height less than the specified value are not created.
             var subassemblizationCondition = assembling.TopPosition >= subassemblizeableLayer;
             var layerCondition = assembled.TopPosition - assembled.BottomPosition >= this.MinSubassemblyLayerCount - 1;
             var subassemblyCountCondition = currentAssemblies.Count + 1 < this.MaxSubassemblyCount;
             if (subassemblizationCondition && layerCondition && subassemblyCountCondition)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"{header}{assembled.TopPosition + 1}段目からサブアセンブリ分割プランへ分岐します");
+                Console.WriteLine($"{header}{assembled.TopPosition + 1} branch from the first row to the subassembly division plan");
                 Console.ForegroundColor = ConsoleColor.White;
                 var subassemblyPlanCurrentAssemblies = currentAssemblies.Append(assembled).ToList();
                 var subassemblyPlans = this.GenerateCandidates(subassemblyPlanCurrentAssemblies, currentSandwichedSupportCount, remainingLayers, recursive + 1, assembled.TopPosition, supportCountSum).ToArray();
@@ -104,60 +104,60 @@ namespace Core.Planner
             else
             {
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"{header}サブアセンブリ分割プランへ分岐しません");
+                Console.WriteLine($"{header}Does not branch to subassembly split plan");
                 Console.ForegroundColor = ConsoleColor.White;
             }
-            //サポートを追加するプランへ分岐
+            // Branch to plan to add support
             var supportPlanCurrentAssemblies = currentAssemblies.ToList();
             IEnumerable<IGrouping<int, AssemblyComponent>> supportPlanRemainingLayers;
             var supportPlanSandwichedSupportCount = currentSandwichedSupportCount;
             supportPlanRemainingLayers = GenerateRemainingLayersOfSupportPlan(assembling, unassembledComponents, remainingLayers.Skip(1), ref supportPlanSandwichedSupportCount, out var supportCount).ToArray();
-            //間に挟まれたサポートが規定数を超えるなら，この分岐をキャンセル
+            // Cancel this branch if the number of intervening supports exceeds the specified number
             if (supportPlanSandwichedSupportCount > this.MaxSandwichedSupportCount)
             {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"{header}間に挟まれたサポートが多すぎます");
+                Console.WriteLine($"{header} there are too much support blocks in between!");
                 Console.ForegroundColor = ConsoleColor.White;
                 yield break;
             }
-            //サポート数がより少ない組立計画がすでに生成されていた場合は，この分岐をキャンセル
+            // Cancel this branch if an assembly plan with fewer supports has already been generated
             if (supportCountSum + supportCount > this.minSupportCount)
             {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"{header}よりサポートが少ない組立計画がすでに生成されています");
+                Console.WriteLine($"Assembly plans with less support blocks than {header} have already been generated");
                 Console.ForegroundColor = ConsoleColor.White;
                 yield break;
             }
             if (supportCount == 0)
             {
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"{header}サポートを追加できませんでした");
+                Console.WriteLine($"Failed to add {header} support");
                 Console.ForegroundColor = ConsoleColor.White;
                 yield break;
             }
             //
             var remainingLayerMin = supportPlanRemainingLayers.Min(layer => layer.Key);
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{header}サポート追加プランへ分岐します．サポートを追加して{remainingLayerMin}段目から組み立て直します．これまで:{supportCountSum} 追加:{supportCount} 挟:{supportPlanSandwichedSupportCount}");
+            Console.WriteLine($"Branch to the {header} plan for adding support. Add support and reassemble from the {remainingLayerMin} stage. So far:{supportCountSum} add:{supportCount} pinch:{supportPlanSandwichedSupportCount}");
             Console.ForegroundColor = ConsoleColor.White;
             var supportPlans = this.GenerateCandidates(supportPlanCurrentAssemblies, supportPlanSandwichedSupportCount, supportPlanRemainingLayers, recursive + 1, assembling.TopPosition + 1, supportCountSum + supportCount).ToArray();
             foreach (var supportPlan in supportPlans) yield return supportPlan;
         }
         /// <summary>
-        /// ブロック1層を組み立てる．
+        /// Assemble one layer of blocks.
         /// </summary>
-        /// <param name="remainingLayer">組み立てるブロック層．</param>
-        /// <param name="assembly">この部品にブロックを組み立てる．</param>
-        /// <param name="assembled">組立可能なブロックを組み立てた部品．</param>
-        /// <param name="unassembledComponents">組み立てられなかったブロック．</param>
+        /// <param name="remainingLayer">Block layer to assemble. </param>
+        /// <param name="assembly">Block assembly on this part. </param>
+        /// <param name="assembled">Assembled part with blocks that can be assembled. </param>
+        /// <param name="unassembledComponents">Blocks that were not assembled. </param>
         private void AssembleLayer(IEnumerable<AssemblyComponent> remainingLayer, Assembly assembly, out Assembly assembled, out IReadOnlyCollection<AssemblyComponent> unassembledComponents)
         {
             var assembling = new Assembly(assembly);
             var remainingComponents = remainingLayer.ToList();
             while (true)
             {
-                //未組立のブロックすべての組立可能性を計算．組立可能なものを組み立てやすさ順に並び替える
-                //組み立てやすさの評価値が同じもの同士は位置順に並び替える
+                //Calculates the assembleability of all unassembled blocks. Sort the assembleables by ease of assembly.
+                //Sort items with the same ease-of-assembly evaluation value in order of position.
                 var assemblableComponents = remainingComponents.AsParallel()
                 .SelectWithSource(c => this.assemblabilityProvider.GetAssemblability(assembling, c))
                 .Where(tuple => tuple.map.IsAssemblable)
@@ -166,27 +166,27 @@ namespace Core.Planner
                 .ThenBy(tuple => tuple.source.Position.Y)
                 .Select(tuple => tuple.source)
                 .ToArray();
-                //組立可能なブロックがなくなったらループ終了
+                //Loop ends when there are no more blocks available for assembly.
                 if (!assemblableComponents.Any()) break;
-                //組立可能なブロックを組み立てる
+                //Assemble blocks that can be assembled.
                 foreach (var component in assemblableComponents)
                 {
                     assembling.AddComponent(component);
                 }
-                //組み立てたブロックを未組立ブロックのリストから削除
+                //Remove assembled blocks from the list of unassembled blocks
                 remainingComponents = remainingComponents.Except(assemblableComponents, componentSizeAndPositionComparer).ToList();
             }
-            //組立結果を渡す
+            //Passing on assembly results
             assembled = assembling;
-            //組み立てられなかったブロックを渡す
+            //Passing on blocks that were not assembled.
             unassembledComponents = remainingComponents;
         }
         /// <summary>
-        /// サポートブロックを追加するプランにて組み立てる必要のあるブロック層を返す．
+        /// Returns the block layers that need to be assembled in the plan to add support blocks.
         /// </summary>
-        /// <param name="assembly">サポートブロックを追加したい組み立てかけの部品．</param>
-        /// <param name="unassembledComponents">組み立て不可能と判定されたブロック．</param>
-        /// <param name="remainingLayers">まだ組立可能性の判定を行っていないブロック層．</param>
+        /// <param name="assembly">The part to be assembled to which you want to add support blocks. </param>
+        /// <param name="unassembledComponents">Blocks that are determined to be unassembled. </param>
+        /// <param name="remainingLayers">Block layers that have not yet been determined to be ready for assembly. </param>
         /// <returns></returns>
         private IEnumerable<IGrouping<int, AssemblyComponent>> GenerateRemainingLayersOfSupportPlan(Assembly assembly, IEnumerable<AssemblyComponent> unassembledComponents, IEnumerable<IGrouping<int, AssemblyComponent>> remainingLayers, ref int sandwichedSupportCount, out int supportCount)
         {
@@ -208,9 +208,9 @@ namespace Core.Planner
                 .OrderBy(group => group.Key);
         }
         /// <summary>
-        /// 指定した組立不可能ブロックを組み立てるためのサポート柱を返す．
+        /// Returns the support columns for assembling the specified unassembled block.
         /// </summary>
-        /// <param name="assemblyWithSupport">サポートブロックを追加していく部品．この内容は上書きされる．</param>
+        /// <param name="assemblyWithSupport">The component to which the support block will be added. This content is overwritten. </param>
         /// <param name="unassemblableComponent"></param>
         /// <returns></returns>
         private IReadOnlyCollection<AssemblyComponent> GetSupportBlockTowerFor(Assembly assemblyWithSupport, AssemblyComponent unassemblableComponent, ref int sandwichedSupportCount)
@@ -246,7 +246,7 @@ namespace Core.Planner
             return supportComponents;
         }
         /// <summary>
-        /// 組み立て不可能ブロックを支持するためのサポートブロックを返す．
+        /// Returns a support block to support the unassembled block.
         /// </summary>
         /// <param name="assembly"></param>
         /// <param name="unassemblableComponent"></param>
@@ -279,7 +279,7 @@ namespace Core.Planner
                     }
                 }
             }
-            //ここに到達したらサポートを使用した組立が不可能ということになる
+            // Once you reach this point, it means that assembly with supports is not possible.
             supportComponent = null;
             return false;
         }

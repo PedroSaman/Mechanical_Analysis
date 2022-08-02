@@ -8,7 +8,7 @@ using Core.Attribute;
 namespace Core
 {
     /// <summary>
-    /// 複数のブロックで構成される部品と，その組み立て順を表す．
+    /// Represents a component consisting of multiple blocks and the order in which they are assembled.
     /// </summary>
     class Assembly : IEnumerable<AssemblyComponent>
     {
@@ -92,18 +92,18 @@ namespace Core
                 }
                 throw new InvalidOperationException(message);
             }
-            //組立属性を変更する
+            //Change assembly attributes
             var assemblyAttributes = component.AssemblyAttributeCollection
                 .Append(this.GetPlaceShiftFor(component))
                 .Append(this.GetPressCapabilityFor(component));
             var addedComponent = new AssemblyComponent(component.Size, component.BlockAttributeCollection, component.Position, assemblyAttributes);
-            //ブロックを追加
+            //Add block
             this.components.Add(addedComponent);
             if (!this.upperLayers.ContainsKey(addedComponent.TopPosition)) this.upperLayers.Add(addedComponent.TopPosition, new List<AssemblyComponent>());
             this.upperLayers[addedComponent.TopPosition].Add(addedComponent);
             if (!this.lowerLayers.ContainsKey(addedComponent.BottomPosition)) this.lowerLayers.Add(addedComponent.BottomPosition, new List<AssemblyComponent>());
             this.lowerLayers[addedComponent.BottomPosition].Add(addedComponent);
-            //部品端部の位置を更新
+            //Update part end position
             this.RightPosition = Math.Max(this.rightPosition ?? int.MinValue, addedComponent.RightPosition);
             this.LeftPosition = Math.Min(this.leftPosition ?? int.MaxValue, addedComponent.LeftPosition);
             this.FrontPosition = Math.Max(this.frontPosition ?? int.MinValue, addedComponent.FrontPosition);
