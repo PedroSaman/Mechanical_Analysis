@@ -80,10 +80,10 @@ function [fncoutput,CM] = Stability_Judge_pushing(filename)
     % Count the number of forces
     force_f = size(F_f,1); % Friction force number
     force_nz = size(F_nz,1); % Z axis normal force number
-    force_nx = size(F_nx,1); % X axis normal force number
+    force_nx = 0;%size(F_nx,1); % X axis normal force number
     force_ny = size(F_ny,1); % Y axis normal force number
-    F = [F_f; F_nz; F_nx; F_ny];
-    force = force_f + force_nz + force_nx + force_ny; % Total number of forces
+    F = [F_f; F_nz]; %F_nx; F_ny];
+    force = force_f + force_nz;% + force_nx + force_ny; % Total number of forces
 
     %% Force value bounds
     %Lower Bounds
@@ -157,7 +157,7 @@ function [fncoutput,CM] = Stability_Judge_pushing(filename)
     %% Final output messages
     if(~isempty(x)) % If there were a solution
         %fprintf('Solution found\n');
-        %XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
+        XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
         CM = x(3*force+1); %Capacity CM 
         if(CM >= good_margin)
             fncoutput = 'safe';
