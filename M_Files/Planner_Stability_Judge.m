@@ -18,23 +18,32 @@ function [fncoutput] = Planner_Stability_Judge(model)
     g = 9.8;
     T = 151*g; % Maximum static friction force of one set of convex part
     M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
-    good_margin = T*0.8; % Arbitrary minimum value for stability
+    good_margin = T*0.85; % Arbitrary minimum value for stability
 
     %% Load the model and search for structural problems
-    check = model_check(model,M); % Verify the datfile model
+    check = model_check(model); % Verify the datfile model
     if(check == -1 ) 
-        fprintf('This model has a block that is not currently available in the laboratory. \n');
-        fncoutput = 'Input has problems';
+        %fprintf('This model has a block that is not currently available in the laboratory. \n');
+        fncoutput = 'This input has blocks not available';
         return;
     elseif(check == -2)
-        fprintf('This model has multiples blocks occupying the same spot. \n');
-        fncoutput = 'Input has problems';
+        %fprintf('This model has multiples blocks occupying the same spot. \n');
+        fncoutput = 'This input has blocks occupying the same space';
+        return;
+    elseif(check == -3)
+        %fprintf('This model has blocks floating. \n');
+        fncoutput = 'This input has blocks floating';
         return;
     end
 
     %% Model, knobs and pushing force information
     N = size(model,1); % Total block number
     b_push = pushing(model, N, T); % Forces and Torques caused by the last block insertion
+    if(isempty(b_push))
+        %fprintf('The block being inserted has no contact forces \n');
+        fncoutput = 'The block being inserted has no contact forces';
+        return;
+    end
     N = N - 1; % Ignore the last block in the usual stability judge.
     model = model(1:N,:); % Exclude the last block from the model.
     z_max = model(end,4); % Structure height
@@ -86,7 +95,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
     ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; % Fnz X axis upper bound value is 0
     ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; % Fnz Y axis upper bound value is 0
     ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; % Fnx Y axis upper bound value is 0
-    ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; % Fnx z axis upper bound value is 0
+    ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; % Fnx Z axis upper bound value is 0
     ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; % Fny X axis upper bound value is 0
     ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny Z axis upper bound value is 0
 
@@ -144,19 +153,19 @@ function [fncoutput] = Planner_Stability_Judge(model)
 
     %% Final output messages
     if(~isempty(x)) % If there were a solution
-        fprintf('Solution found\n');
-        %XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
+        %fprintf('Solution found\n');
+        XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
         CM = x(3*force+1); %Capacity CM 
         if(CM >= good_margin)
             fncoutput = 'safe';
-            fprintf('Stability with good security margin. CM = %.4f \n',CM);
+            %fprintf('Stability with good security margin. CM = %.4f \n',CM);
         else
             fncoutput = 'not safe';
-            fprintf('Stability can not be guaranteed. CM = %.4f \n',CM);
+            %fprintf('Stability can not be guaranteed. CM = %.4f \n',CM);
         end
     else
         fncoutput = 'no solution';
-        fprintf('No feasible solution found \n');
+        %fprintf('No feasible solution found \n');
     end
     %CM = 100*round(CM/T,4); % percentage of the maximum value
     %fprintf('Time elapsed: %.2d \n',toc);
