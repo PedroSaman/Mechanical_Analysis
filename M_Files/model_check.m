@@ -1,4 +1,4 @@
-function check = model_check(model,M)
+function check = model_check(model)
 %Verify if the input model has: unavailable blocks or if multiples blocks
 %are occupying the same space
 %input:  model:(block_number, x, y, z, Block_type, color)
@@ -9,8 +9,9 @@ function check = model_check(model,M)
 %map the blocks position. Those values can increase as much as it is
 %desirable.
 
-base_length = 250; % Max length of the base
-base_width = 250; % Max width of the base
+M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
+base_length = 30; % Max length of the base
+base_width = 30; % Max width of the base
 z_max = model(end,4); % Height
 model_size = size(model,1); 
 map = zeros(base_length,base_width,z_max);
@@ -36,7 +37,7 @@ for i = 1 : z_max
                     check = -2;
                     return;
                 end
-                map(base_width-l+1,k,i) = 1;
+                map(base_width-l+1,k,i) = model(j,1);
                 density_map(base_width-l+1,k) = density_map(base_width-l+1,k) + 1;
             end
         end
