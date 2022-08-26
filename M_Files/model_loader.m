@@ -14,11 +14,11 @@ function [model,range] = model_loader(filename)
     j = 1;
     for i = 1:z_max
         while(model(j,4) == i)
-            j = j + 1;
             if(j == model_size)
                 j = j + 1;
                 break;
             end
+            j = j + 1;
         end
         final_index = j - 1;
         range(i,:) = [initial_index,final_index];
