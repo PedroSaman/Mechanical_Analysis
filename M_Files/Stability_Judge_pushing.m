@@ -29,16 +29,21 @@ function [fncoutput,CM] = Stability_Judge_pushing(filename)
     %% Load the model and search for structural problems
     model_original = load(filename); % (x, y, z, type)
     model = putcolor(model_original); % (BlockNo., x, y, z, type, color)
-    check = model_check(model,M); % Verify the datfile model
+    check = model_check(model); % Verify the datfile model
     if(check == -1 ) 
         %fprintf('This model has a block that is not currently available in the laboratory. \n');
         CM = 0;
-        fncoutput = 'Input has problems';
+        fncoutput = 'This input has blocks not available';
         return;
     elseif(check == -2)
         %fprintf('This model has multiples blocks occupying the same spot. \n');
         CM = 0;
-        fncoutput = 'Input has problems';
+        fncoutput = 'This input has blocks occupying the same space';
+        return;
+    elseif(check == -3)
+        %fprintf('This model has blocks floating. \n');
+        CM = 0;
+        fncoutput = 'This input has blocks floating';
         return;
     end
 
