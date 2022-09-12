@@ -1,7 +1,7 @@
-function [plan,ins_blk_n] = insert_support_blocks(model,support_coordinate,insert_block)
+function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coordinate,insert_block)
 
     base_size = max([max(model(:,3)),max(model(:,2))]) + 8;
-    z_max = model(end,4); % Height
+    z_max = model(end,4); % MELHORAR AQUI, N PRECISA FAZER ATE MODEL END, SO ATE A ALTURA DE INSERT BLOCK EU ACHO
     model_size = size(model,1);
     map = zeros(base_size,base_size,z_max);
     j = 1;
@@ -21,6 +21,7 @@ function [plan,ins_blk_n] = insert_support_blocks(model,support_coordinate,inser
     end
     
     ins_blk_n = 0;
+    pilar_number = 0;
     plan = model;
     
     while(~isempty(support_coordinate))
@@ -32,6 +33,7 @@ function [plan,ins_blk_n] = insert_support_blocks(model,support_coordinate,inser
                 Y = support_coordinate(m,2);
                 Z = support_coordinate(m,3);
                 blk_number = support_coordinate(m,4);
+                pilar_number = pilar_number + 1;
                 j=1;
                 for i = 1 : Z
                     if(map(X,Y,i) == 0) %There is space to insert support block in the i layer
