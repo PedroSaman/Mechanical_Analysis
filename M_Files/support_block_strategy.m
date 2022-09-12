@@ -38,15 +38,19 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
                 support_knob = k;
                 %Convertion from block knob number to cartesian position
                 if(col >= row)
-                    if(mod(support_knob,2) == 0)
-                        tentative_positions(k,2) = model(block_number(j),3) + 1;
+                    if(row > 1)
+                        if(mod(support_knob,2) == 0)
+                            tentative_positions(k,2) = model(block_number(j),3) + 1;
+                        else
+                            tentative_positions(k,2) = model(block_number(j),3);
+                        end
                     else
                         tentative_positions(k,2) = model(block_number(j),3);
                     end
                     tentative_positions(k,1) = model(block_number(j),2) + ceil(support_knob/row) - 1;
                 else
                     if(row > col)
-                        if(support_knob/row < 1)
+                        if(support_knob/row <= 1)
                             tentative_positions(k,1) = model(block_number(j),2);
                         else
                             tentative_positions(k,1) = model(block_number(j),2) + 1;
@@ -64,6 +68,7 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
         support_coordinates = [tentative_positions;support_coordinates];
         j = j - 1;
     end
-    [plan,inserted_block_number] = insert_support_blocks(model,support_coordinates,insert_block); % Input is a matrix with each row being a cartesian position of each pilar
-    [plan] = remove_redundancies(plan,insert_block+inserted_block_number);
+    [plan,inserted_block_number,pillars_inserted] = insert_support_blocks(model,support_coordinates,insert_block); % Input is a matrix with each row being a cartesian position of each pilar
+    [plan,removed_blocks_number] = remove_redundancies(plan,insert_block+inserted_block_number,pillars_inserted);
+    inserted_block_number = inserted_block_number - removed_blocks_number;
 end

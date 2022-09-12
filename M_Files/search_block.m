@@ -41,16 +41,22 @@ function [knob_map,block_number] = search_block(knobs,model,block_number)
     
     for i = 1 : size(below_blocks,1)
         layer = model(below_blocks(i),4); % Being Inserted block layer
-        join_i = join(knobs, layer); % Connected knobs information
         [col,row] = col_row_converter(model(below_blocks(i),5));
-        for j = 1:col*row
-            knob_map_below(i,j) = 0;
-        end
-        for j = 1:size(join_i,1) % Count how many contact points 'block_number' has
-            if(join_i(j,3) == below_blocks(i))
-                knob_map_below(i,join_i(j,4)) = 1; % 0 Indicates the knob is free
+        if(layer == 1)
+            for j = 1:col*row
+                knob_map_below(i,j) = 1;
             end
-        end        
+        else
+            join_i = join(knobs, layer); % Connected knobs information
+            for j = 1:col*row
+                knob_map_below(i,j) = 0;
+            end
+            for j = 1:size(join_i,1) % Count how many contact points 'block_number' has
+                if(join_i(j,3) == below_blocks(i))
+                    knob_map_below(i,join_i(j,4)) = 1; % 0 Indicates the knob is free
+                end
+            end        
+        end
     end
     
     knob_map = [knob_map;knob_map_below];
