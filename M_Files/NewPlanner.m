@@ -15,6 +15,8 @@ function [plan] = NewPlanner(filename)
     z_max = plan(end,4); % Highest Z position must be from the last block in model
     offset = 0; % Keep track of support blocks number to preserve the block iteration
     
+    fprintf("Blocks 1 to %d are from the 1st layer, so their insertion is stable\n",range(1,2));
+    
     for layer = 2:z_max % From layer two to z_max. (First layer is always stable)
         
         [plan,rearrange_strategy_output] = rearrange_strategy(plan,layer); % Run the Rearrange Strategy
@@ -26,7 +28,6 @@ function [plan] = NewPlanner(filename)
         for block = range(layer,1):range(layer,2) % For every block in the current layer
             evaluating_model = plan(1:block + offset,:); % Delimit the model to be from the 1st to the "block"-th of the "layer"-th layer
             [planner_output] = Planner_Stability_Judge(evaluating_model); % Evaluate the insertion Stability
-            
             if(~strcmp(planner_output,'safe')) % If not safe
                 [plan,support_strategy_output] = support_block_strategy(plan,block + offset); % Run the Support Block Strategy
                 if(support_strategy_output < 0) % If not possible, the output will be -1 indicating error ocurred
@@ -35,7 +36,7 @@ function [plan] = NewPlanner(filename)
                 end
                 offset = offset + support_strategy_output; % Correct the next block to be analyzed
             end
-            fprintf("Block %d insertion is stable\n",block);
+            fprintf("Block %d insertion is stable\n",block + offset);
         end
         
     end
