@@ -103,6 +103,14 @@ elseif(force_type == "ff") % Friction force (excluding some forces)
     %exist in the block (only the ones that actually appears in the knobs)
     if(row == 1 && col == 1)
         Pf = zeros(4,4);
+    
+    %{
+    %experiment excluding one ff from 2x2 blocks
+    elseif(row == col)  %special case 2x2
+        Pf = zeros(16,4);
+    %end experiment (line below was 'elseif(row>=col)' before
+    %}
+        
     elseif(row>=col)
         Pf = zeros((2*3+(row-2)*2)*col,4);
     elseif(col>row)
@@ -126,6 +134,26 @@ elseif(force_type == "ff") % Friction force (excluding some forces)
             if(row==1 && col==1) % Special case for 1x1 blocks
                 Pf(pf_index:pf_index+3,:) = [[f1,1.5,11];[f2,1.5,11];[f3,1.5,4];[f4,1.5,0]];
                 pf_index = pf_index + 4;
+            
+            %{
+            %experiment excluding one ff from 2x2 blocks
+            elseif(row==col) % Special case for 2x2 blocks
+                if(j==0 && i==0) % If first knob
+                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f2,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,3,4]];
+                    pf_index = pf_index + 4;
+                elseif(j==1 && i==0) % If second knob
+                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f3,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,2,4]];
+                    pf_index = pf_index + 4;
+                elseif(j==0 && i == 1) % % If third knob
+                    Pf(pf_index:pf_index+3,:) = [[f2,1.5,10*col+row];[f4,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,1,3]];
+                    pf_index = pf_index + 4;
+                elseif(j==1 && i == 1) % % If fourth knob
+                    Pf(pf_index:pf_index+3,:) = [[f3,1.5,10*col+row];[f4,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,1,2]];
+                    pf_index = pf_index + 4;
+                end
+            %end experiment (line below was 'elseif(row>=col)' before
+            %}
+            
             elseif(row>=col) % If the block is taller than wide
                 if(j==0) % If columns first knob
                     Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f2,1.5,10*(i+1)+(j+1)];[f4,1.5,3];[0,0,0,3]];
