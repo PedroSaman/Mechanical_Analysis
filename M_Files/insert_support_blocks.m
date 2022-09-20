@@ -1,10 +1,20 @@
 function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coordinate,insert_block)
+    %Insert support pillars in the positions given by 'support_coordinate' while testing the stability via the stability judge.
+    %It is needed a strategy to choose the 'support_coordinate' positions order. For now it is alternated the block to insert the pillar
+    %from the ones possible.
+    %input: model: current plan. (PRECISO VERIFICAR NO LAB)
+    %       support_coordinate: (PRECISO VERIFICAR NO LAB)
+    %       insert_block: being inserted block number.
+    %output: plan: new assembly plan with support pillars inserted.
+    %        ins_blk_n: number of blocks inserted.
+    %        pilar_number: number of pillars inserted.
 
-    base_size = max([max(model(:,3)),max(model(:,2))]) + 8;
-    z_max = model(insert_block,4); % MELHORAR AQUI, N PRECISA FAZER ATE MODEL END, SO ATE A ALTURA DE INSERT BLOCK EU ACHO
+    base_size = max([max(model(:,3)),max(model(:,2))]) + 8; %Maximum value for X and Y + 8 (biggest size of a block)
+    z_max = model(insert_block,4);
     model_size = insert_block;
     map = zeros(base_size,base_size,z_max);
     j = 1;
+    %Create the input model map to verify where there are space to insert the support block
     for i = 1 : z_max
         while(model(j,4) == i)
             [col,row] = col_row_converter(model(j,5));
@@ -24,6 +34,7 @@ function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coo
     pilar_number = 0;
     plan = model;
     
+    %While there is more support pillar possible coordinates
     while(~isempty(support_coordinate))
         m = size(support_coordinate,1);
         blk_number = 0;
@@ -50,7 +61,7 @@ function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coo
                 support_coordinate(m,:) = [];
                 plan = [(1:size(plan,1))' , plan(1:end,2:end)];
                 [planner_output] = Planner_Stability_Judge(plan(1:insert_block + ins_blk_n,:));
-                if(strcmp(planner_output,'safe'))
+                if(strcmp(planner_output,'safe')) %If the insertion is stable, there is no need to check the rest
                     return;
                 end
             end
