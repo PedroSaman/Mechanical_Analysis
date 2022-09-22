@@ -38,10 +38,20 @@ namespace Core.Blockalization
                 //余ったボクセルで，8x2ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(8, 2));
 
+                //8x2ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(2, 8), offset);
+                //余ったボクセルで，8x2ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(2, 8));
+
                 //4x2ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(4, 2), offset);
                 //余ったボクセルで，4x2ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(4, 2));
+
+                //4x2ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(2, 4), offset);
+                //余ったボクセルで，4x2ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(2, 4));
 
                 //2x2ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(2, 2), offset);
@@ -52,16 +62,31 @@ namespace Core.Blockalization
                 ArrangeComponents(assembly, voxelLayer, new Grid2(4, 1), offset);
                 //余ったボクセルで，4x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(4, 1));
-                
+
+                //4x1ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(1, 4), offset);
+                //余ったボクセルで，4x1ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(1, 4));
+
                 //1x3ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(3, 1), offset);
                 //余ったボクセルで，3x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(3, 1));
 
+                //1x3ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(1, 3), offset);
+                //余ったボクセルで，3x1ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(1, 3));
+
                 //1x2ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(2, 1), offset);
                 //余ったボクセルで，2x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(2, 1));
+
+                //1x2ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(1, 2), offset);
+                //余ったボクセルで，2x1ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(1, 2));
 
                 //1x1ブロックを組立
                 FillComponents(assembly, voxelLayer, new Grid2(1, 1));
@@ -73,10 +98,20 @@ namespace Core.Blockalization
                 //余ったボクセルで，8x2ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(2, 8));
 
+                //8x2ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(8, 2), offset);
+                //余ったボクセルで，8x2ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(8, 2));
+
                 //4x2ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(2, 4), offset);
                 //余ったボクセルで，4x2ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(2, 4));
+
+                //4x2ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(4, 2), offset);
+                //余ったボクセルで，4x2ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(4, 2));
 
                 //2x2ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(2, 2), offset);
@@ -88,15 +123,30 @@ namespace Core.Blockalization
                 //余ったボクセルで，4x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(1, 4));
 
+                //4x1ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(4, 1), offset);
+                //余ったボクセルで，4x1ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(4, 1));
+
                 //1x3ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(1, 3), offset);
                 //余ったボクセルで，3x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(1, 3));
 
+                //1x3ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(3, 1), offset);
+                //余ったボクセルで，3x1ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(3, 1));
+
                 //1x2ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(1, 2), offset);
                 //余ったボクセルで，2x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(1, 2));
+
+                //1x2ブロックを互い違いに組立
+                ArrangeComponents(assembly, voxelLayer, new Grid2(2, 1), offset);
+                //余ったボクセルで，2x1ブロックにできるとこがあれば組立
+                FillComponents(assembly, voxelLayer, new Grid2(2, 1));
 
                 //1x1ブロックを組立
                 FillComponents(assembly, voxelLayer, new Grid2(1, 1));

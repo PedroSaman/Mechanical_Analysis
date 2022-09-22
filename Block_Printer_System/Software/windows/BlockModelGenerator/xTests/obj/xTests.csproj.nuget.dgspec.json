@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj": {}
+    "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj": {
+    "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj",
+        "projectUniqueName": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj",
         "projectName": "BlockModelGenerator",
-        "projectPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj",
-        "packagesPath": "C:\\Users\\Pedro\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\obj\\",
+        "projectPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj",
+        "packagesPath": "C:\\Users\\maeda\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Pedro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\maeda\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -53,25 +53,26 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj": {
+    "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj",
+        "projectUniqueName": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj",
         "projectName": "VoxelModelConverter",
-        "projectPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj",
-        "packagesPath": "C:\\Users\\Pedro\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\obj\\",
+        "projectPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj",
+        "packagesPath": "C:\\Users\\maeda\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Pedro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\maeda\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -85,8 +86,8 @@
           "netcoreapp2.1": {
             "targetAlias": "netcoreapp2.1",
             "projectReferences": {
-              "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj": {
-                "projectPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj"
+              "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj": {
+                "projectPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj"
               }
             }
           }
@@ -114,25 +115,26 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj": {
+    "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj",
+        "projectUniqueName": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj",
         "projectName": "xTests",
-        "projectPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj",
-        "packagesPath": "C:\\Users\\Pedro\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\xTests\\obj\\",
+        "projectPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\xTests\\xTests.csproj",
+        "packagesPath": "C:\\Users\\maeda\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\xTests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Pedro\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\maeda\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -146,11 +148,11 @@
           "netcoreapp2.1": {
             "targetAlias": "netcoreapp2.1",
             "projectReferences": {
-              "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj": {
-                "projectPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj"
+              "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj": {
+                "projectPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\BlockModelGenerator\\BlockModelGenerator.csproj"
               },
-              "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj": {
-                "projectPath": "C:\\Users\\Pedro\\Desktop\\Kohama_3D_Printer\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj"
+              "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj": {
+                "projectPath": "C:\\Users\\maeda\\Documents\\GitHub\\Mechanical_Analysis\\Block_Printer_System\\Software\\windows\\BlockModelGenerator\\VoxelModelConverter\\VoxelModelConverter.csproj"
               }
             }
           }
@@ -190,11 +192,12 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }
