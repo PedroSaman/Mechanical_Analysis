@@ -11,7 +11,7 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
     
     knobs = knob(model,0); % Knob information (entire block model)
     insert_block = block_number;
-    [knob_map,block_number] = search_block(knobs,model,block_number); % search for blocks to add support
+    [knob_map,block_number] = search_block(knobs,model,block_number); % Search for blocks to add support
     
     if(isempty(block_number)) %Impossible to insert support blocks
         inserted_block_number = -1; %Return error
@@ -20,10 +20,11 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
     end
     
     possible_blocks = size(block_number,1);
-    support_coordinates = [];
+    support_coordinates = []; % (X,Y,Z,BlockNumber) (PRECISO VERIFICAR NO LAB)
     
     j = possible_blocks;
-    while(j >= 1)
+    %For each possible support pillar position 
+    while(j >= 1) 
         [col,row] = col_row_converter(model(block_number(j),5));
         
         tentative_positions = zeros(size(knob_map,2),4);
@@ -32,11 +33,12 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
         
         k = size(knob_map,2);
         while(k >= 1)
-            if(knob_map(j,k) == -1 || knob_map(j,k) == 1)
-                tentative_positions(k,:) = [];
-            elseif(knob_map(j,k) == 0)
+            if(knob_map(j,k) == -1 || knob_map(j,k) == 1) %If this knob is no free, or do not exists.
+                tentative_positions(k,:) = []; %Erase this tentative position.
+            elseif(knob_map(j,k) == 0) %This knob is free.
                 support_knob = k;
-                %Convertion from block knob number to cartesian position
+                
+                %Convertion from block knob number to cartesian position.
                 if(col >= row)
                     if(row > 1)
                         if(mod(support_knob,2) == 0)
@@ -62,13 +64,15 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
                         end
                     end
                 end
+
             end
             k = k - 1;
         end
-        support_coordinates = [tentative_positions;support_coordinates];
+        support_coordinates = [tentative_positions;support_coordinates]; %Concatenate the tentative with the support coordinates.
         j = j - 1;
     end
-    [plan,inserted_block_number,pillars_inserted] = insert_support_blocks(model,support_coordinates,insert_block); % Input is a matrix with each row being a cartesian position of each pilar
-    [plan,removed_blocks_number] = remove_redundancies(plan,insert_block+inserted_block_number,pillars_inserted);
-    inserted_block_number = inserted_block_number - removed_blocks_number;
+
+    [plan,inserted_block_number,pillars_inserted] = insert_support_blocks(model,support_coordinates,insert_block); %Input is a matrix with each row being a cartesian position of each pilar.
+    [plan,removed_blocks_number] = remove_redundancies(plan,insert_block+inserted_block_number,pillars_inserted); %Remove pillars not necessary.
+    inserted_block_number = inserted_block_number - removed_blocks_number; %Update the inserted block number with the removed pillars.
 end
