@@ -21,24 +21,24 @@ function [plan] = NewPlanner(filename)
         
         [plan,rearrange_strategy_output] = rearrange_strategy(plan,layer); % Run the Rearrange Strategy
         if(rearrange_strategy_output < 0)
-            plan = "Error Occurred in Rearrange Strategy!";
+            fprintf("Error Occurred in Rearrange Strategy!");
             return;
         end
-        
+
         for block = range(layer,1):range(layer,2) % For every block in the current layer
             evaluating_model = plan(1:block + offset,:); % Delimit the model to be from the 1st to the "block"-th of the "layer"-th layer
             [planner_output] = Planner_Stability_Judge(evaluating_model); % Evaluate the insertion Stability
             if(~strcmp(planner_output,'safe')) % If not safe
                 [plan,support_strategy_output] = support_block_strategy(plan,block + offset); % Run the Support Block Strategy
                 if(support_strategy_output < 0) % If not possible, the output will be -1 indicating error ocurred
-                    plan = "Error Occurred in Support Block Strategy!";
+                    fprintf("Error Occurred in Support Block Strategy!");
                     return;
                 end
                 offset = offset + support_strategy_output; % Correct the next block to be analyzed
             end
             fprintf("Block %d insertion is stable\n",block + offset);
         end
-        
     end
     toc
+    save(filename + "_plan", 'plan');
 end
