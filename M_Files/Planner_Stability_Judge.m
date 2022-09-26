@@ -145,7 +145,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
     for n = 1 : N_push
         pbn = b_push(n, 1);
         b_push(n, 4) = b_push(n, 4) + beq(6*pbn-3); % Pushing force in Z (Fz) + gravity 
-        b_dummy = b_push(n, 2:7).';%'
+        b_dummy = b_push(n, 2:7).';
         beq(6*pbn-5 : 6*pbn) = b_dummy;
     end
     options = optimoptions('linprog','Display','none');
