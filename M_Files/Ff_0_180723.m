@@ -59,14 +59,14 @@ for n = 1 : count
     block_force = 0; % Number of forces in the current block
     for i = 1:temp_c % Count the number of friction forces acting in the nth block
         if(col == 1 && row == 1) % 1x1 block have 8 friction forces
-            block_force = 8;
+            block_force = 4;
             break;
         end
         for j = 1:temp_r
             if(j == 1 || j == temp_r) % The first and the last knob in a row have 6 friction forces
-                block_force = block_force + 6;
+                block_force = block_force + 3;
             else
-                block_force = block_force + 4; % The other ones have 4 friction forces
+                block_force = block_force + 2; % The other ones have 4 friction forces
             end
         end
     end
@@ -113,8 +113,6 @@ for n = 1 : count
            end
         end
     end
-    F(force+block_force/2:force+block_force,2:7) = F(force:force+block_force/2,2:7); % Double the vector
-    F(force+block_force/2:force+block_force,6) = -0.5;
     force = force + block_force; % Update force value
 end
 

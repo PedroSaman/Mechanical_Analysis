@@ -25,8 +25,8 @@ for n = 1 : loop
     end
 end
 
-Ff = zeros(8*loop, 13); % Maximum possible number of friction force (If all blocks were 1x1)
-Ff(1:8*loop, 1) = 1 : 8*loop; % Force Number
+Ff = zeros(4*loop, 13); % Maximum possible number of friction force (If all blocks were 1x1)
+Ff(1:4*loop, 1) = 1 : 4*loop; % Force Number
 count = 1; 
 for n = 1 : loop % For each knob connection
     type_1 = join(n, 2); % Upper block type
@@ -91,28 +91,34 @@ for n = 1 : loop % For each knob connection
     while(i<size(All_Forces2,1))
         if(type_2 == All_Forces2(i,4) && knob2 == All_Forces2(i+1,4))
             Ff(count:count+3, 10:12) = [All_Forces2(i:i+3,1), All_Forces2(i:i+3,2), -All_Forces2(i:i+3,3)];
-            if(exclude_knob_1 == 4 || exclude_knob_2 == 4)
+            if(exclude_knob_1 == 0 && exclude_knob_2 == 4)
                 Ff(count+3,10:12) = [0,0,0];
-            elseif(exclude_knob_1 == 3 || exclude_knob_2 == 3)
+            elseif(exclude_knob_1 == 0 && exclude_knob_2 == 3)
                 Ff(count+2,10:12) = Ff(count+3,10:12); 
                 Ff(count+3,10:12) = [0,0,0];
-            elseif(exclude_knob_1 == 2 || exclude_knob_2 == 2)
+            elseif(exclude_knob_1 == 0 && exclude_knob_2 == 2)
                 Ff(count+1,10:12) = Ff(count+2,10:12); 
                 Ff(count+2,10:12) = Ff(count+3,10:12); 
                 Ff(count+3,10:12) = [0,0,0];
-            elseif(exclude_knob_1 == 1 || exclude_knob_2 == 1)
+            elseif(exclude_knob_1 == 0 && exclude_knob_2 == 1)
                 Ff(count,10:12) = Ff(count+1,10:12);
                 Ff(count+1,10:12) = Ff(count+2,10:12);
                 Ff(count+2,10:12) = Ff(count+3,10:12);
+                Ff(count+3,10:12) = [0,0,0];
+            elseif(exclude_knob_1 == 1 && exclude_knob_2 == 4)
+                Ff(count,10:12) = Ff(count+1,10:12);
+                Ff(count+1,10:12) = Ff(count+2,10:12);
+                Ff(count+2,10:12) = [0,0,0];
+                Ff(count+3,10:12) = [0,0,0];
+            elseif(exclude_knob_1 == 2 && exclude_knob_2 == 3)
+                Ff(count+1,10:12) = Ff(count+3,10:12);
+                Ff(count+2,10:12) = [0,0,0];
                 Ff(count+3,10:12) = [0,0,0];
             end
             break;
         end
         i = i + 4;
     end
-    Ff(count+force_number+1:count+2*force_number+1, 2:11) = Ff(count:count+force_number, 2:11); %Duplicate the force vector
-    Ff(count+force_number+1:count+2*force_number+1, 6) = -0.5; %Coordinate 1 (z = -0.5)
-    Ff(count+force_number+1:count+2*force_number+1, 12) = 2.5; %Coordinate 1 (z = 2.5)
-    count = count + 2*force_number + 2;
+    count = count + force_number + 1;
 end
 Ff(count:end,:) = [];
