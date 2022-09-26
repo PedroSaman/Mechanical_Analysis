@@ -40,5 +40,6 @@ function [plan] = NewPlanner(filename)
         end
     end
     toc
-    save(filename + "_plan", 'plan');
+    %save(filename + "_plan", 'plan');
+    plan_formatation(plan,filename);
 end
