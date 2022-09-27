@@ -34,8 +34,7 @@ for n = 1 : count
             j = 1;
             while(j <= col*row)
                 force_number = All_Forces(i+2,4) - 1;
-                F(start:start+force_number, 4:5) = All_Forces(i:i+force_number,1:2); %Force X and Y Position
-                F(start:start+force_number, 6) = -All_Forces(i:i+force_number,3);
+                F(start:start+force_number, 4:6) = All_Forces(i:i+force_number,1:3); %Force X, Y and Z Position
                 F(start:start+force_number,2) = model(n, 1); %Block Number
                 
                 start = start + force_number + 1;

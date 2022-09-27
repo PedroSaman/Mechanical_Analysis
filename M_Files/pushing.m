@@ -25,7 +25,6 @@ join_push = join(knob_push, z_max); % Find out the knobs that are snapped togeth
 %Get the upper block forces position
 [col,row] = col_row_converter(model(N, 5));
 UpperBlock_Forces = force_position(col,row,"ff");
-UpperBlock_Forces(:,3) = -UpperBlock_Forces(:,3); %Need to invert the z value (needs to be positive)
 
 %Fills the All_Forces Matrix
 bc = zeros(9,9);
@@ -43,7 +42,6 @@ for n = 1 : loop
         All_Forces = [All_Forces;force_position(col,row,"ffc")];
     end
 end
-All_Forces(:,3) = -All_Forces(:,3);
 
 %Find the number of blocks and knobs being pushed and create a matix with the block number
 block_number = 0; knob_number = size(join_push,1);
@@ -66,7 +64,7 @@ for n = 1 : knob_number
     end
 end
 
-%Calculate the forces and momentous to all blocks caused by the insertion
+%Calculate the forces and momentos to all blocks caused by the insertion
 beq = zeros(block_number, 7);
 for m = 1 : block_number %for each block that is being applied force
     block = b(m);
@@ -87,7 +85,7 @@ for m = 1 : block_number %for each block that is being applied force
         i = 1;
         while(i<size(UpperBlock_Forces,1))
             if(type_1 == UpperBlock_Forces(i,4) && knob1 == UpperBlock_Forces(i+1,4))
-                exclude_knob_1 = -UpperBlock_Forces(i+3,3);
+                exclude_knob_1 = UpperBlock_Forces(i+3,3);
                 exclude_knob_2 = UpperBlock_Forces(i+3,4);
                 knobs = [1, 2, 3, 4];
                 if(exclude_knob_2 ~= 0)

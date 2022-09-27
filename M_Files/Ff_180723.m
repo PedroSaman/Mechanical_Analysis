@@ -79,7 +79,7 @@ for n = 1 : loop % For each knob connection
                 Ff(count+j, 2:6:8) = join(n, 3:3:6); %Block Number
                 Ff(count+j, 3:6:9) = join(n, 4:3:7); %Knob Number
             end
-            Ff(count:count+force_number, 4:6) = [All_Forces(i:i+force_number,1), All_Forces(i:i+force_number,2), -All_Forces(i:i+force_number,3)];
+            Ff(count:count+force_number, 4:6) = All_Forces(i:i+force_number,1:3); %Force X, Y and Z Position
             break;
         end
         if(force_number == 1)
@@ -90,7 +90,7 @@ for n = 1 : loop % For each knob connection
     i = 1;
     while(i<size(All_Forces2,1))
         if(type_2 == All_Forces2(i,4) && knob2 == All_Forces2(i+1,4))
-            Ff(count:count+3, 10:12) = [All_Forces2(i:i+3,1), All_Forces2(i:i+3,2), -All_Forces2(i:i+3,3)];
+            Ff(count:count+3, 10:12) = All_Forces2(i:i+3,1:3);
             if(exclude_knob_1 == 0 && exclude_knob_2 == 4)
                 Ff(count+3,10:12) = [0,0,0];
             elseif(exclude_knob_1 == 0 && exclude_knob_2 == 3)
