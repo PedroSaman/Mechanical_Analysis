@@ -10,6 +10,7 @@ function [plan] = NewPlanner(filename)
     %
     % This planner utilizes the Mechanical Analysis to judge the structure
     % stability for each block insertion.
+
     tic
     [plan,range] = model_loader(filename); % Load model and adapt it to the Stability Judge format
     z_max = plan(end,4); % Highest Z position must be from the last block in model
@@ -28,6 +29,7 @@ function [plan] = NewPlanner(filename)
         for block = range(layer,1):range(layer,2) % For every block in the current layer
             evaluating_model = plan(1:block + offset,:); % Delimit the model to be from the 1st to the "block"-th of the "layer"-th layer
             [planner_output] = Planner_Stability_Judge(evaluating_model); % Evaluate the insertion Stability
+            support_strategy_output = 0;
             if(~strcmp(planner_output,'safe')) % If not safe
                 [plan,support_strategy_output] = support_block_strategy(plan,block + offset); % Run the Support Block Strategy
                 if(support_strategy_output < 0) % If not possible, the output will be -1 indicating error ocurred
@@ -36,10 +38,12 @@ function [plan] = NewPlanner(filename)
                 end
                 offset = offset + support_strategy_output; % Correct the next block to be analyzed
             end
-            fprintf("Block %d insertion is stable\n",block + offset);
+            fprintf("\n Block %d/%d insertion is stable\n",block,range(end,2));
+            if(support_strategy_output ~= 0)
+                fprintf("Was necessary %d support blocks\n",support_strategy_output);
+            end
         end
     end
     toc
-    %save(filename + "_plan", 'plan');
     plan_formatation(plan,filename);
 end
