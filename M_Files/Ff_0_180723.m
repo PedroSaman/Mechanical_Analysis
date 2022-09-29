@@ -34,8 +34,7 @@ for n = 1 : count
             j = 1;
             while(j <= col*row)
                 force_number = All_Forces(i+2,4) - 1;
-                F(start:start+force_number, 4:5) = All_Forces(i:i+force_number,1:2); %Force X and Y Position
-                F(start:start+force_number, 6) = -All_Forces(i:i+force_number,3);
+                F(start:start+force_number, 4:6) = All_Forces(i:i+force_number,1:3); %Force X, Y and Z Position
                 F(start:start+force_number,2) = model(n, 1); %Block Number
                 
                 start = start + force_number + 1;
@@ -59,14 +58,14 @@ for n = 1 : count
     block_force = 0; % Number of forces in the current block
     for i = 1:temp_c % Count the number of friction forces acting in the nth block
         if(col == 1 && row == 1) % 1x1 block have 8 friction forces
-            block_force = 8;
+            block_force = 4;
             break;
         end
         for j = 1:temp_r
             if(j == 1 || j == temp_r) % The first and the last knob in a row have 6 friction forces
-                block_force = block_force + 6;
+                block_force = block_force + 3;
             else
-                block_force = block_force + 4; % The other ones have 4 friction forces
+                block_force = block_force + 2; % The other ones have 4 friction forces
             end
         end
     end
@@ -113,8 +112,6 @@ for n = 1 : count
            end
         end
     end
-    F(force+block_force/2:force+block_force,2:7) = F(force:force+block_force/2,2:7); % Double the vector
-    F(force+block_force/2:force+block_force,6) = -0.5;
     force = force + block_force; % Update force value
 end
 

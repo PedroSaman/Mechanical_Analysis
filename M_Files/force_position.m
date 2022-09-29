@@ -98,19 +98,12 @@ elseif(force_type == "ff") % Friction force (excluding some forces)
     r = 1.25; % Knob radius
     b = 2; % Half block size
     pf_index = 1; % Force index in pf matrix
+    z = -0.5;
     
     %That force vector Pf have the forces excluding the ones that doesn’t 
     %exist in the block (only the ones that actually appears in the knobs)
     if(row == 1 && col == 1)
         Pf = zeros(4,4);
-    
-    %{
-    %experiment excluding one ff from 2x2 blocks
-    elseif(row == col)  %special case 2x2
-        Pf = zeros(16,4);
-    %end experiment (line below was 'elseif(row>=col)' before
-    %}
-        
     elseif(row>=col)
         Pf = zeros((2*3+(row-2)*2)*col,4);
     elseif(col>row)
@@ -132,48 +125,28 @@ elseif(force_type == "ff") % Friction force (excluding some forces)
             %column = which force was excluded.
             
             if(row==1 && col==1) % Special case for 1x1 blocks
-                Pf(pf_index:pf_index+3,:) = [[f1,1.5,11];[f2,1.5,11];[f3,1.5,4];[f4,1.5,0]];
+                Pf(pf_index:pf_index+3,:) = [[f1,z,11];[f2,z,11];[f3,z,4];[f4,z,0]];
                 pf_index = pf_index + 4;
-            
-            %{
-            %experiment excluding one ff from 2x2 blocks
-            elseif(row==col) % Special case for 2x2 blocks
-                if(j==0 && i==0) % If first knob
-                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f2,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,3,4]];
-                    pf_index = pf_index + 4;
-                elseif(j==1 && i==0) % If second knob
-                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f3,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,2,4]];
-                    pf_index = pf_index + 4;
-                elseif(j==0 && i == 1) % % If third knob
-                    Pf(pf_index:pf_index+3,:) = [[f2,1.5,10*col+row];[f4,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,1,3]];
-                    pf_index = pf_index + 4;
-                elseif(j==1 && i == 1) % % If fourth knob
-                    Pf(pf_index:pf_index+3,:) = [[f3,1.5,10*col+row];[f4,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,1,2]];
-                    pf_index = pf_index + 4;
-                end
-            %end experiment (line below was 'elseif(row>=col)' before
-            %}
-            
             elseif(row>=col) % If the block is taller than wide
                 if(j==0) % If columns first knob
-                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f2,1.5,10*(i+1)+(j+1)];[f4,1.5,3];[0,0,0,3]];
+                    Pf(pf_index:pf_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f4,z,3];[0,0,0,3]];
                     pf_index = pf_index + 4;
                 elseif(j==row-1) % If columns last knob
-                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f3,1.5,10*(i+1)+(j+1)];[f4,1.5,3];[0,0,0,2]];
+                    Pf(pf_index:pf_index+3,:) = [[f1,z,10*col+row];[f3,z,10*(i+1)+(j+1)];[f4,z,3];[0,0,0,2]];
                     pf_index = pf_index + 4;
                 else % If columns inside knob
-                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f4,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,2,3]];
+                    Pf(pf_index:pf_index+3,:) = [[f1,z,10*col+row];[f4,z,10*(i+1)+(j+1)];[0,0,0,2];[0,0,2,3]];
                     pf_index = pf_index + 4;
                 end
             elseif(col>row) % If the block is wider than tall
                 if(i == 0) % If rows first knob
-                    Pf(pf_index:pf_index+3,:) = [[f1,1.5,10*col+row];[f2,1.5,10*(i+1)+(j+1)];[f3,1.5,3];[0,0,0,4]];
+                    Pf(pf_index:pf_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,3];[0,0,0,4]];
                     pf_index = pf_index + 4;
                 elseif(i == col-1) % If rows last knob
-                    Pf(pf_index:pf_index+3,:) = [[f2,1.5,10*col+row];[f3,1.5,10*(i+1)+(j+1)];[f4,1.5,3];[0,0,0,1]];
+                    Pf(pf_index:pf_index+3,:) = [[f2,z,10*col+row];[f3,z,10*(i+1)+(j+1)];[f4,z,3];[0,0,0,1]];
                     pf_index = pf_index + 4;
                 else % If rows inside knob
-                    Pf(pf_index:pf_index+3,:) = [[f2,1.5,10*col+row];[f3,1.5,10*(i+1)+(j+1)];[0,0,0,2];[0,0,1,4]];
+                    Pf(pf_index:pf_index+3,:) = [[f2,z,10*col+row];[f3,z,10*(i+1)+(j+1)];[0,0,0,2];[0,0,1,4]];
                     pf_index = pf_index + 4;
                 end
             end
@@ -184,6 +157,7 @@ elseif(force_type == "ffc") % Complete friction force matrix
     r = 1.25; % Knob radius
     b = 2; % Half block size
     force_index = 1; % Force index in FP matrix
+    z = 2.5;
     
     %These force vector Pf are have the forces excluding the ones that
     %doesnt exist in the block.
@@ -204,22 +178,22 @@ elseif(force_type == "ffc") % Complete friction force matrix
             %4th row = the number of a knob that would need to be excluded.
             
             if(row==1 && col==1) % Special case for 1x1 blocks
-                FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,0];[f4,-1.5,0]];
+                FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,0];[f4,z,0]];
             elseif(row>=col) % If the block is taller than wide
                 if(j==0) % If columns first knob
-                    FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,3];[f4,-1.5,0]];
+                    FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,3];[f4,z,0]];
                 elseif(j==row-1) % If columns last knob
-                    FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,2];[f4,-1.5,0]];
+                    FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,2];[f4,z,0]];
                 else % If columns inside knob
-                    FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,2];[f4,-1.5,3]];
+                    FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,2];[f4,z,3]];
                 end
             elseif(col>row) % If the block is wider than tall
                 if(i == 0) % If rows first knob
-                    FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,4];[f4,-1.5,0]];
+                    FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,4];[f4,z,0]];
                 elseif(i == col-1) % If rows last knob
-                    FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,1];[f4,-1.5,0]];
+                    FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,1];[f4,z,0]];
                 else % If rows inside knob
-                    FP(force_index:force_index+3,:) = [[f1,-1.5,10*col+row];[f2,-1.5,10*(i+1)+(j+1)];[f3,-1.5,1];[f4,-1.5,4]];
+                    FP(force_index:force_index+3,:) = [[f1,z,10*col+row];[f2,z,10*(i+1)+(j+1)];[f3,z,1];[f4,z,4]];
                 end
             end
             force_index = force_index + 4;
