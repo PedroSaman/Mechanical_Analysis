@@ -1,4 +1,4 @@
-function [plan] = NewPlanner(filename)
+function [plan,output] = NewPlanner(plan)
     % NewPlanner  Calculate the assembly plan for the input block model. 
     % [plan] = NewPlanner(filename)
     %
@@ -10,19 +10,20 @@ function [plan] = NewPlanner(filename)
     %
     % This planner utilizes the Mechanical Analysis to judge the structure
     % stability for each block insertion.
-
-    tic
-    [plan,range] = model_loader(filename); % Load model and adapt it to the Stability Judge format
+    
+    range = range_calculator(plan);
     z_max = plan(end,4); % Highest Z position must be from the last block in model
     offset = 0; % Keep track of support blocks number to preserve the block iteration
+    subassembly_strategy_detector = 6;
     
-    fprintf("Blocks 1 to %d are from the 1st layer, so their insertion is stable\n",range(1,2));
+    fprintf("\nBlocks 1 to %d are from the 1st layer, so their insertion is stable\n",range(1,2));
     
     for layer = 2:z_max % From layer two to z_max. (First layer is always stable)
         
         [plan,rearrange_strategy_output] = rearrange_strategy(plan,layer); % Run the Rearrange Strategy
         if(rearrange_strategy_output < 0)
             fprintf("Error Occurred in Rearrange Strategy!");
+            output = "rearrange";
             return;
         end
 
@@ -32,8 +33,19 @@ function [plan] = NewPlanner(filename)
             support_strategy_output = 0;
             if(~strcmp(planner_output,'safe')) % If not safe
                 [plan,support_strategy_output] = support_block_strategy(plan,block + offset); % Run the Support Block Strategy
-                if(support_strategy_output < 0) % If not possible, the output will be -1 indicating error ocurred
+                if(support_strategy_output >= subassembly_strategy_detector) % If the subassembly flag is detected
+                    [plan,subassembly_strategy_output] = subassembly_strategy(plan,block + offset + support_strategy_output);
+                    if(subassembly_strategy_output < 0) % If error in subassembly strategy
+                        fprintf("Error Occurred in Support Block Strategy!");
+                        output = "subassembly";
+                        return;
+                    else
+                        output = "ok";
+                        return;
+                    end
+                elseif(support_strategy_output < 0) % If not possible, the output will be -1 indicating error ocurred
                     fprintf("Error Occurred in Support Block Strategy!");
+                    output = "support";
                     return;
                 end
                 offset = offset + support_strategy_output; % Correct the next block to be analyzed
@@ -44,6 +56,5 @@ function [plan] = NewPlanner(filename)
             end
         end
     end
-    toc
-    plan_formatation(plan,filename);
+    output = "ok";
 end

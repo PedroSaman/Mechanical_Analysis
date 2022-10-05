@@ -44,7 +44,7 @@ function [Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M)
         for i = 1:size(M) % Search for the registered mass
             if(model(n, 5) == M(i,1))
                 mass =  M(i,2);
-            break;
+                break;
             end
         end
         beq((6*n - 5) : 6*n, 1) = [0; 0; mass*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
