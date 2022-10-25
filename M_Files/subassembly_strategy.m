@@ -1,4 +1,4 @@
-function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_number)
+function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_number,filename)
 %myFun - Description
 %
 % Syntax: output = myFun(input)
@@ -29,7 +29,7 @@ function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_n
     end
     
     fprintf("\nStarted the Subassembly assembly planning. It has %d blocks\n\n",size(submodel2,1));
-    [submodel2,~] = NewPlanner(submodel2);
+    [submodel2,~] = NewPlanner(submodel2,filename);
     
     plan = merge_subassemblies(submodel1,submodel2);
 end
