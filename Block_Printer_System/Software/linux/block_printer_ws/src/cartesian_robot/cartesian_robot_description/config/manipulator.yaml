@@ -1,0 +1,10 @@
+block_printer:
+  manipulator:
+    initial_pose:
+      position: [0.1, 0, 0.3]
+      orientation: [0,0,0,1]
+    finish_pose:
+      position: [0.1, 0, 0.3]
+      orientation: [0,0,0,1]
+    velocity_factor: {high: 1.0, low: 0.2}
+    effort_factor: {high: 1.0, low: 0.7}

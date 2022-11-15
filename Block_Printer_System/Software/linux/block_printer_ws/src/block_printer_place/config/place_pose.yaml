@@ -1,0 +1,32 @@
+block_printer:
+  shift_grid_ratio: 0.1
+  pad0:
+    size: {x: 20,y: 20}
+    place0:
+      block: {size_x: 1,size_y: 1}
+      x_min_y_min: [0.200,0.200,0.103]
+      x_max_y_min: [0.276,0.200,0.103]
+      x_min_y_max: [0.200,0.276,0.103]
+      x_max_y_max: [0.276,0.276,0.103]
+      orientation: [0,0,1.57079632679]
+    place1:
+      block: {size_x: 2,size_y: 1}
+      x_min_y_min: [0.200,0.200,0.103]
+      x_max_y_min: [0.272,0.200,0.103]
+      x_min_y_max: [0.200,0.276,0.103]
+      x_max_y_max: [0.272,0.276,0.103]
+      orientation: [0,0,1.57079632679]
+    place2:
+      block: {size_x: 1,size_y: 2}
+      x_min_y_min: [0.200,0.202,0.103]
+      x_max_y_min: [0.276,0.202,0.103]
+      x_min_y_max: [0.200,0.274,0.103]
+      x_max_y_max: [0.276,0.274,0.103]
+      orientation: [0,0,0]
+    place3:
+      block: {size_x: 2,size_y: 2}
+      x_min_y_min: [0.200,0.202,0.103]
+      x_max_y_min: [0.272,0.202,0.103]
+      x_min_y_max: [0.200,0.274,0.103]
+      x_max_y_max: [0.272,0.274,0.103]
+      orientation: [0,0,1.57079632679]

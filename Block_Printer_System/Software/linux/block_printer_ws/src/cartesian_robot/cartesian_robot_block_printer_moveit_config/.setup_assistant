@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: cartesian_robot_description
+    relative_path: urdf/cartesian_robot_block_printer.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/cartesian_robot_block_printer.srdf
+  CONFIG:
+    author_name: Mikiya KOHAMA
+    author_email: nat.horn.mk0426@gmail.com
+    generated_timestamp: 1543374000

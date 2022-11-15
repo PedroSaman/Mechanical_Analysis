@@ -1,0 +1,8 @@
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="material_color" params="name rgba">
+        <material name="material_color_${name}">
+            <color rgba="${rgba}"/>
+        </material>
+    </xacro:macro>
+</robot>

@@ -1,0 +1,13 @@
+<launch>
+  <arg name="spawn_scene_filename" default=""/>
+  <arg name="output" default="screen"/>
+  <arg name="reference_move_group"/>
+  <arg name="reference_frame_id" default=""/>
+  <node pkg="block_printer_visualizer" name="block_printer_visualizer" type="object_spawner" output="$(arg output)"/>
+  <node pkg="block_printer_visualizer" name="scene_spawner" type="scene_spawner" output="$(arg output)" args="$(arg spawn_scene_filename)">
+    <param name="reference_frame_id" type="string" value="$(arg reference_frame_id)"/>
+  </node>
+  <node pkg="block_printer_visualizer" name="block_spawner" type="block_spawner" output="$(arg output)">
+    <param name="reference_move_group" type="string" value="$(arg reference_move_group)"/>
+  </node>
+</launch>

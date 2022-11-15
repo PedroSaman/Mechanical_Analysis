@@ -1,0 +1,4 @@
+block_printer:
+  model_description:
+    file: "/home/kohama/Desktop/bunny_y270_support.txt"
+    type: "kohama2019"

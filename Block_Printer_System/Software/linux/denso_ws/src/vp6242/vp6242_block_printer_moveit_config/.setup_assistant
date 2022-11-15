@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: vp6242_description
+    relative_path: urdf/vp6242_block_printer_macro.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/denso_vp6242.srdf
+  CONFIG:
+    author_name: mikiya KOHAMA
+    author_email: nat.horn.mk0426@gmail.com
+    generated_timestamp: 1542326008

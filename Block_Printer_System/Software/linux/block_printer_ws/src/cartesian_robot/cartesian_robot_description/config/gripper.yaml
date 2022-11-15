@@ -1,0 +1,5 @@
+block_printer:
+  gripper:
+    positions: [0, 0.0182, 0.0152]
+    margin: -0.001
+    max_effort: 100

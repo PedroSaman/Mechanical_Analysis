@@ -1,0 +1,4 @@
+<launch>
+    <!-- Run joint state publisher -->
+    <node name="denso_bcap_controller_interface" pkg="denso_bcap_controller" type="denso_bcap_controller_interface"/>
+</launch>

@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--TAIYO ESG1_FS_2840 Gripper with Fixed Claws-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!--xacro arg-->
+    <xacro:arg name="robot_tool_link" default="tool0"/>
+    <xacro:arg name="tool_roll" default="0"/>
+    <xacro:arg name="tool_pitch" default="3.141592653589793238"/>
+    <xacro:arg name="tool_yaw" default="0"/>
+    <!--xacro property-->
+    <xacro:property name="finger_gap" value="0.0085"/>
+    <xacro:property name="interface_radius" value="0.04" />
+    <xacro:property name="interface_length" value="0.009" />
+    <xacro:property name="interface_mass" value="0.1" />
+    <xacro:property name="interface_rgba" value="0.6 1 0.6 1"/>
+    <xacro:property name="gripper_body_x" value="0.11" />
+    <xacro:property name="gripper_body_y" value="0.04" />
+    <xacro:property name="gripper_body_z" value="0.084" />
+    <xacro:property name="gripper_body_mass" value="0.8" />
+    <xacro:property name="gripper_body_rgba" value="1 1 1 1"/>
+    <xacro:property name="gripper_side_radius" value="0.009" />
+    <xacro:property name="gripper_side_length" value="0.05" />
+    <xacro:property name="gripper_side_mass" value="0.01" />
+    <xacro:property name="gripper_side_rgba" value="1 0.5 0.5 1" />
+    <xacro:property name="finger_body_x" value="${(gripper_body_x-finger_gap)/2}" />
+    <xacro:property name="finger_body_y" value="0.015" />
+    <xacro:property name="finger_body_z" value="0.0136" />
+    <xacro:property name="finger_mass" value="0.005" />
+    <xacro:property name="finger_rgba" value="0.6 0.6 1 1"/>
+    <xacro:property name="tool_roll" value="$(arg tool_roll)"/>
+    <xacro:property name="tool_pitch" value="$(arg tool_pitch)"/>
+    <xacro:property name="tool_yaw" value="$(arg tool_yaw)"/>
+    <!--xacro macro-->
+    <xacro:include filename="$(find urdf_macro)/urdf/material.xacro" />
+    <xacro:include filename="$(find urdf_macro)/urdf/primitive_shape.xacro" />
+    <!--link-->
+    <xacro:cylinder_link name="robot_gripper_interface1" radius="${interface_radius}" length="${interface_length}" mass="${interface_mass}" rgba="${interface_rgba}"/>
+    <xacro:cylinder_link name="robot_gripper_interface2" radius="${interface_radius}" length="${interface_length}" mass="${interface_mass}" rgba="${interface_rgba}"/>
+    <xacro:rectangle_link name="gripper_body" x="${gripper_body_x}" y="${gripper_body_y}" z="${gripper_body_z}" mass="${gripper_body_mass}" rgba="${gripper_body_rgba}"/>
+    <xacro:cylinder_link name="gripper_side" radius="${gripper_side_radius}" length="${gripper_side_length}" mass="${gripper_side_mass}" rgba="${gripper_side_rgba}"/>
+    <xacro:rectangle_link name="right_claw" x="${finger_body_x}" y="${finger_body_y}" z="${finger_body_z}" mass="${finger_mass}" rgba="${finger_rgba}"/>
+    <xacro:rectangle_link name="left_claw" x="${finger_body_x}" y="${finger_body_y}" z="${finger_body_z}" mass="${finger_mass}" rgba="${finger_rgba}"/>
+    <link name="peak_tool" />
+    <!--joint of robot and gripper interface-->
+    <joint name="robot_to_gripper" type="fixed">
+        <parent link="$(arg robot_tool_link)" />
+        <child link="robot_gripper_interface1" />
+        <origin xyz="0 0 0" rpy="0 0 ${pi / 2}" />
+    </joint>
+    <!--joint of gripper interface and body-->
+    <joint name="robot_to_gripper_interface_2" type="fixed">
+        <parent link="robot_gripper_interface1" />
+        <child link="robot_gripper_interface2" />
+        <origin rpy="0 0 0" xyz="0 0 ${interface_length / 2 * 2}" />
+    </joint>
+    <joint name="interface_to_gripper_body" type="fixed">
+        <parent link="robot_gripper_interface2"/>
+        <child link="gripper_body"/>
+        <origin xyz="0.0 0.0 ${interface_length / 2 * 2}" rpy="0 0 0"/>
+    </joint>
+    <!--joint of gripper body and its side-->
+    <joint name="gripper_to_side" type="fixed">
+        <parent link="gripper_body" />
+        <child link="gripper_side" />
+        <origin rpy="${pi} ${-pi/2} 0" xyz="${gripper_body_x/2} 0 ${0.006+gripper_side_radius}" />
+    </joint>
+    <!--joint of gripper and claw-->
+    <joint name="right_claw_joint" type="fixed">
+        <parent link="gripper_body"/>
+        <child link="right_claw"/>
+        <origin xyz="${gripper_body_x/2-finger_body_x/2} 0 ${gripper_body_z}" rpy="0 0 0"/>
+    </joint>
+    <joint name="left_claw_joint" type="fixed">
+        <parent link="gripper_body"/>
+        <child link="left_claw"/>
+        <origin xyz="${-gripper_body_x/2+finger_body_x/2} 0 ${gripper_body_z}" rpy="0 0 0"/>
+    </joint>
+    <!--joint of gripper and peak tool-->
+    <joint name="peak_tool" type="fixed">
+        <origin xyz="0 0 ${gripper_body_z + finger_body_z}" rpy="${tool_roll} ${tool_pitch} ${tool_yaw}"/>
+        <parent link="gripper_body"/>
+        <child link="peak_tool"/>
+    </joint>
+</robot>
