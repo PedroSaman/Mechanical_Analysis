@@ -1,0 +1,1 @@
+rosrun moveit_kinematics create_ikfast_moveit_plugin.py vp6242_block_printer manipulator vp6242_block_printer_ikfast_manipulator_plugin /home/kohama/denso_ws/src/vp6242/vp6242_block_printer_ikfast_manipulator_plugin/src/vp6242_block_printer_manipulator_ikfast_solver.cpp

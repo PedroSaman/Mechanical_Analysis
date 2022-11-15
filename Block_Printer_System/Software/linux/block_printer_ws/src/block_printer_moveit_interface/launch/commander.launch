@@ -1,0 +1,45 @@
+<launch>
+    <arg name="use_moveit_dependent_core" default="false"/>
+    <arg name="block_model_filename"/>
+    <arg name="block_model_type"/>
+    <arg name="block_config" default="$(find block_printer_model_reader)/config/block.yaml"/>
+    <arg name="pick_config" default="$(find block_printer_pick)/config/pick_pose.yaml"/>
+    <arg name="place_config" default="$(find block_printer_place)/config/place_pose.yaml"/>
+    <arg name="robot_config" default="$(find block_printer_motion_commander)/config/robot.yaml"/>
+    <arg name="moveit_config" default="$(find block_printer_moveit_interface)/config/moveit.yaml"/>
+    <arg name="visualizer_reference_move_group" default="manipulator"/>
+    <arg name="visualizer_reference_frame_id" default="base_link"/>
+    <arg name="visualizer_spawn_scene_filename" default=""/>
+    <include file="$(find block_printer_model_reader)/launch/block_printer_model_reader.launch">
+        <arg name="block_model_filename" value="$(arg block_model_filename)"/>
+        <arg name="block_model_type" value="$(arg block_model_type)"/>
+        <arg name="block_config" value="$(arg block_config)"/>
+    </include>
+    <group if="$(arg use_moveit_dependent_core)">
+        <include file="$(find block_printer_pick_moveit)/launch/block_printer_pick_moveit.launch">
+            <arg name="pick_config_file" value="$(arg pick_config)"/>
+        </include>
+        <include file="$(find block_printer_place_moveit)/launch/block_printer_place_moveit.launch">
+            <arg name="place_config_file" value="$(arg place_config)"/>
+        </include>
+    </group>
+    <group unless="$(arg use_moveit_dependent_core)">
+        <include file="$(find block_printer_pick)/launch/block_printer_pick.launch">
+            <arg name="pick_config_file" value="$(arg pick_config)"/>
+        </include>
+        <include file="$(find block_printer_place)/launch/block_printer_place.launch">
+            <arg name="place_config_file" value="$(arg place_config)"/>
+        </include>
+    </group>
+    <include file="$(find block_printer_motion_commander)/launch/motion_commander.launch">
+        <arg name="robot_config" value="$(arg robot_config)"/>
+        <arg name="use_moveit" value="true"/>
+    </include>
+    <include file="$(find block_printer_visualizer)/launch/block_printer_visualizer.launch">
+        <arg name="reference_move_group" value="$(arg visualizer_reference_move_group)"/>
+        <arg name="reference_frame_id" value="$(arg visualizer_reference_frame_id)"/>
+        <arg name="spawn_scene_filename" value="$(arg visualizer_spawn_scene_filename)"/>
+    </include>
+    <rosparam file="$(arg moveit_config)" command="load"/>
+    <node pkg="block_printer_moveit_interface" name="moveit_interface" type="moveit_robot_movement_interface" output="screen"/>
+</launch>

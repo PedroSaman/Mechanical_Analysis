@@ -1,0 +1,4 @@
+int32 block_index
+---
+geometry_msgs/Point position
+float64[] orientation

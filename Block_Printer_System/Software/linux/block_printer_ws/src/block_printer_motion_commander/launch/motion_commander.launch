@@ -1,0 +1,10 @@
+<launch>
+    <arg name="robot_config" default="$(find block_printer_motion_commander)/config/robot.yaml"/>
+    <arg name="use_moveit" default="false"/>
+    <arg name="output" default="screen"/>
+    <rosparam file="$(arg robot_config)" command="load"/>
+    <node name="motion_commander" pkg="block_printer_motion_commander" type="block_printer_motion_commander_node" output="$(arg output)"/>
+    <group unless="$(arg use_moveit)">
+        <node name="motion_interpolator" pkg="block_printer_motion_commander" type="interpolator" output="$(arg output)"/>
+    </group>
+</launch>

@@ -1,0 +1,6 @@
+<launch>
+  <arg name="pick_config_file" default="$(find block_printer_pick)/config/pick_pose.yaml"/>
+  <arg name="output" default="screen"/>
+  <rosparam file="$(arg pick_config_file)" command="load" />
+  <node pkg="block_printer_pick" name="block_printer_pick" type="block_printer_pick_node" output="$(arg output)"/>
+</launch>

@@ -1,0 +1,6 @@
+int32 assembly_pad_index
+int32 block_index
+bool enable_shift
+---
+geometry_msgs/Point position
+float64[] orientation

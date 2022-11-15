@@ -1,0 +1,16 @@
+<launch>
+    <arg name="block_model_filename" default="/home/kohama/Desktop/block_model/tile_test/test_plan0.txt"/>
+    <arg name="block_model_type" default="kohama2019"/>
+    <arg name="visualizer_spawn_scene_filename" default="$(find vp6242_description)/config/block_printing.scene"/>
+    <!--block printer with moveit-->
+    <include file="$(find block_printer_moveit_interface)/launch/block_printer_moveit_interface.launch">
+        <arg name="block_model_filename" value="$(arg block_model_filename)"/>
+        <arg name="block_model_type" value="$(arg block_model_type)"/>
+        <arg name="pick_config" value="$(find vp6242_description)/config/pick.yaml"/>
+        <arg name="place_config" value="$(find vp6242_description)/config/place.yaml"/>
+        <arg name="manipulator_config" value="$(find vp6242_description)/config/manipulator.yaml"/>
+        <arg name="gripper_config" value="$(find vp6242_description)/config/gripper.yaml"/>
+        <arg name="moveit_config" value="$(find vp6242_description)/config/moveit.yaml"/>
+        <arg name="visualizer_spawn_scene_filename" value="$(arg visualizer_spawn_scene_filename)"/>
+    </include>
+</launch>
