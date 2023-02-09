@@ -1,0 +1,71 @@
+-- The C compiler identification is GNU 11.3.0
+-- The CXX compiler identification is GNU 11.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 1.3.3 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3.10 (found version "3.10.6") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_description
+-- Install configuration: ""
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/ament_index/resource_index/package_run_dependencies/denso_cobotta_description
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/ament_index/resource_index/parent_prefix_path/denso_cobotta_description
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/environment/ament_prefix_path.sh
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/environment/ament_prefix_path.dsv
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/environment/path.sh
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/environment/path.dsv
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/local_setup.bash
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/local_setup.sh
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/local_setup.zsh
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/local_setup.dsv
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/package.dsv
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/ament_index/resource_index/packages/denso_cobotta_description
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/cmake/denso_cobotta_descriptionConfig.cmake
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/cmake/denso_cobotta_descriptionConfig-version.cmake
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/package.xml
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/urdf
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/urdf/vacuum.urdf.xacro
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/urdf/parallel.urdf.xacro
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/urdf/cobotta.urdf.xacro
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/tool
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/tool/vacuum.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/tool/pad.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/tool/gripper_base.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/tool/right_finger.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/tool/left_finger.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/J1.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/base_link.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/J5.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/J6.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/J2.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/J3.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/collision/robot/J4.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/tool
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/tool/vacuum.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/tool/pad.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/tool/gripper_base.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/tool/right_finger.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/tool/left_finger.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/J1.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/base_link.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/J5.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/J6.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/J2.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/J3.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/meshes/visual/robot/J4.dae
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/launch
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/config
+-- Installing: /home/pedro/Mechanical_Analysis/ROS2_ws/install/denso_cobotta_description/share/denso_cobotta_description/.setup_assistant
