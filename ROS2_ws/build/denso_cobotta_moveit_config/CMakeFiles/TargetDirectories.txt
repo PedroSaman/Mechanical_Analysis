@@ -1,9 +1,0 @@
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/uninstall.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/denso_cobotta_moveit_config_uninstall.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/test.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/edit_cache.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/rebuild_cache.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/list_install_components.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/install.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/install/local.dir
-/home/pedro/Mechanical_Analysis/ROS2_ws/build/denso_cobotta_moveit_config/CMakeFiles/install/strip.dir
