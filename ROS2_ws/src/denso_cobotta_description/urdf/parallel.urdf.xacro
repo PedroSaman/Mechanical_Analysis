@@ -19,6 +19,12 @@
 			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
 		</inertial>
 	</link>
+	<link name="gripper_tip"/>
+	<joint name="joint_tip" type="fixed">
+		<parent link="gripper_base"/>
+		<child link="gripper_tip"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.065000"/>
+	</joint>
 	<joint name="joint_gripper_base" type="fixed">
 		<parent link="J6"/>
 		<child link="gripper_base"/>
@@ -51,16 +57,7 @@
 		<limit effort="20" lower="0.000000" upper="0.015000" velocity="0.040000"/>
 		<dynamics damping="0" friction="0"/>
 	</joint>
-	<transmission name="trans_gripper">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_gripper">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_gripper">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
+
 	<link name="right_finger">
 		<visual>
 			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.060000"/>

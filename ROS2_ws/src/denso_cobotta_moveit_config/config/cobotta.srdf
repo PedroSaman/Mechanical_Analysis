@@ -14,8 +14,9 @@
     </group>
     <group name="cobotta_hand">
         <link name="gripper_base"/>
-        <link name="right_finger"/>
         <link name="left_finger"/>
+        <link name="right_finger"/>
+        <link name="gripper_tip"/>
         <joint name="joint_gripper"/>
     </group>
     <group name="cobotta_arm_hand">
@@ -31,6 +32,12 @@
         <joint name="joint_5" value="0"/>
         <joint name="joint_6" value="0"/>
     </group_state>
+    <group_state name="close_hand" group="cobotta_hand">
+        <joint name="joint_gripper" value="0"/>
+    </group_state>
+    <group_state name="open_hand" group="cobotta_hand">
+        <joint name="joint_gripper" value="0.015"/>
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="gripper" parent_link="J6" group="cobotta_hand" parent_group="cobotta_arm"/>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
@@ -45,6 +52,7 @@
     <disable_collisions link1="J2" link2="J5" reason="Never"/>
     <disable_collisions link1="J2" link2="J6" reason="Never"/>
     <disable_collisions link1="J2" link2="base_link" reason="Never"/>
+    <disable_collisions link1="J2" link2="right_finger" reason="Never"/>
     <disable_collisions link1="J3" link2="J4" reason="Adjacent"/>
     <disable_collisions link1="J3" link2="J5" reason="Never"/>
     <disable_collisions link1="J3" link2="J6" reason="Never"/>

@@ -86,16 +86,6 @@
 		<limit effort="10" lower="-2.617994" upper="2.617994" velocity="0.40317105721069" />
 		<dynamics damping="${joint_damping}" friction="${joint_friction}" />
 	</joint>
-	<transmission name="trans_1">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_1">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_1">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
 
 	<link name="J2">
 		<visual>
@@ -123,16 +113,6 @@
 		<limit effort="10" lower="-1.047198" upper="1.745329" velocity="0.392175482923126" />
 		<dynamics damping="${joint_damping}" friction="${joint_friction}"/>
 	</joint>
-	<transmission name="trans_2">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_2">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_2">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
 
 	<link name="J3">
 		<visual>
@@ -160,16 +140,6 @@
 		<limit effort="10" lower="0.3141593" upper="2.443461" velocity="0.725707902979242" />
 		<dynamics damping="${joint_damping}" friction="${joint_friction}"/>
 	</joint>
-	<transmission name="trans_3">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_3">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_3">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
 
 	<link name="J4">
 		<visual>
@@ -197,16 +167,6 @@
 		<limit effort="10" lower="-2.96706" upper="2.96706" velocity="0.739146938219599" />
 		<dynamics damping="${joint_damping}" friction="${joint_friction}"/>
 	</joint>
-	<transmission name="trans_4">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_4">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_4">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
 
 	<link name="J5">
 		<visual>
@@ -234,16 +194,6 @@
 		<limit effort="10" lower="-1.658063" upper="2.356194" velocity="0.739146938219599" />
 		<dynamics damping="${joint_damping}" friction="${joint_friction}"/>
 	</joint>
-	<transmission name="trans_5">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_5">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_5">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
 
 	<link name="J6">
 		<visual>
@@ -271,16 +221,6 @@
 		<limit effort="10" lower="-2.96706" upper="2.96706" velocity="1.1093312725676" />
 		<dynamics damping="${joint_damping}" friction="${joint_friction}"/>
 	</joint>
-	<transmission name="trans_6">
-		<type>transmission_interface/SimpleTransmission</type>
-		<joint name="joint_6">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-		</joint>
-		<actuator name="motor_6">
-			<hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
-			<mechanicalReduction>1</mechanicalReduction>
-		</actuator>
-	</transmission>
 
 	<xacro:if value="${gripper_type != 'none'}">
 		<xacro:include filename="$(find denso_cobotta_description)/urdf/${gripper_type}.urdf.xacro" />
