@@ -46,15 +46,15 @@ void Setup_Builder::setupBlock(size_t block_number)
   primitive.dimensions[primitive.BOX_Z] = 0.01;
 
   // Define the pose of the box (relative to the frame_id)
-  float pos = static_cast< float >(block_number)/100;
+  float pos = static_cast< float >(block_number)*1.25/100;
 
   geometry_msgs::msg::Pose block_pose;
   block_pose.orientation.x = 0;
   block_pose.orientation.y = 0;
   block_pose.orientation.z = 0;
-  block_pose.position.x = 0.25;
+  block_pose.position.x = 0.15;
   block_pose.position.y = 0.15 - pos;
-  block_pose.position.z = 0.205;
+  block_pose.position.z = 0.21;
 
   block_object.primitives.push_back(primitive);
   block_object.primitive_poses.push_back(block_pose);
@@ -127,7 +127,7 @@ int main(int argc, char** argv)
 
   setup_builder->setupTable();
   size_t i;
-  size_t count = 1;
+  size_t count = 6;
   for (i = 1; i <= count; i++)
   {
     setup_builder->setupBlock(i);

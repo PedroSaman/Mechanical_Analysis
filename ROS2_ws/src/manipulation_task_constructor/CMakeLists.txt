@@ -14,7 +14,12 @@ find_package(rclcpp REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 add_executable(manipulation_task_constructor src/manipulation_task_constructor.cpp)
-ament_target_dependencies(manipulation_task_constructor moveit_task_constructor_core rclcpp)
+ament_target_dependencies(
+  manipulation_task_constructor 
+  "moveit_task_constructor_core"
+  "moveit_ros_planning_interface"
+  "rclcpp"
+)
 target_include_directories(manipulation_task_constructor PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
