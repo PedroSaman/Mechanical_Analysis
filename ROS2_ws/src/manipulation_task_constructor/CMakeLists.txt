@@ -9,15 +9,14 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
 find_package(rclcpp REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(environment_interface REQUIRED)
 
 add_executable(manipulation_task_constructor src/manipulation_task_constructor.cpp)
 ament_target_dependencies(
   manipulation_task_constructor 
   "moveit_task_constructor_core"
   "moveit_ros_planning_interface"
+  "environment_interface"
   "rclcpp"
 )
 target_include_directories(manipulation_task_constructor PUBLIC
@@ -29,6 +28,7 @@ add_executable(world_builder src/world_builder.cpp)
 ament_target_dependencies(
   world_builder 
   "moveit_ros_planning_interface"
+  "environment_interface"
   "rclcpp"
 )
 target_include_directories(world_builder PUBLIC
