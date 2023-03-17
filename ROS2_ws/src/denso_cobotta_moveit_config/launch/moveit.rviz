@@ -41,7 +41,7 @@ Visualization Manager:
   Class: ""
   Displays:
     - Alpha: 0.5
-      Cell Size: 1
+      Cell Size: 100
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
       Enabled: true
@@ -58,7 +58,7 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Acceleration_Scaling_Factor: 0.1
+    - Acceleration_Scaling_Factor: 1
       Class: moveit_rviz_plugin/MotionPlanning
       Enabled: false
       Move Group Namespace: ""
@@ -113,7 +113,7 @@ Visualization Manager:
         Interactive Marker Size: 0
         Joint Violation Color: 255; 0; 255
         Planning Group: cobotta_arm
-        Query Goal State: false
+        Query Goal State: true
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -139,7 +139,7 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
       Value: false
-      Velocity_Scaling_Factor: 0.1
+      Velocity_Scaling_Factor: 1
     - Class: moveit_task_constructor/Motion Planning Tasks
       Enabled: true
       Interrupt Display: false
@@ -155,36 +155,6 @@ Visualization Manager:
           Expand Joint Details: false
           Expand Link Details: false
           Expand Tree: false
-          J1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           Link Tree Style: Links in Alphabetic Order
           base_link:
             Alpha: 1
@@ -201,6 +171,36 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
           left_finger:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_6:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -254,36 +254,6 @@ Visualization Manager:
           Expand Joint Details: false
           Expand Link Details: false
           Expand Tree: false
-          J1:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J2:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J3:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J4:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J5:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          J6:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           Link Tree Style: Links in Alphabetic Order
           base_link:
             Alpha: 1
@@ -300,6 +270,36 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
           left_finger:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_1:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_2:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_3:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_4:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_5:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
+          link_6:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -335,25 +335,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.240000009536743
+      Distance: 255.60919189453125
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.10000000149011612
-        Y: 0.25
-        Z: 0.30000001192092896
+        X: 0.15129664540290833
+        Y: 3.89815616607666
+        Z: 9.854248046875
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.25500011444091797
+      Pitch: 0.3199998736381531
       Target Frame: world
       Value: Orbit (rviz_default_plugins)
-      Yaw: 5.465182781219482
+      Yaw: 0.38889700174331665
     Saved: ~
 Window Geometry:
   Displays:
