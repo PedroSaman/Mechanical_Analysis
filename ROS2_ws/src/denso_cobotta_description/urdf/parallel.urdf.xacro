@@ -4,13 +4,13 @@
 		<visual>
 			<origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
 			<geometry>
-				<mesh filename="package://denso_cobotta_description/meshes/visual/tool/gripper_base.dae" scale="1 1 1"/>
+				<mesh filename="package://denso_cobotta_description/meshes/visual/tool/gripper_base.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</visual>
 		<collision>
 			<origin rpy="0 0 0" xyz="0 0 0"/>
 			<geometry>
-				<mesh filename="package://denso_cobotta_description/meshes/collision/tool/gripper_base.dae" scale="1 1 1"/>
+				<mesh filename="package://denso_cobotta_description/meshes/collision/tool/gripper_base.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</collision>
 		<inertial>
@@ -23,24 +23,24 @@
 	<joint name="joint_tip" type="fixed">
 		<parent link="gripper_base"/>
 		<child link="gripper_tip"/>
-		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.065000"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * 0.06500}"/>
 	</joint>
 	<joint name="joint_gripper_base" type="fixed">
-		<parent link="J6"/>
+		<parent link="link_6"/>
 		<child link="gripper_base"/>
 		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.0000000"/>
 	</joint>
 	<link name="left_finger">
 		<visual>
-			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.060000"/>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
 			<geometry>
-				<mesh filename="package://denso_cobotta_description/meshes/visual/tool/left_finger.dae" scale="1 1 1"/>
+				<mesh filename="package://denso_cobotta_description/meshes/visual/tool/left_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</visual>
 		<collision>
-			<origin rpy="0 0 0" xyz="0.000000 0.000000 -0.060000"/>
+			<origin rpy="0 0 0" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
 			<geometry>
-				<mesh filename="package://denso_cobotta_description/meshes/collision/tool/left_finger.dae" scale="1 1 1"/>
+				<mesh filename="package://denso_cobotta_description/meshes/collision/tool/left_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</collision>
 		<inertial>
@@ -52,23 +52,23 @@
 	<joint name="joint_gripper" type="prismatic">
 		<parent link="gripper_base"/>
 		<child link="left_finger"/>
-		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.06000"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * 0.060000}"/>
 		<axis xyz="-0.000000 1.000000 -0.000000"/>
-		<limit effort="20" lower="0.000000" upper="0.015000" velocity="0.040000"/>
+		<limit effort="${scale_value * 200000}" lower="0.000000" upper="${scale_value * 0.0150000}" velocity="${scale_value * 18.000000}"/>
 		<dynamics damping="0" friction="0"/>
 	</joint>
 
 	<link name="right_finger">
 		<visual>
-			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.060000"/>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
 			<geometry>
-				<mesh filename="package://denso_cobotta_description/meshes/visual/tool/right_finger.dae" scale="1 1 1"/>
+				<mesh filename="package://denso_cobotta_description/meshes/visual/tool/right_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</visual>
 		<collision>
-			<origin rpy="0 0 0" xyz="0.000000 0.000000 -0.060000"/>
+			<origin rpy="0 0 0" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
 			<geometry>
-				<mesh filename="package://denso_cobotta_description/meshes/collision/tool/right_finger.dae" scale="1 1 1"/>
+				<mesh filename="package://denso_cobotta_description/meshes/collision/tool/right_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</collision>
 		<inertial>
@@ -81,9 +81,9 @@
 		<parent link="gripper_base"/>
 		<child link="right_finger"/>
 		<mimic joint="joint_gripper" multiplier="-1.000000" offset="0.000000"/>
-		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.060000"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * (0.060000)}"/>
 		<axis xyz="-0.000000 1.000000 -0.000000"/>
-		<limit effort="20" lower="-0.015000" upper="0.000000" velocity="0.040000"/>
+		<limit effort="${scale_value * 200000}" lower="${scale_value * (-0.0150000)}" upper="0.000000" velocity="${scale_value * 18.00000}"/>
 		<dynamics damping="0" friction="0"/>
 	</joint>
 </robot>
