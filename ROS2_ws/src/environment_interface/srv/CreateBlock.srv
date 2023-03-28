@@ -1,8 +1,0 @@
-int64 x
-int64 y
-int64 z
-int64 x_size
-int64 y_size
-int64 block_number
----
-int64 res
