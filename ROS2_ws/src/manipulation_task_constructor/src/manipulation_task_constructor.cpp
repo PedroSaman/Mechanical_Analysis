@@ -5,20 +5,11 @@
 #include <moveit/task_constructor/solvers.h>
 #include <moveit/task_constructor/stages.h>
 #include "environment_interface/msg/block.hpp"
-#include "environment_interface/srv/create_block.hpp"
+#include "environment_interface/srv/block_create.hpp"
+#include "environment_interface/srv/block_remove.hpp"
+#include "environment_information.h"
+#include "manipulation_task_constructor/manipulation_task_constructor.h"
 #include <chrono>
-
-#define block_size 0.3
-#define table_x_size 30.0
-#define table_y_size 20.0
-#define table_z_size 25.0
-#define base_x_size 6.0
-#define base_y_size 6.0
-#define base_z_size 0.2
-#define dispenser_x_size 2.4
-#define dispenser_y_size 12.0
-#define dispenser_z_size 0.2
-#define minimum_resolution 0.01
 
 #if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
@@ -43,14 +34,17 @@ public:
 
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr getNodeBaseInterface();
 
-  void doTask(environment_interface::msg::Block block);
-  void doReturnHome();
-
+  void doTask(environment_interface::msg::Block block, size_t OPERATION);
+  moveit_msgs::msg::CollisionObject request_block(environment_interface::msg::Block& block);
+  void remove_old_block(std::string object_name);
+  void refil_block(moveit_msgs::msg::CollisionObject object);
+  void correct_color(environment_interface::msg::Block block);
 private:
   // Compose an MTC task from a series of stages.
-  void request_block(environment_interface::msg::Block block);
-  mtc::Task createTask(environment_interface::msg::Block block);
-  mtc::Task returnHome();
+  void create_new_block(environment_interface::msg::Block block);
+  mtc::Task pick_and_placeTask(environment_interface::msg::Block block);
+  mtc::Task return_homeTaks();
+  mtc::Task retreatTask();
   mtc::Task task_;
   rclcpp::Node::SharedPtr node_;
 };
@@ -65,39 +59,27 @@ MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions &options)
 {
 }
 
-void MTCTaskNode::doTask(environment_interface::msg::Block block)
+void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATION)
 {
-  task_ = createTask(block);
-  try
+  switch (OPERATION)
   {
-    task_.init();
-  }
-  catch (mtc::InitStageException &e)
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, e);
+  case PICK_AND_PLACE:
+    task_ = pick_and_placeTask(block);
+    break;
+  
+  case RETREAT:
+    task_ = retreatTask();
+    break;
+  
+  case RETURN_HOME:
+    task_ = return_homeTaks();
+    break;
+  default:
+    RCLCPP_ERROR_STREAM(LOGGER, "Opperation not defined.");
     return;
+    break;
   }
-
-  if (!task_.plan(20))
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
-    while(1);
-    return;
-  }
-  //task_.introspection().publishSolution(*task_.solutions().front());
-  moveit_msgs::msg::MoveItErrorCodes execute_result;
-  execute_result = task_.execute(*task_.solutions().front());
-  if (execute_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {
-    RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed and returned: " << execute_result.val);
-    while(1);
-    return;
-  }
-  return;
-}
-
-void MTCTaskNode::doReturnHome()
-{
-  task_ = returnHome();
+  
   try
   {
     task_.init();
@@ -111,6 +93,7 @@ void MTCTaskNode::doReturnHome()
   if (!task_.plan(5))
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
+    while(1);
     return;
   }
   //task_.introspection().publishSolution(*task_.solutions().front());
@@ -118,89 +101,13 @@ void MTCTaskNode::doReturnHome()
   execute_result = task_.execute(*task_.solutions().front());
   if (execute_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {
     RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed and returned: " << execute_result.val);
+    while(1);
     return;
   }
   return;
 }
 
-/*
-void request_block(environment_interface::msg::Block block)
-{
-  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("create_block_client");  // CHANGE
-  rclcpp::Client<environment_interface::srv::CreateBlock>::SharedPtr client =                // CHANGE
-    node->create_client<environment_interface::srv::CreateBlock>("create_block");          // CHANGE
-
-  auto request = std::make_shared<environment_interface::srv::CreateBlock::Request>();       // CHANGE
-  request->x = 18;
-  request->y = 1;
-  request->z = 1;
-  request->x_size = block.x_size;
-  request->y_size = block.y_size;
-  request->block_number = block.block_number;
-
-  while (!client->wait_for_service(1s)) {
-    if (!rclcpp::ok()) {
-      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-      return;
-    }
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
-  }
-
-  auto result = client->async_send_request(request);
-  // Wait for the result.
-  if (rclcpp::spin_until_future_complete(node, result) ==
-    rclcpp::FutureReturnCode::SUCCESS)
-  {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Res: %ld", result.get()->res);
-  } else {
-    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service create_block");    // CHANGE
-  }
-}*/
-
-mtc::Task MTCTaskNode::returnHome()
-{
-  mtc::Task task;
-  task.stages()->setName("Return Home");
-  task.loadRobotModel(node_);
-
-  const auto& arm_group_name = "cobotta_arm";
-  const auto& hand_group_name = "cobotta_hand";
-
-  // Set task properties
-  task.setProperty("group", arm_group_name);
-
-  auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
-  task.add(std::move(stage_state_current));
-
-  auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
-  auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
-
-  auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
-  cartesian_planner->setMaxVelocityScaling(1.0);
-  cartesian_planner->setMaxAccelerationScaling(1.0);
-  cartesian_planner->setStepSize(.01);
-
-  {
-    // clang-format off
-    auto stage =
-        std::make_unique<mtc::stages::MoveTo>("Return Home", interpolation_planner);
-    // clang-format on
-    stage->setGroup(arm_group_name);
-    stage->setGoal("Home");
-    task.add(std::move(stage));
-  }
-  
-  {
-    auto stage = std::make_unique<mtc::stages::MoveTo>("close hand", interpolation_planner);
-    stage->setGroup(hand_group_name);
-    stage->setGoal("close_hand");
-    task.add(std::move(stage));
-  }
-
-  return task;
-}
-
-mtc::Task MTCTaskNode::createTask(environment_interface::msg::Block block)
+mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block block)
 {
   mtc::Task task;
 
@@ -216,10 +123,24 @@ mtc::Task MTCTaskNode::createTask(environment_interface::msg::Block block)
   {
     target_pose_msg.pose.orientation.z = 0; //Keep the block orientation
   }else{
-    target_pose_msg.pose.orientation.z = 1.0; //(Needs to rotate PI/2 degrees.
+    double cr = cos(0);
+    double sr = sin(0);
+    double cp = cos(0);
+    double sp = sin(0);
+    double cy = cos(M_PI_2 * 0.5);
+    double sy = sin(M_PI_2 * 0.5);
+    target_pose_msg.pose.orientation.w = cr * cp * cy + sr * sp * sy;
+    target_pose_msg.pose.orientation.x = sr * cp * cy - cr * sp * sy;
+    target_pose_msg.pose.orientation.y = cr * sp * cy + sr * cp * sy;
+    target_pose_msg.pose.orientation.z = cr * cp * sy - sr * sp * cy;
+    /*
+    target_pose_msg.pose.orientation.x = 1.0; //(Needs to rotate PI/2 degrees.
+    target_pose_msg.pose.orientation.y = 1.0;
+    target_pose_msg.pose.orientation.z = sin(M_PI/4); //(Needs to rotate PI/2 degrees.
+    target_pose_msg.pose.orientation.w = 1.0;*/
   }
 
-  task.stages()->setName("assembly task "+object_name);
+  task.stages()->setName("assembly task " + object_name);
   task.loadRobotModel(node_);
 
   const auto& arm_group_name = "cobotta_arm";
@@ -350,7 +271,6 @@ mtc::Task MTCTaskNode::createTask(environment_interface::msg::Block block)
       attach_object_stage = stage.get();
       grasp->insert(std::move(stage));
     }
-
     task.add(std::move(grasp));
   }
 
@@ -474,15 +394,6 @@ mtc::Task MTCTaskNode::createTask(environment_interface::msg::Block block)
     }
 
     {
-      // clang-format off
-      auto stage =
-          std::make_unique<mtc::stages::ModifyPlanningScene>("allow collision object");
-      stage->allowCollisions(object_name, true);
-      // clang-format on
-      insert_block->insert(std::move(stage));
-    }
-
-    {
       auto stage = std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
       stage->setGroup(hand_group_name);
       stage->setGoal("open_hand");
@@ -510,6 +421,31 @@ mtc::Task MTCTaskNode::createTask(environment_interface::msg::Block block)
 
     task.add(std::move(insert_block));
   }
+  return task;
+}
+
+mtc::Task MTCTaskNode::retreatTask()
+{
+  mtc::Task task;
+  task.stages()->setName("Retreat");
+  task.loadRobotModel(node_);
+
+  const auto& arm_group_name = "cobotta_arm";
+  const auto& hand_frame = "gripper_base";  
+
+  // Set task properties
+  task.setProperty("group", arm_group_name);
+
+  auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
+  task.add(std::move(stage_state_current));
+
+  auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
+  auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
+
+  auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
+  cartesian_planner->setMaxVelocityScaling(1.0);
+  cartesian_planner->setMaxAccelerationScaling(1.0);
+  cartesian_planner->setStepSize(.01);
 
   {
     auto stage = std::make_unique<mtc::stages::MoveRelative>("retreat", cartesian_planner);
@@ -525,7 +461,220 @@ mtc::Task MTCTaskNode::createTask(environment_interface::msg::Block block)
     stage->setDirection(vec);
     task.add(std::move(stage));
   }
+
   return task;
+}
+
+mtc::Task MTCTaskNode::return_homeTaks()
+{
+  mtc::Task task;
+  task.stages()->setName("Return Home");
+  task.loadRobotModel(node_);
+
+  const auto& arm_group_name = "cobotta_arm";
+  const auto& hand_group_name = "cobotta_hand";
+
+  // Set task properties
+  task.setProperty("group", arm_group_name);
+
+  auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
+  task.add(std::move(stage_state_current));
+
+  auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
+  auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
+
+  auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
+  cartesian_planner->setMaxVelocityScaling(1.0);
+  cartesian_planner->setMaxAccelerationScaling(1.0);
+  cartesian_planner->setStepSize(.01);
+
+  {
+    // clang-format off
+    auto stage =
+        std::make_unique<mtc::stages::MoveTo>("Return Home", interpolation_planner);
+    // clang-format on
+    stage->setGroup(arm_group_name);
+    stage->setGoal("Home");
+    task.add(std::move(stage));
+  }
+  
+  {
+    auto stage = std::make_unique<mtc::stages::MoveTo>("close hand", interpolation_planner);
+    stage->setGroup(hand_group_name);
+    stage->setGoal("close_hand");
+    task.add(std::move(stage));
+  }
+
+  return task;
+}
+
+void MTCTaskNode::remove_old_block(std::string object_name)
+{
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("remove_block_client");
+  rclcpp::Client<environment_interface::srv::BlockRemove>::SharedPtr client =              
+    node->create_client<environment_interface::srv::BlockRemove>("remove_block_service");        
+
+  auto request = std::make_shared<environment_interface::srv::BlockRemove::Request>();
+  environment_interface::msg::Block object;
+  object.name = object_name;
+  request->block = object;
+
+  while (!client->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return;
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "block services not available, waiting again...");
+  }
+
+  auto result = client->async_send_request(request);
+  // Wait for the result.
+  if (rclcpp::spin_until_future_complete(node, result) != rclcpp::FutureReturnCode::SUCCESS)
+  {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service create_block");  
+  }
+}
+
+void MTCTaskNode::create_new_block(environment_interface::msg::Block block)
+{
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("block_service_client");  
+  rclcpp::Client<environment_interface::srv::BlockCreate>::SharedPtr client =                
+    node->create_client<environment_interface::srv::BlockCreate>("add_block_service");          
+
+  auto request = std::make_shared<environment_interface::srv::BlockCreate::Request>();       
+  block.frame_id = "world";
+  request->block = block;
+  while (!client->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return;
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  auto result = client->async_send_request(request);
+  // Wait for the result.
+  if (rclcpp::spin_until_future_complete(node, result) != rclcpp::FutureReturnCode::SUCCESS)
+  {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service create_block");    
+  }
+}
+
+moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interface::msg::Block& block)
+{ 
+  moveit_msgs::msg::CollisionObject replacement_block;
+  moveit::planning_interface::PlanningSceneInterface psi;
+  moveit_msgs::msg::CollisionObject object;
+  std::vector<std::string> object_name_vector = {block.name,"/0"};
+
+  std::map<std::string, moveit_msgs::msg::CollisionObject> object_name_map;
+  
+  object_name_map = psi.getObjects(object_name_vector);
+
+  object = object_name_map.begin()->second;
+
+  replacement_block = object;
+  remove_old_block(block.name);
+
+  block.name = "block_" + std::to_string(block.number);
+  block.frame_id = "dispenser";
+  object.id = block.name;
+  object.header.frame_id = "world";
+
+  object.operation = object.ADD;
+  psi.applyCollisionObject(object, block.color);
+  
+  return replacement_block;
+}
+
+void MTCTaskNode::correct_color(environment_interface::msg::Block block)
+{ 
+  moveit::planning_interface::PlanningSceneInterface psi;
+  std::vector<std::string> object_name = {block.name,"/0"};
+  moveit_msgs::msg::CollisionObject replacement_block;
+  std::map<std::string, moveit_msgs::msg::CollisionObject> replacement_block_msg;
+  replacement_block_msg = psi.getObjects(object_name);
+  replacement_block = replacement_block_msg.begin()->second;
+  replacement_block.operation = replacement_block.MOVE;
+  psi.applyCollisionObject(replacement_block, block.color);
+}
+
+std_msgs::msg::ColorRGBA getColor(int color_index)
+{
+  std_msgs::msg::ColorRGBA color;
+  switch (color_index)
+  {
+  case WHITE:
+    color.r = 1;
+    color.g = 1;
+    color.b = 1;
+    color.a = 1;
+    break;
+  case RED:
+    color.r = 1;
+    color.g = 0;
+    color.b = 0;
+    color.a = 1;
+    break;
+  case ORANGE:
+    color.r = 1;
+    color.g = 0.65;
+    color.b = 0;
+    color.a = 1;
+    break;
+  case YELLOW:
+    color.r = 1;
+    color.g = 1;
+    color.b = 0;
+    color.a = 1;
+    break;
+  case GREEN:
+    color.r = 0;
+    color.g = 1;
+    color.b = 0;
+    color.a = 1;
+    break;
+  case BLUE:
+    color.r = 0;
+    color.g = 0;
+    color.b = 1;
+    color.a = 1;
+    break;
+  case BLACK:
+    color.r = 0.2;
+    color.g = 0.2;
+    color.b = 0.2;
+    color.a = 1;
+    break;
+  case SUPPORT:
+    color.r = 0.8;
+    color.g = 0.8;
+    color.b = 0.8;
+    color.a = 0.4;
+    break;
+  default:
+    color.r = 0.2;
+    color.g = 0.2;
+    color.b = 0.2;
+    color.a = 1;
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "COLOR NOT DEFINED");
+    break;
+  }
+  return color;
+
+}
+
+void MTCTaskNode::refil_block(moveit_msgs::msg::CollisionObject refil_object)
+{
+  std_msgs::msg::ColorRGBA refil_color;
+  refil_color.r = 0;
+  refil_color.g = 0;
+  refil_color.b = 160;
+  refil_color.a = 1;
+  refil_object.operation = refil_object.ADD;
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(refil_object, refil_color);
+  return;
 }
 
 int main(int argc, char **argv)
@@ -539,29 +688,52 @@ int main(int argc, char **argv)
   rclcpp::executors::MultiThreadedExecutor executor;
 
   auto spin_thread = std::make_unique<std::thread>([&executor, &mtc_task_node]()
-                                                   {
-    executor.add_node(mtc_task_node->getNodeBaseInterface());
-    executor.spin();
-    executor.remove_node(mtc_task_node->getNodeBaseInterface()); });
+    {
+      executor.add_node(mtc_task_node->getNodeBaseInterface());
+      executor.spin();
+      executor.remove_node(mtc_task_node->getNodeBaseInterface()); 
+    }
+  );
 
-  int assembly_plan[][6] = {{1,1,1,8,2,82},{1,3,1,2,4,42},{4,3,1,1,2,21},{3,5,1,2,2,22},{5,6,1,3,1,31},{8,6,1,1,1,11},{5,4,1,4,1,41},{6,4,2,2,3,32}};
+  //int assembly_plan[][7] = {{1,1,1,2,8,6,1},{3,1,1,2,8,6,2},{5,1,1,2,8,6,3},{7,1,1,2,8,6,4},{9,1,1,2,8,6,5}};//,{3,5,1,3,1,6,6},{6,5,1,1,1,6,7},{7,5,1,4,1,6,8}};
+  
+  int assembly_plan[][7] = {{1,1,1,2,2,6,1},{8,2,1,1,1,0,2},{7,5,1,1,1,0,3},{11,2,1,1,1,0,4},{1,1,2,8,2,7,5},{7,5,2,1,1,0,6},{11,2,2,1,1,0,7},{7,1,3,2,2,2,8},{7,5,3,1,1,0,9},{11,2,3,1,1,0,10},{7,2,4,1,4,3,11},{8,1,4,4,2,4,12},{7,2,5,3,1,5,13},{7,5,5,1,1,0,14},{8,1,5,2,1,1,15},{10,1,5,2,2,2,16},{7,3,5,3,1,6,17},{7,2,6,1,2,3,18},{8,1,6,1,3,4,19},{9,1,6,1,3,5,20},{10,1,6,1,3,6,21},{7,2,7,4,2,0,22}};
   int assembly_size = sizeof(assembly_plan)/sizeof(assembly_plan[0]);
 
   for (int i = 0; i < assembly_size; i++)
   {
     environment_interface::msg::Block block;
+    moveit_msgs::msg::CollisionObject replacement_block;
+
     block.x = assembly_plan[i][0];
     block.y = assembly_plan[i][1];
     block.z = assembly_plan[i][2];
+    block.color = getColor(assembly_plan[i][5]);
+    block.number = assembly_plan[i][6];
+    if(assembly_plan[i][3] >= assembly_plan[i][4])
+    {
+      block.name = std::to_string(assembly_plan[i][3]) + std::to_string(assembly_plan[i][4]);
+      block.x_size = assembly_plan[i][3];
+      block.y_size = assembly_plan[i][4];
+    }else
+    {
+      block.name = std::to_string(assembly_plan[i][4]) + std::to_string(assembly_plan[i][3]);
+      block.x_size = assembly_plan[i][4];
+      block.y_size = assembly_plan[i][3];
+    }
+    replacement_block = mtc_task_node->request_block(block);
     block.x_size = assembly_plan[i][3];
     block.y_size = assembly_plan[i][4];
-    block.number = assembly_plan[i][5];
-    //request_block(block);
-    
-    mtc_task_node->doTask(block);
+    mtc_task_node->doTask(block,PICK_AND_PLACE);
+
+    mtc_task_node->refil_block(replacement_block);
+    mtc_task_node->correct_color(block);
+
+    mtc_task_node->doTask(block,RETREAT);
   }
 
-  mtc_task_node->doReturnHome();
+  environment_interface::msg::Block block;
+  mtc_task_node->doTask(block,RETURN_HOME);
   spin_thread->join();
   rclcpp::shutdown();
   return 0;

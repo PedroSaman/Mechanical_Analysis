@@ -16,7 +16,7 @@ ament_target_dependencies(
   manipulation_task_constructor 
   "moveit_task_constructor_core"
   "moveit_ros_planning_interface"
-  "environment_interface"
+  environment_interface
   "rclcpp"
 )
 target_include_directories(manipulation_task_constructor PUBLIC
@@ -37,6 +37,11 @@ $<INSTALL_INTERFACE:include>)
 target_compile_features(world_builder PUBLIC c_std_99 cxx_std_17)
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+
+install(
+  DIRECTORY include/manipulation_task_constructor
+  DESTINATION include
+)
 
 install(TARGETS manipulation_task_constructor world_builder
 DESTINATION lib/${PROJECT_NAME})

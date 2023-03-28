@@ -3,23 +3,12 @@
 #include <moveit/planning_scene/planning_scene.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include "environment_interface/msg/block.hpp"
-#include "environment_interface/srv/block_service.hpp"
+#include "environment_interface/srv/block_create.hpp"
+#include "environment_information.h"
+//std::list<std::string> Blocks_List = {"28","24","14","23","13","22","12","11"};
+std::list<std::string> Blocks_List = {"82","42","41","32","31","22","21","11"};
 #include <chrono>
 using namespace std::chrono_literals;
-
-#define FRAME_ID "dispenser"
-#define block_size 0.3
-#define table_x_size 30.0
-#define table_y_size 20.0
-#define table_z_size 25.0
-#define base_x_size 6.0
-#define base_y_size 6.0
-#define base_z_size 0.2
-#define dispenser_x_size 2.4
-#define dispenser_y_size 12.0
-#define dispenser_z_size 0.2
-#define minimum_resolution 0.01
-std::list<std::string> Blocks_List = {"82","42","41","32","31","22","21","11"};
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("world_builder");
 
@@ -78,10 +67,10 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
 void Setup_Builder::setupBlock(environment_interface::msg::Block block)
 {
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("block_service_client");  
-  rclcpp::Client<environment_interface::srv::BlockService>::SharedPtr client =                
-    node->create_client<environment_interface::srv::BlockService>("block_service");          
+  rclcpp::Client<environment_interface::srv::BlockCreate>::SharedPtr client =                
+    node->create_client<environment_interface::srv::BlockCreate>("add_block_service");          
 
-  auto request = std::make_shared<environment_interface::srv::BlockService::Request>();       
+  auto request = std::make_shared<environment_interface::srv::BlockCreate::Request>();       
   request->block = block;
   while (!client->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
@@ -93,11 +82,8 @@ void Setup_Builder::setupBlock(environment_interface::msg::Block block)
 
   auto result = client->async_send_request(request);
   // Wait for the result.
-  if (rclcpp::spin_until_future_complete(node, result) ==
-    rclcpp::FutureReturnCode::SUCCESS)
+  if (rclcpp::spin_until_future_complete(node, result) != rclcpp::FutureReturnCode::SUCCESS)
   {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Res: %ld", result.get()->output);
-  } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service create_block");    
   }
 }
