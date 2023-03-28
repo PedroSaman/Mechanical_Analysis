@@ -80,6 +80,11 @@ def generate_launch_description():
         output="both",
     )
 
+    block_services = Node(
+        package="environment_builder",
+        executable="block_services",
+    )
+
     # Load controllers
     load_controllers = []
     for controller in [
@@ -102,6 +107,7 @@ def generate_launch_description():
             robot_state_publisher,
             run_move_group_node,
             ros2_control_node,
+            block_services,
         ]
         + load_controllers
     )

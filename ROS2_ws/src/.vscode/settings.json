@@ -99,6 +99,36 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
-    }
+        "variant": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp"
+    },
+    "python.analysis.extraPaths": [
+        "/home/pedro/Mechanical_Analysis/ROS2_ws/install/environment_interface/local/lib/python3.10/dist-packages",
+        "/home/pedro/ws_moveit2/install/moveit_configs_utils/lib/python3.10/site-packages",
+        "/home/pedro/ws_moveit2/install/srdfdom/local/lib/python3.10/dist-packages",
+        "/home/pedro/ws_moveit2/install/moveit_task_constructor_msgs/local/lib/python3.10/dist-packages",
+        "/home/pedro/ws_moveit2/install/launch_param_builder/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/ultraarm/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mypalletizer_260_pi/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mypalletizer_260/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mypalletizer_communication/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mypalletizer_interfaces/local/lib/python3.10/dist-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_320pi/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_320/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_280pi/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_280jn/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_280/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_communication/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mecharm_pi/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mecharm/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mecharm_communication/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_interfaces/local/lib/python3.10/dist-packages",
+        "/home/pedro/ws_mycobot/install/mybuddy/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mycobot_description/lib/python3.10/site-packages",
+        "/home/pedro/ws_mycobot/install/mecharm_interfaces/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/denso_cobotta_description"
 }
