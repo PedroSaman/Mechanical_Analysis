@@ -13,23 +13,24 @@ find_package(rclcpp REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
 find_package(environment_interface REQUIRED)
 
-add_executable(block_spawner src/block_spawner.cpp)
-ament_target_dependencies(
-  block_spawner
-  "environment_interface"
-  "moveit_ros_planning_interface"
-  "rclcpp"
+set(msg_files
+  "msg/Block.msg"
+  # etc
+)
+
+set(srv_files
+  "srv/BlockCreate.srv"
+  "srv/BlockRemove.srv"
+   # etc
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Block.msg"
-  "srv/CreateBlock.srv"
-  "srv/BlockService.srv"
+  ${msg_files}
+  ${srv_files}
   DEPENDENCIES std_msgs
 )
 
 install(TARGETS
-block_spawner
 DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
@@ -44,4 +45,14 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_package()
+# let the compiler search for headers in the include folder
+include_directories(include)
+ 
+# this line to exports the library
+ament_export_targets(environment_interface HAS_LIBRARY_TARGET)
+ 
+# install the include/my_cpp_library directory to the install/include/my_cpp_library
+install(
+  DIRECTORY include/environment_interface
+  DESTINATION include
+)
