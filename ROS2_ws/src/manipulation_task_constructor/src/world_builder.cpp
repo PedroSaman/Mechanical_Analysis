@@ -55,9 +55,9 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
     block.y = 1 + 1.5*iterator;
     block.z = 0;
     block.number = 0;
-    block.color.r = 0;
-    block.color.g = 0;
-    block.color.b = 160;
+    block.color.r = 0.25;
+    block.color.g = 0.25;
+    block.color.b = 0.25;
     block.color.a = 1;
     iterator = iterator + block.y_size + 1;
     setupBlock(block);
@@ -117,9 +117,9 @@ void Setup_Builder::setupBase()
 
   // Add color to the object
   std_msgs::msg::ColorRGBA color;
-  color.r = 255;
-  color.g = 255;
-  color.b = 255;
+  color.r = 1;
+  color.g = 1;
+  color.b = 1;
   color.a = 1;
 
   moveit::planning_interface::PlanningSceneInterface psi;
@@ -155,8 +155,8 @@ void Setup_Builder::setupDispenser()
 
   // Add color to the object
   std_msgs::msg::ColorRGBA color;
-  color.r = 160;
-  color.g = 160;
+  color.r = 16;
+  color.g = 16;
   color.b = 0;
   color.a = 1;
 
@@ -184,7 +184,7 @@ void Setup_Builder::setupTable()
   pose.orientation.y = 0;
   pose.orientation.z = 0;
   pose.position.x = 0.0;
-  pose.position.y = 23.5;
+  pose.position.y = 17.5;
   pose.position.z = table_z_size/2;
 
   object.primitives.push_back(primitive);
@@ -193,9 +193,9 @@ void Setup_Builder::setupTable()
 
   // Add color to the object
   std_msgs::msg::ColorRGBA color;
-  color.r = 0;
-  color.g = 0;
-  color.b = 0;
+  color.r = 0.5;
+  color.g = 0.5;
+  color.b = 0.5;
   color.a = 1;
 
   moveit::planning_interface::PlanningSceneInterface psi;
