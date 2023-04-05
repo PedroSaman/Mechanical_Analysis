@@ -1,0 +1,9 @@
+# Default initial positions for vp6242's ros2_control fake system
+
+initial_positions:
+  joint1: 0
+  joint2: 0
+  joint3: 1.57079632679 
+  joint4: 0
+  joint5: 0
+  joint6: 0
