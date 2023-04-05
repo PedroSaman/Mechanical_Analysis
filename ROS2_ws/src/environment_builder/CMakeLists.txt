@@ -19,6 +19,14 @@ ament_target_dependencies(
   "rclcpp"
 )
 
+add_executable(block_cleaner src/block_cleaner.cpp)
+ament_target_dependencies(
+  block_cleaner
+  "environment_interface"
+  "moveit_ros_planning_interface"
+  "rclcpp"
+)
+
 add_executable(dummy_client src/dummy_client.cpp)
 ament_target_dependencies(
   dummy_client
@@ -29,6 +37,7 @@ ament_target_dependencies(
 install(TARGETS
 block_services
 dummy_client
+block_cleaner
 DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
