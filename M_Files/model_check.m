@@ -32,7 +32,7 @@ for i = 1 : z_max
         [col,row] = col_row_converter(model(j,5));
         for k = model(j,2) : model(j,2)+col-1 %Column iterator
             for l = model(j,3) : model(j,3)+row-1 %Row iterator
-                if(map(base_size-l+1,k,i) == 1) %This Cartesian space already has a block
+                if(map(base_size-l+1,k,i) ~= 0) %This Cartesian space already has a block
                     check = -2;
                     return;
                 end
