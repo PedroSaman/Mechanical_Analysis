@@ -117,10 +117,10 @@ void Setup_Builder::setupBase()
 
   // Add color to the object
   std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
+  color.r = 0.85;
+  color.g = 0.85;
+  color.b = 0.85;
+  color.a = 0;
 
   moveit::planning_interface::PlanningSceneInterface psi;
   psi.applyCollisionObject(object, color);

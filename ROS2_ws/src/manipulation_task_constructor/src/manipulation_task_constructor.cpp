@@ -33,12 +33,13 @@ namespace mtc = moveit::task_constructor;
 class MTCTaskNode
 {
 public:
-
+  
   MTCTaskNode(const rclcpp::NodeOptions &options);
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr getNodeBaseInterface();
 
   void doTask(environment_interface::msg::Block block, size_t OPERATION);
   moveit_msgs::msg::CollisionObject request_block(environment_interface::msg::Block& block);
+  std::vector<std::vector<int>> read_assembly_plan();
   void remove_old_block(std::string object_name);
   void refil_block(moveit_msgs::msg::CollisionObject object);
   void correct_color(environment_interface::msg::Block block);
@@ -122,10 +123,8 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x - 1) + block.x_size*0.5);
   target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y - 1) + block.y_size*0.5);
   target_pose_msg.pose.position.z = base_z_size/2 + block_size*(block.z - 0.5) + 1.5;
-  if(block.x_size >= block.y_size)
+  if(block.x_size < block.y_size)
   {
-    target_pose_msg.pose.orientation.z = 0; //Keep the block orientation
-  }else{
     double cr = cos(0);
     double sr = sin(0);
     double cp = cos(0);
@@ -136,11 +135,6 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     target_pose_msg.pose.orientation.x = sr * cp * cy - cr * sp * sy;
     target_pose_msg.pose.orientation.y = cr * sp * cy + sr * cp * sy;
     target_pose_msg.pose.orientation.z = cr * cp * sy - sr * sp * cy;
-    /*
-    target_pose_msg.pose.orientation.x = 1.0; //(Needs to rotate PI/2 degrees.
-    target_pose_msg.pose.orientation.y = 1.0;
-    target_pose_msg.pose.orientation.z = sin(M_PI/4); //(Needs to rotate PI/2 degrees.
-    target_pose_msg.pose.orientation.w = 1.0;*/
   }
 
   task.stages()->setName("assembly task " + object_name);
@@ -563,6 +557,40 @@ void MTCTaskNode::create_new_block(environment_interface::msg::Block block)
   }
 }
 
+std::vector<std::vector<int>> MTCTaskNode::read_assembly_plan()
+{
+  std::string myFilePath = node_->get_parameter("csv_file_path").as_string();
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "parameter name: %s", myFilePath.c_str());
+  std::ifstream assemblyfile;
+  assemblyfile.open(myFilePath);
+  
+  std::vector<std::vector<int>> assembly_plan;
+  if(assemblyfile.fail())
+  {
+    RCLCPP_ERROR_STREAM(LOGGER, "Csv file not found.");
+    return assembly_plan;
+  }
+  int assembly_size = 0;
+  while(assemblyfile.peek()!=EOF)
+  {
+    std::string records;
+    assembly_plan.push_back(std::vector<int>());
+    if (getline (assemblyfile, records)) {            /* read line of input into line */
+        int itmp;                       /* temporary integer to fill */
+        std::stringstream ss (records);    /* create stringstream from line */
+        
+        while (ss >> itmp) {            /* read integer value from ss */
+            std::string stmp {};        /* temporary string to hold delim */
+            assembly_plan[assembly_size].push_back(itmp);          /* add to vector */
+            getline (ss, stmp, ',');  /* read delimiter */
+        }
+        assembly_size++;
+    }
+  }
+  assemblyfile.close();
+  return assembly_plan;
+}
+
 moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interface::msg::Block& block)
 { 
   moveit_msgs::msg::CollisionObject replacement_block;
@@ -578,14 +606,27 @@ moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interfa
 
   replacement_block = object;
   remove_old_block(block.name);
-
   block.name = "block_" + std::to_string(block.number);
   block.frame_id = "dispenser";
-  object.id = block.name;
-  object.header.frame_id = "world";
 
-  object.operation = object.ADD;
-  psi.applyCollisionObject(object, block.color);
+  if(block.is_support)
+  {
+    moveit_msgs::msg::CollisionObject support_block_object;
+    support_block_object.id = block.name;
+    support_block_object.header.frame_id = "world";
+    support_block_object.primitives.resize(1);
+    support_block_object.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
+    support_block_object.primitives[0].dimensions = { block_size - minimum_resolution, block_size/2 - minimum_resolution };
+    support_block_object.pose = object.pose;
+    support_block_object.operation = support_block_object.ADD;
+    psi.applyCollisionObject(support_block_object, block.color);
+
+  }else{
+    object.id = block.name;
+    object.header.frame_id = "world";
+    object.operation = object.ADD;
+    psi.applyCollisionObject(object, block.color);
+  }
   
   return replacement_block;
 }
@@ -693,39 +734,11 @@ int main(int argc, char **argv)
     }
   );
 
-  std::string myFilePath = "/home/pedro/Mechanical_Analysis/Block_Printer_System/Models/plan/test_subassembly_1_no_support meeting_version.csv";
-  std::ifstream assemblyfile;
-  assemblyfile.open(myFilePath);
-  std::vector<int> v;
-  
-  std::vector<std::vector<int>> tentative;
-  if(assemblyfile.fail())
-  {
-    RCLCPP_ERROR_STREAM(LOGGER, "Csv file not found.");
-    return 0;
-  }
-  int counter = 0;
-  while(assemblyfile.peek()!=EOF)
-  {
-    std::string records;
-    tentative.push_back(std::vector<int>());
-    if (getline (assemblyfile, records)) {            /* read line of input into line */
-        int itmp;                       /* temporary integer to fill */
-        std::stringstream ss (records);    /* create stringstream from line */
-        
-        while (ss >> itmp) {            /* read integer value from ss */
-            std::string stmp {};        /* temporary string to hold delim */
-            tentative[counter].push_back(itmp);          /* add to vector */
-            getline (ss, stmp, ',');  /* read delimiter */
-        }
-        counter++;
-    }
-  }
-  assemblyfile.close();
+  std::vector<std::vector<int>> assembly_plan = mtc_task_node->read_assembly_plan();
 
-  //int assembly_plan[][7] = {{1,1,1,2,2,6,1},{8,2,1,1,1,0,2},{7,5,1,1,1,0,3},{11,2,1,1,1,0,4},{1,1,2,8,2,7,5},{7,5,2,1,1,0,6},{11,2,2,1,1,0,7},{7,1,3,2,2,2,8},{7,5,3,1,1,0,9},{11,2,3,1,1,0,10},{7,2,4,1,4,3,11},{8,1,4,4,2,4,12},{7,2,5,3,1,5,13},{7,5,5,1,1,0,14},{8,1,5,2,1,1,15},{10,1,5,2,2,2,16},{7,3,5,3,1,6,17},{7,2,6,1,2,3,18},{8,1,6,1,3,4,19},{9,1,6,1,3,5,20},{10,1,6,1,3,6,21},{7,2,7,4,2,0,22}};
-  int assembly_size = counter;//sizeof(tentative[0])/sizeof(tentative[0]);
+  int assembly_size = assembly_plan.size();
   std::cout << std::to_string(assembly_size) << std::endl;
+  
   //      0      1 2 3   4     5     6       7           8        9      10     11 
   //AssemblyArea,X,Y,Z,SizeX,SizeY,SizeZ,ColorIndex,IsSupport,CanPress,ShiftX,ShiftY
   for (int i = 0; i < assembly_size; i++)
@@ -733,31 +746,32 @@ int main(int argc, char **argv)
     environment_interface::msg::Block block;
     moveit_msgs::msg::CollisionObject replacement_block;
 
-    block.x = tentative[i][1] + 1;
-    block.y = tentative[i][2] + 1;
-    block.z = tentative[i][3];
-    if(tentative[i][8] == 1)
+    block.x = assembly_plan[i][1] + 1;
+    block.y = assembly_plan[i][2] + 1;
+    block.z = assembly_plan[i][3];
+    if(assembly_plan[i][8] == 1)
     {
       block.color = getColor(SUPPORT);
+      block.is_support = 1;
     }else 
     {
-      block.color = getColor(tentative[i][7]);
+      block.color = getColor(assembly_plan[i][7]);
     }
     block.number = i+1;
-    if(tentative[i][4] >= tentative[i][5])
+    if(assembly_plan[i][4] >= assembly_plan[i][5])
     {
-      block.name = std::to_string(tentative[i][4]) + std::to_string(tentative[i][5]);
-      block.x_size = tentative[i][4];
-      block.y_size = tentative[i][5];
+      block.name = std::to_string(assembly_plan[i][4]) + std::to_string(assembly_plan[i][5]);
+      block.x_size = assembly_plan[i][4];
+      block.y_size = assembly_plan[i][5];
     }else
     {
-      block.name = std::to_string(tentative[i][5]) + std::to_string(tentative[i][4]);
-      block.x_size = tentative[i][5];
-      block.y_size = tentative[i][4];
+      block.name = std::to_string(assembly_plan[i][5]) + std::to_string(assembly_plan[i][4]);
+      block.x_size = assembly_plan[i][5];
+      block.y_size = assembly_plan[i][4];
     }
     replacement_block = mtc_task_node->request_block(block);
-    block.x_size = tentative[i][4];
-    block.y_size = tentative[i][5];
+    block.x_size = assembly_plan[i][4];
+    block.y_size = assembly_plan[i][5];
     mtc_task_node->doTask(block,PICK_AND_PLACE);
 
     mtc_task_node->refil_block(replacement_block);
