@@ -15,6 +15,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
     % still can be applied (case positive) for each knob in the model.
 
     %% Constant numbers
+    %tic
     g = 9.8;
     T = 151*g; % Maximum static friction force of one set of convex part
     M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
@@ -51,36 +52,36 @@ function [fncoutput] = Planner_Stability_Judge(model)
 
     %% Find the forces acting on the model
     %For the first layer
-    knob_i = knob(model, 1); % Layer knob information
-    adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
+    %knob_i = knob(model, 1); % Layer knob information
+    %adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
     F_f = Ff_0_180723(model); % First layer friction forces
     F_nz = Fnz_0(model); % First layer z axis normal forces
-    F_nx = Fnx(adjoin_i); % Layer X axis normal forces 
-    F_ny = Fny(adjoin_i); % Layer Y axis normal forces
+    %F_nx = Fnx(adjoin_i); % Layer X axis normal forces 
+    %F_ny = Fny(adjoin_i); % Layer Y axis normal forces
 
     %For second layer onwards 
     for n = 2 : z_max 
-        knob_i = knob(model, n); % Layer knob information
-        adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
+        %knob_i = knob(model, n); % Layer knob information
+        %adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
         join_i = join(knobs, n); % Connected knobs information
 
         Ff_i = Ff_180723(join_i); % Layer friction forces
         Fnz_i = Fnz(join_i);   % Layer z axis normal forces
-        Fnx_i = Fnx(adjoin_i); % Layer X axis normal forces
-        Fny_i = Fny(adjoin_i); % Layer Y axis normal forces
+        %Fnx_i = Fnx(adjoin_i); % Layer X axis normal forces
+        %Fny_i = Fny(adjoin_i); % Layer Y axis normal forces
 
         % Add the computed forces to the final forces matrix
         F_f = [F_f; Ff_i];
         F_nz = [F_nz; Fnz_i];
-        F_nx = [F_nx; Fnx_i];
-        F_ny = [F_ny; Fny_i];
+        %F_nx = [F_nx; Fnx_i];
+        %F_ny = [F_ny; Fny_i];
     end
 
     % Count the number of forces
     force_f = size(F_f,1); % Friction force number
     force_nz = size(F_nz,1); % Z axis normal force number
-    force_nx = 0;%size(F_nx,1); % X axis normal force number
-    force_ny = size(F_ny,1); % Y axis normal force number
+    %force_nx = 0;%size(F_nx,1); % X axis normal force number
+    %force_ny = size(F_ny,1); % Y axis normal force number
     F = [F_f; F_nz];%; F_nx; F_ny];
     force = force_f + force_nz ;%+ force_nx + force_ny; % Total number of forces
 
@@ -94,34 +95,39 @@ function [fncoutput] = Planner_Stability_Judge(model)
     ub = Inf(3*force+1, 1); % Number of forces times 3 (X, Y, Z) + Capacity
     ub(3*force_f + 1:3:3*(force_f+force_nz) - 2) = 0; % Fnz X axis upper bound value is 0
     ub(3*force_f + 2:3:3*(force_f+force_nz) - 1) = 0; % Fnz Y axis upper bound value is 0
-    ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; % Fnx Y axis upper bound value is 0
-    ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; % Fnx Z axis upper bound value is 0
-    ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; % Fny X axis upper bound value is 0
-    ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny Z axis upper bound value is 0
+    %ub(3*(force_f+force_nz) + 2:3:3*(force_f+force_nz+force_nx) - 1) = 0; % Fnx Y axis upper bound value is 0
+    %ub(3*(force_f+force_nz) + 3:3:3*(force_f+force_nz+force_nx)) = 0; % Fnx Z axis upper bound value is 0
+    %ub(3*(force_f+force_nz+force_nx) + 1:3:3*force - 2) = 0; % Fny X axis upper bound value is 0
+    %ub(3*(force_f+force_nz+force_nx) + 3:3:3*force) = 0; %Fny Z axis upper bound value is 0
 
     % Friction force X and Y axis bounds (Fn_line) and orientation correction
-    for i = 1 : force_f
-        if((F_f(i, 7) == -1))
+    for i = 1 : force
+        if((F(i, 7) == -1))
             % Ff X axis points to -infinite and does not have component in Y axis 
             lb(3*i-1) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force in Y axis and in X axis bounds are [-inf,0]
-        elseif((F_f(i, 7) == -2)) 
+        elseif((F(i, 7) == -2)) 
             % Ff does not have component in X axis and Y axis points to -infinite 
             lb(3*i-2) =  0;   ub(3*i-2 : 3*i-1) = [0, 0]; %no force in X axis and in Y axis bounds are [-inf,0]
-        elseif((F_f(i, 7) == 2))
+        elseif((F(i, 7) == 2))
             % Ff does not have component in X axis and Y axis points to +infinite
             lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-2) =  0; %no force in X axis and in Y axis bounds are [0,+inf]
-        elseif((F_f(i, 7) == 1))
+        elseif((F(i, 7) == 1))
             % Ff X axis points to +infinite and does not have component in Y axis
             lb(3*i-2 : 3*i-1) = [0, 0];   ub(3*i-1) = 0; %no force in Y axis and in X axis bounds are [0,+inf]
+        elseif((F(i, 7) == -3))
+            ub(3*i) = 0.1*T;
         end
-        if(F_f(i,8) == 0) % If the force is from the first layer
-            F(i, 7) = -1;
-        else
-            F(i, 7:6:13) = [-1, 1];
+        if(i<=force_f)
+            if(F(i,8) == 0) % If the force is from the first layer
+                F(i, 7) = -1;
+            else
+                F(i, 7:6:13) = [-1, 1];
+            end
         end
     end
 
     % Fn_line upper limit setting (Only the inner Fn_line from the nx2/2xn blocks)
+    %{
     for i = 1 : force_f
         if(F(i, 4) == -0.75)
             lb(3*i-2) = -T;
@@ -133,11 +139,12 @@ function [fncoutput] = Planner_Stability_Judge(model)
             ub(3*i-1) = T;
         end
     end
-
+    %}
+    
     %% Linear programming problem
     [A,b] = A_b_matrices_assembler(F,force_f,model,T); % Linear Inequalities
     [Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M); % Linear equalities
-    f = zeros(3*force+1, 1); % Evaluate function
+    f = sparse(3*force+1, 1); % Evaluate function
     f((3*force + 1), 1) = -1; % Change the problem to minimization
 
     % Add pushing force and momentum to beq 
@@ -154,7 +161,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
     %% Final output messages
     if(~isempty(x)) % If there were a solution
         %fprintf('Solution found\n');
-        XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
+        %XX =[x(1:3:3*force-2), x(2:3:3*force-1), x(3:3:3*force)]; % All forces (x,y,z) 
         CM = x(3*force+1); %Capacity CM 
         if(CM >= good_margin)
             fncoutput = 'safe';

@@ -1,4 +1,4 @@
-function plan_formatation(plan,filename)
+function plan_formatation(plan,file_location)
 %myFun - Description
 %
 % Syntax: output = myFun(input)
@@ -33,5 +33,5 @@ function plan_formatation(plan,filename)
             if (backNeightbors.Any(p => this.Occupy(p))) shiftY++;
         %} 
     end
-    csvwrite(strrep(filename, 'txt' , 'csv' ), csv_plan);
+    csvwrite(strrep(file_location, 'txt' , 'csv' ), csv_plan);
 end

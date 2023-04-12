@@ -36,9 +36,7 @@ function [submodel1,submodel2] = separate_model(model,division_layer)
     end
     
     %Prepare subassembly2 to be iterated in New_Planner function (change Z values)
-    min_x = min(submodel2(:,2)) - 1;
     submodel2(:,4) = submodel2(:,4) - division_layer;
-    submodel2(:,2) = submodel2(:,2) - min_x;
     submodel2(:,1) = 1:size(submodel2);
     
 end

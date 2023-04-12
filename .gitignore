@@ -1,6 +1,16 @@
 Unused/
 Photos/
 Dat_Files/Bridge
+Block_Printer_System/Models/plan/Incomplete_Plans
+Block_Printer_System/Models/plan/Fails
+Block_Printer_System/Software/ubuntu
+Block_Printer_System/Software/denso-RC7M-controller
+Block_Printer_System/Software/windows/BlockPainter-UnityExecutable
+Block_Printer_System/Software/windows/BlockPainter-UnityProject
+Block_Printer_System/Software/windows/BlockModelGenerator/BlockModelGenerator/bin
+Block_Printer_System/Software/windows/BlockModelGenerator/BlockModelGenerator/obj
+Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/bin
+Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj
 Block_Printer_System/Software/windows/xTests
 Block_Printer_System/Software/windows/BlockModelGenerator/.vs
 .vscode/
