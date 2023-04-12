@@ -9,20 +9,41 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
 find_package(rclcpp REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(environment_interface REQUIRED)
 
 add_executable(manipulation_task_constructor src/manipulation_task_constructor.cpp)
-ament_target_dependencies(manipulation_task_constructor moveit_task_constructor_core rclcpp)
+ament_target_dependencies(
+  manipulation_task_constructor 
+  "moveit_task_constructor_core"
+  "moveit_ros_planning_interface"
+  environment_interface
+  "rclcpp"
+)
 target_include_directories(manipulation_task_constructor PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
-target_compile_features(manipulation_task_constructor PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_compile_features(manipulation_task_constructor PUBLIC c_std_99 cxx_std_17)  
+
+add_executable(world_builder src/world_builder.cpp)
+ament_target_dependencies(
+  world_builder 
+  "moveit_ros_planning_interface"
+  "environment_interface"
+  "rclcpp"
+)
+target_include_directories(world_builder PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<INSTALL_INTERFACE:include>)
+target_compile_features(world_builder PUBLIC c_std_99 cxx_std_17)
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
-install(TARGETS manipulation_task_constructor
+install(
+  DIRECTORY include/manipulation_task_constructor
+  DESTINATION include
+)
+
+install(TARGETS manipulation_task_constructor world_builder
 DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

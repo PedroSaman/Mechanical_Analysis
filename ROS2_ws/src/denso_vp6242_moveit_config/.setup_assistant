@@ -1,14 +1,13 @@
 moveit_setup_assistant_config:
   urdf:
-    package: denso_cobotta_description
-    relative_path: urdf/cobotta.urdf.xacro
-    xacro_args: gripper_type:=parallel
+    package: denso_vp6242_description
+    relative_path: urdf/vp6242.urdf
   srdf:
-    relative_path: config/cobotta.srdf
+    relative_path: config/vp6242.srdf
   package_settings:
     author_name: pedro
     author_email: pedro@pedro.com
-    generated_timestamp: 1678417063
+    generated_timestamp: 1680598151
   control_xacro:
     command:
       - position
