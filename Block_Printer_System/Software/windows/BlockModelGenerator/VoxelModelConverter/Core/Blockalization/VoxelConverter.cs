@@ -72,7 +72,7 @@ namespace Core.Blockalization
                 ArrangeComponents(assembly, voxelLayer, new Grid2(3, 1), offset);
                 //余ったボクセルで，3x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(3, 1));
-
+                
                 //1x3ブロックを互い違いに組立
                 ArrangeComponents(assembly, voxelLayer, new Grid2(1, 3), offset);
                 //余ったボクセルで，3x1ブロックにできるとこがあれば組立
@@ -87,6 +87,9 @@ namespace Core.Blockalization
                 ArrangeComponents(assembly, voxelLayer, new Grid2(1, 2), offset);
                 //余ったボクセルで，2x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(1, 2));
+
+                //1x1ブロックを組立
+                FillComponents(assembly, voxelLayer, new Grid2(1, 1));
             }
             else
             {
@@ -144,10 +147,10 @@ namespace Core.Blockalization
                 ArrangeComponents(assembly, voxelLayer, new Grid2(2, 1), offset);
                 //余ったボクセルで，2x1ブロックにできるとこがあれば組立
                 FillComponents(assembly, voxelLayer, new Grid2(2, 1));
-            }
 
-            //1x1ブロックを組立
-            FillComponents(assembly, voxelLayer, new Grid2(1, 1));
+                //1x1ブロックを組立
+                FillComponents(assembly, voxelLayer, new Grid2(1, 1));
+            }
 
         }
         private static void ArrangeComponents(Assembly assembly, IReadOnlyCollection<Grid3> voxelLayer, Grid2 planarBlockSize, Grid2 planarOffset)

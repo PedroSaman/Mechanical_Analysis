@@ -9,6 +9,9 @@ function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coo
     %        ins_blk_n: number of blocks inserted.
     %        pilar_number: number of pillars inserted.
 
+    %TODO: inconsistency when no number of support pillars make the
+    %structure stable. Look into this
+    
     base_size = max([max(model(:,3)),max(model(:,2))]) + 8; %Maximum value for X and Y + 8 (biggest size of a block)
     z_max = model(insert_block,4);
     model_size = insert_block;
@@ -59,7 +62,7 @@ function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coo
                     end
                 end
                 support_coordinate(m,:) = [];
-                plan = [(1:size(plan,1))' , plan(1:end,2:end)];
+                plan(:,1) = 1:size(plan,1);
                 [planner_output] = Planner_Stability_Judge(plan(1:insert_block + ins_blk_n,:));
                 if(strcmp(planner_output,'safe')) %If the insertion is stable, there is no need to check the rest
                     return;
