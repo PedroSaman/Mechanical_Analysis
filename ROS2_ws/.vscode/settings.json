@@ -82,7 +82,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "*.ipp": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/pedro/ws_moveit2/install/moveit_configs_utils/lib/python3.10/site-packages",
