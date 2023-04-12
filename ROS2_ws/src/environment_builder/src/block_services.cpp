@@ -68,7 +68,6 @@ int main(int argc, char **argv)
 
   std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("block_service_server");
 
-  //Look here if I can create many services inside this node like kohama did
   rclcpp::Service<environment_interface::srv::BlockCreate>::SharedPtr add_service =
     node->create_service<environment_interface::srv::BlockCreate>("add_block_service",  &add_block);
   

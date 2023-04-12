@@ -21,6 +21,7 @@ set(msg_files
 set(srv_files
   "srv/BlockCreate.srv"
   "srv/BlockRemove.srv"
+  "srv/GetBlockColor.srv"
    # etc
 )
 

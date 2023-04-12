@@ -10,10 +10,10 @@
 #define dispenser_z_size 0.2
 #define minimum_resolution 0.01
 #define WHITE 0
+#define RED 1
 #define ORANGE 2
-#define RED 3
-#define YELLOW 4
-#define GREEN 5
+#define YELLOW 3
+#define GREEN 4
+#define BLUE 5
 #define BLACK 6
-#define BLUE 7
-#define SUPPORT 8
+#define SUPPORT 7
