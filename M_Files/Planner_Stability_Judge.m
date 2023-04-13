@@ -19,7 +19,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
     g = 9.8;
     T = 151*g; % Maximum static friction force of one set of convex part
     M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
-    good_margin = T*0.2; % Arbitrary minimum value for stability
+    good_margin = T*0.4; % Arbitrary minimum value for stability
 
     %% Load the model and search for structural problems
     check = model_check(model); % Verify the datfile model
