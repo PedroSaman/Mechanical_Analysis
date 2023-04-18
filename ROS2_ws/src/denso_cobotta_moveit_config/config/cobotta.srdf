@@ -38,7 +38,10 @@
     <group_state name="open_hand" group="cobotta_hand">
         <joint name="joint_gripper" value="0.4"/>
     </group_state>
-    <group_state name="grab" group="cobotta_hand">
+    <group_state name="grab_1" group="cobotta_hand">
+        <joint name="joint_gripper" value="0.15"/>
+    </group_state>
+    <group_state name="grab_2" group="cobotta_hand">
         <joint name="joint_gripper" value="0.3"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
