@@ -184,7 +184,7 @@ void Setup_Builder::setupTable()
   pose.orientation.y = 0;
   pose.orientation.z = 0;
   pose.position.x = 0.0;
-  pose.position.y = 17.5;
+  pose.position.y = table_y_position;
   pose.position.z = table_z_size/2;
 
   object.primitives.push_back(primitive);
