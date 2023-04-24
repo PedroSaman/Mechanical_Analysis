@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\maeda\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\maeda\\.nuget\\packages"
-    ]
-  }
-}

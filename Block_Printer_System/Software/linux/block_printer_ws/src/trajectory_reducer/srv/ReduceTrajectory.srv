@@ -1,6 +1,0 @@
-trajectory_msgs/JointTrajectory trajectory_source
-int32 max_point
----
-trajectory_msgs/JointTrajectory trajectory
-int32 point
-bool reduced

@@ -1,5 +1,0 @@
-<launch>
-  <arg name="place_config_file" default="$(find block_printer_place)/config/place_pose.yaml"/>
-  <rosparam file="$(arg place_config_file)" command="load" />
-  <node pkg="block_printer_place" name="block_printer_place" type="block_printer_place_node" output="screen"/>
-</launch>

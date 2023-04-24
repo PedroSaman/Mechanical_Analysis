@@ -1,4 +1,0 @@
-block_printer:
-  visualizer:
-    attach:
-      move_group: "manipulator"
