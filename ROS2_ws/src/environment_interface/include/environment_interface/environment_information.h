@@ -9,6 +9,7 @@
 #define dispenser_y_size 12.0
 #define dispenser_z_size 0.2
 #define minimum_resolution 0.01
+#define table_y_position 23.0
 #define WHITE 0
 #define RED 1
 #define ORANGE 2

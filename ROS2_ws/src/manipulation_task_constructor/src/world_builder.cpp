@@ -55,9 +55,9 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
     block.y = 1 + 1.5*iterator;
     block.z = 0;
     block.number = 0;
-    block.color.r = 0.25;
-    block.color.g = 0.25;
-    block.color.b = 0.25;
+    block.color.r = 0.7;
+    block.color.g = 0;
+    block.color.b = 1;
     block.color.a = 1;
     iterator = iterator + block.y_size + 1;
     setupBlock(block);
@@ -120,7 +120,7 @@ void Setup_Builder::setupBase()
   color.r = 0.85;
   color.g = 0.85;
   color.b = 0.85;
-  color.a = 0;
+  color.a = 1;
 
   moveit::planning_interface::PlanningSceneInterface psi;
   psi.applyCollisionObject(object, color);
