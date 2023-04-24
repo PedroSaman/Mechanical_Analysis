@@ -12,7 +12,7 @@ function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_n
     join_i = join(knobs, layer); % Connected knobs information
     subassembly_strategy_output = 1;
     
-    
+    %{
     floating = 1;
     for i = 1:size(join_i,1) % Verify if the block is floating
         if(join_i(i,3) == block_number)
@@ -20,14 +20,18 @@ function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_n
             break;
         end
     end
-
+    %}
+    
     % If the problematic block is floating, the first subassembly is: 1 ->
     % layer -1 but if not, the first subassembly is: 1 -> layer - 2
+    %{
     if(floating)
         layer = layer - 1;
     else
         layer = layer - 2;
     end
+    %} 
+    layer = layer - 1;
     
     [submodel1,submodel2] = separate_model(model,layer);
     
