@@ -3,7 +3,7 @@ function [plan,rearrange_strategy_output] = rearrange_strategy(model,layer)
     %Currently it is given priority to blocks that has all knobs connected with the lower layer.
     %Can be changed to: count how many connected knobs every block in the layer has and reorder
     %the insertion order from the ones with more contacts to the ones with less.
-    %input: model: current plan. (PRECISO VERIFICAR NO LAB)
+    %input: model: current plan.
     %       layer: current layer.
     %output: plan: rearranged plan.
     %        rearrange_strategy_output: a flag to indicate if this strategy had any problem. 1 -> OK, < 0 -> Not OK
@@ -11,7 +11,7 @@ function [plan,rearrange_strategy_output] = rearrange_strategy(model,layer)
     rearrange_strategy_output = 1; % Assume correct functionality.
     knobs = knob(model,0); % Knob information (entire block model).
     join_i = join(knobs, layer); % Connected knobs information.
-    plan = model; %(PRECISO VERIFICAR NO LAB) Change to use only plan and not model.
+    plan = model; % Preset the output to be equal to the input.
     mx_blk_n = max(join_i(:,3)); % Maximum block number in the layer.
     mn_blk_n = min(join_i(:,3)); % Minimum block number in the layer.
 
@@ -26,7 +26,7 @@ function [plan,rearrange_strategy_output] = rearrange_strategy(model,layer)
         [col,row] = col_row_converter(model(i,5));
         knob_number = col*row;
         for j = 1:size(join_i,1) % Search in join how many knobs are connected.
-            if(join_i(j,3) == i) %(PRECISO VERIFICAR NO LAB) If this connection is from block i
+            if(join_i(j,3) == i) % If this connection is from block i
                 knob_number = knob_number - 1;
             end
             if(knob_number == 0) % If all knobs are connected, add this block to s_block vector
