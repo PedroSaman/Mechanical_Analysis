@@ -1,4 +1,0 @@
-block_printer:
-  block:
-    size: {side: 0.004, height: 0.003, convex: {radius: 0.0025,height: 0.002}}
-    colors: ["white","red","orange","yellow","green","blue","black","support"]

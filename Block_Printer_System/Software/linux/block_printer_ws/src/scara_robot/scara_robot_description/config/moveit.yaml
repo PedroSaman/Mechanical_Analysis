@@ -1,9 +1,0 @@
-block_printer:
-  moveit_interface:
-    manipulator:
-      move_group: "manipulator"
-      tool_link: "peak_tool"
-      block_tool_link: "peak_tool"
-      reference_frame: "base_link"
-      desired_force_type: "percent"
-      target_set: "pose"

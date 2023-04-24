@@ -1,5 +1,0 @@
-string command
-string parameters
----
-int32 error_code
-string response
