@@ -11,3 +11,7 @@ Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/bi
 Block_Printer_System/Software/windows/xTests/
 Block_Printer_System/Software/windows/BlockModelGenerator/.vs
 .vscode/
+Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.AssemblyInfo.cs
+Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.csproj.AssemblyReference.cache
+Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.dll
+Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.pdb
