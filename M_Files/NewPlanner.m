@@ -1,22 +1,14 @@
 function [plan,output] = NewPlanner(plan,filename,initial_condition)
-    % NewPlanner  Calculate the assembly plan for the input block model. 
-    % [plan] = NewPlanner(filename)
-    %
-    % Input: filename: text file name with its directory. Must be in Kohama
-    % Voxel Converter output format.
-    %
-    % Output: plan: csv file in the necessary format to be used in the
-    % next 3D block printer step (NOT IMPLEMENTED)
-    %
-    % This planner utilizes the Mechanical Analysis to judge the structure
-    % stability for each block insertion.
+% NewPlanner  Calculate the assembly plan for the input block model. 
+%
+% 
     
     %% Preparation
-    range = range_calculator(plan);
+    range = Layer_Range_Calculator(plan);
     z_max = plan(end,4); % Highest Z position must be from the last block in model
     offset = 0; % Keep track of support blocks number to preserve the block iteration
-    max_pil_h = 9; % Maximum height a support pillar can have
-    max_layer_sup = 100; % Maximum number of support blocks in a single layer
+    max_pil_h = 7; % Maximum height a support pillar can have
+    max_layer_sup = 25; % Maximum number of support blocks in a single layer
     
     %% First Layer
     fprintf("\nBlocks %d to %d are from the 1st layer and therefore insertion is stable\n",initial_condition(2)+1,range(1,2)+initial_condition(2));
@@ -43,6 +35,7 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
             sup_strat_output = 0;
             if(~strcmp(planner_output,'safe')) % If insertion is not safe
                 %% Support block strategy
+<<<<<<< Updated upstream
                 [plan,sup_strat_output] = support_block_strategy(plan,block + offset); % Run the Support Block Strategy
                 layer_sup_n = layer_sup_n + sup_strat_output; % Update the layer number of support blocks
                 if(layer_sup_n >= max_layer_sup || sup_strat_output >= max_pil_h) % If the subassembly flag is detected
@@ -57,9 +50,26 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
                         return;
                     end
                 elseif(sup_strat_output < 0) % If any problem were detected in the support block strategy
+=======
+                [plan,sup_strat_output] = Support_Block_Strategy(plan,block + offset); % Run the Support Block Strategy
+                if(sup_strat_output < 0) % If any problem were detected in the support block strategy
+>>>>>>> Stashed changes
                     fprintf("Error Occurred in Support Block Strategy!");
                     output = "support";
                     return;
+                end
+                layer_sup_n = layer_sup_n + sup_strat_output; % Update the layer number of support blocks
+                if(layer_sup_n >= max_layer_sup || sup_strat_output >= max_pil_h) % If the subassembly flag is detected
+                    %% Subassembly strategy
+                    [plan,subassembly_strategy_output] = Subassembly_Strategy(plan,block + offset + sup_strat_output,filename,initial_condition);
+                    if(subassembly_strategy_output < 0) % If error in subassembly strategy
+                        fprintf("Error Occurred in Subassembly Block Strategy!");
+                        output = "subassembly";
+                        return;
+                    else % Because this function is called from within Subassembly_Strategy, when it returns here, all the block model has been iterated.
+                        output = "ok";
+                        return;
+                    end
                 end
                 offset = offset + sup_strat_output; % Correct the next block to be analyzed
             end

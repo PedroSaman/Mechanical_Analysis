@@ -1,17 +1,18 @@
-function [plan,inserted_block_number] = support_block_strategy(model,block_number)
-    %Implement the support block strategy. This function receives the block
-    %that is being inserted, then call the function to search the possible
-    %blocks to have support blocks inserted, then decides in which
-    %available knob of each block the support pilar will be inserted and
-    %finaly calls the function that insert in the plan the support bricks
-    %input: model:(block_number ,x, y, z, block_type, color) is the planning until now
-    %       block number: is the block being inserted
-    %output: plan: (block_number ,x, y, z, block_type, color). Is the plan updated 
-    %        inserted_block_number: how many support blocks was added. -1 is error 
+function [plan,inserted_block_number] = Support_Block_Strategy(model,block_number)
+% Implement the support block strategy. This function receives the block
+% that is being inserted, then call the function to search the possible
+% blocks to have support blocks inserted, then decides in which available 
+% knob of each block the support pilar will be inserted and finaly calls the
+% function that insert in the plan the support bricks
+%
+% input: model:(block_number ,x, y, z, block_type, color) is the planning until now
+%       block number: is the block being inserted
+% output: plan: (block_number ,x, y, z, block_type, color). Is the plan updated 
+%        inserted_block_number: how many support blocks was added. -1 is error 
     
     knobs = knob(model,0); % Knob information (entire block model)
     insert_block = block_number;
-    [knob_map,block_number] = search_block(knobs,model,block_number); % Search for blocks to add support
+    [knob_map,block_number] = Search_Blocks(knobs,model,block_number); % Search for blocks to add support
     
     if(isempty(block_number)) %Impossible to insert support blocks
         inserted_block_number = -1; %Return error
@@ -20,7 +21,7 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
     end
     
     possible_blocks = size(block_number,1);
-    support_coordinates = []; % (X,Y,Z,BlockNumber) (PRECISO VERIFICAR NO LAB)
+    support_coordinates = []; % (X,Y,Z,BlockNumber)
     
     j = possible_blocks;
     %For each possible support pillar position 
@@ -68,11 +69,11 @@ function [plan,inserted_block_number] = support_block_strategy(model,block_numbe
             end
             k = k - 1;
         end
-        support_coordinates = [tentative_positions;support_coordinates]; %Concatenate the tentative with the support coordinates.
+        support_coordinates = [tentative_positions;support_coordinates]; % Concatenate the tentative with the support coordinates.
         j = j - 1;
     end
 
-    [plan,inserted_block_number,pillars_inserted] = insert_support_blocks(model,support_coordinates,insert_block); %Input is a matrix with each row being a cartesian position of each pilar.
-    [plan,removed_blocks_number] = remove_redundancies(plan,insert_block+inserted_block_number,pillars_inserted); %Remove pillars not necessary.
-    inserted_block_number = inserted_block_number - removed_blocks_number; %Update the inserted block number with the removed pillars.
+    [plan,inserted_block_number,pillars_inserted] = insert_support_blocks(model,support_coordinates,insert_block); % Input is a matrix with each row being a cartesian position of each pilar.
+    [plan,removed_blocks_number] = Remove_Redundancies(plan,insert_block+inserted_block_number,pillars_inserted); % Remove pillars not necessary.
+    inserted_block_number = inserted_block_number - removed_blocks_number; % Update the inserted block number with the removed pillars.
 end

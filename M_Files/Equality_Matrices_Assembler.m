@@ -1,13 +1,15 @@
-function [Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M)
-%Assembly the A and B matrices for the equality constrains of the 
-%linear programing problem (Aeq.x = b).
+function [Aeq,beq] = Equality_Matrices_Assembler(F,N,force,model,M)
+%Create Aeq and beq matrices (equalities) of the linear programing problem 
+%(Aeq.x = beq).
+%
 %input: F: The force vector (all forces acting in the model).
 %       N: Model block number
 %       force: Total number of forces
 %       model: Input model
 %       M: Block mass matrix
 %output: Aeq: A matrix 
-%        Beq: B matrix
+%        beq: B matrix
+
     g = 9.8;
     Aeq = spalloc(6*N, 3*force+1,9*force+3);
     beq = zeros(6*N, 1);
@@ -48,6 +50,6 @@ function [Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M)
                 break;
             end
         end
-        beq((6*n - 5) : 6*n, 1) = [0; 0; mass*g; 0; 0; 0]; %[(0,0,M1*g,0,0,0);...;(0,0,Mn*g,0,0,0)]
+        beq((6*n - 5) : 6*n, 1) = [0; 0; mass*g; 0; 0; 0];
     end
 end

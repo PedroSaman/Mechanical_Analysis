@@ -1,10 +1,10 @@
-function beq = pushing(model, N, T)
-    %Compute the force and torque that the model last block insertion would
-    %apply in the structure.
-    %input:  model:(block_number, x, y, z, Block_type, color)
-    %        N:(number of the block being inserted)
-    %        T:(maximum friction force to snap out one connection point)
-    %output: beq:(Block_Number, Fx, Fy, Fz, Mx, My, Mz)
+function beq = Pushing_Forces(model, N, T)
+% Compute the force and torque that the model last block insertion would
+% apply in the structure.
+% input:  model:(block_number, x, y, z, Block_type, color)
+%        N:(number of the block being inserted)
+%        T:(maximum friction force to snap out one connection point)
+% output: beq:(Block_Number, Fx, Fy, Fz, Mx, My, Mz)
 
     %Information on the block being inserted (Upper Block)
     model_pushing = model(N, 1:6); % Block being inserted information

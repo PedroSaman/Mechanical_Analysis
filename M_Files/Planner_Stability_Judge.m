@@ -19,7 +19,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
     g = 9.8;
     T = 151*g; % Maximum static friction force of one set of convex part
     M = [11,17/448;12,1.39/20;21,1.39/20;13,17/175;31,17/175;14,1.03/8;41,1.03/8;22,8.1/64;24,3.9/16;42,3.9/16;28,11/24;82,11/24]; % Mass of each registered block
-    good_margin = T*0.4; % Arbitrary minimum value for stability
+    good_margin = T*0.2; % Arbitrary minimum value for stability
 
     %% Load the model and search for structural problems
     check = model_check(model); % Verify the datfile model
@@ -39,7 +39,7 @@ function [fncoutput] = Planner_Stability_Judge(model)
 
     %% Model, knobs and pushing force information
     N = size(model,1); % Total block number
-    b_push = pushing(model, N, T); % Forces and Torques caused by the last block insertion
+    b_push = Pushing_Forces(model, N, T); % Forces and Torques caused by the last block insertion
     if(isempty(b_push))
         %fprintf('The block being inserted has no contact forces \n');
         fncoutput = 'The block being inserted has no contact forces';
@@ -142,8 +142,8 @@ function [fncoutput] = Planner_Stability_Judge(model)
     %}
     
     %% Linear programming problem
-    [A,b] = A_b_matrices_assembler(F,force_f,model,T); % Linear Inequalities
-    [Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M); % Linear equalities
+    [A,b] = Inequality_Matrices_Assembler(F,force_f,model,T); % Linear Inequalities
+    [Aeq,beq] = Equality_Matrices_Assembler(F,N,force,model,M); % Linear equalities
     f = sparse(3*force+1, 1); % Evaluate function
     f((3*force + 1), 1) = -1; % Change the problem to minimization
 
@@ -174,6 +174,6 @@ function [fncoutput] = Planner_Stability_Judge(model)
         fncoutput = 'no solution';
         %fprintf('No feasible solution found \n');
     end
-    %CM = 100*round(CM/T,4); % percentage of the maximum value
+    %CM = 100*round(CM/T,4) % percentage of the maximum value
     %fprintf('Time elapsed: %.2d \n',toc);
 end

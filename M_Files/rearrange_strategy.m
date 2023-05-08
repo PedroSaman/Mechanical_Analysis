@@ -1,12 +1,12 @@
 function [plan,rearrange_strategy_output] = rearrange_strategy(model,layer)
-    %Run the Rearranging the inserting order. This function can have any reordering strategy.
-    %Currently it is given priority to blocks that has all knobs connected with the lower layer.
-    %Can be changed to: count how many connected knobs every block in the layer has and reorder
-    %the insertion order from the ones with more contacts to the ones with less.
-    %input: model: current plan.
-    %       layer: current layer.
-    %output: plan: rearranged plan.
-    %        rearrange_strategy_output: a flag to indicate if this strategy had any problem. 1 -> OK, < 0 -> Not OK
+%Run the Rearranging the inserting order. This function can have any reordering strategy.
+%Currently it is given priority to blocks that has all knobs connected with the lower layer.
+%Can be changed to: count how many connected knobs every block in the layer has and reorder
+%the insertion order from the ones with more contacts to the ones with less.
+%input: model: current plan.
+%       layer: current layer.
+%output: plan: rearranged plan.
+%        rearrange_strategy_output: a flag to indicate if this strategy had any problem. 1 -> OK, < 0 -> Not OK
     
     rearrange_strategy_output = 1; % Assume correct functionality.
     knobs = knob(model,0); % Knob information (entire block model).

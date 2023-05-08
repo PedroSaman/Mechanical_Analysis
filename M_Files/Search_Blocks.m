@@ -1,19 +1,21 @@
-function [knob_map,block_number] = search_block(knobs,model,block_number)
-    %Searches to knobs with free space below to insert support blocks.
-    %input: knobs: Knob information from all model layers (PRECISO VERIFICAR NO LAB)
-    %       model: Entire block model (PRECISO VERIFICAR NO LAB)
-    %       block_number: being inserted block number
-    %output: knob_map: represent the state of a knob. 1 -> not free, 0 - > free, -1 -> does not exist.
-    %                  each row is a block and each column is a knob in that block.
-    %       block_number: stores each knob_map row block number.
+function [knob_map,block_number] = Search_Blocks(knobs,model,block_number)
+% Search knobs with free space below to insert support blocks.
+%
+% input: knobs: Knob information from all model layers
+%       model: Entire block model
+%       block_number: being inserted block number
+% output: knob_map: represent the state of a knob. 1 -> not free, 0 - > free, -1 -> does not exist.
+%                  each row is a block and each column is a knob in that block.
+%       block_number: stores each knob_map row block number.
 
     layer = model(block_number,4); % Being inserted block layer.
     join_i = join(knobs, layer); % Connected knobs information of connections between block_number layer and the one below. 
+    max_knob_number = 16; % For now 16 is the maximum in a block (2x8).
     
     [col,row] = col_row_converter(model(block_number,5));
     
     contact_points = col*row;
-    knob_map = -ones(1,16); % Create the being inserted knob_map vector assuming no knob exist. (16 is the maximum size of a block)
+    knob_map = -ones(1,max_knob_number); % Create the being inserted knob_map vector assuming no knob exist. 
     for i = 1:col*row
         knob_map(i) = 0; % For each existing knob assumes that it is free.
     end
@@ -42,7 +44,7 @@ function [knob_map,block_number] = search_block(knobs,model,block_number)
         return;
     end
     
-    knob_map_below = -ones(size(below_blocks,1),16); % Create the knob_map for every 'below block'.
+    knob_map_below = -ones(size(below_blocks,1),max_knob_number); % Create the knob_map for every 'below block'.
     
     for i = 1 : size(below_blocks,1) % For each 'block below'.
         layer = model(below_blocks(i),4); % This 'below block' layer

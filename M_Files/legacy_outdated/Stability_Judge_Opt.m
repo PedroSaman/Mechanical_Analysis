@@ -132,8 +132,8 @@ function [fncoutput,CM] = Stability_Judge_Opt(filename)
     end
 
     %% Linear programming problem
-    [A,b] = A_b_matrices_assembler(F,force_f,model,T); % Linear Inequalities
-    [Aeq,beq] = Aeq_beq_matrices_assembler(F,N,force,model,M); % Linear equalities
+    [A,b] = Inequality_Matrices_Assembler(F,force_f,model,T); % Linear Inequalities
+    [Aeq,beq] = Equality_Matrices_Assembler(F,N,force,model,M); % Linear equalities
     f = zeros(3*force+1, 1); % Evaluate function
     f((3*force + 1), 1) = -1; % Change the problem to minimization
     [x,~,~,~] = linprog(f,A,b,Aeq,beq,lb,ub); % Solve the problem
