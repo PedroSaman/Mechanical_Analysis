@@ -49,7 +49,7 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
                     %% Subassembly strategy
                     [plan,subassembly_strategy_output] = subassembly_strategy(plan,block + offset + sup_strat_output,filename,initial_condition);
                     if(subassembly_strategy_output < 0) % If error in subassembly strategy
-                        fprintf("Error Occurred in Support Block Strategy!");
+                        fprintf("Error Occurred in Subassembly Strategy!");
                         output = "subassembly";
                         return;
                     else
