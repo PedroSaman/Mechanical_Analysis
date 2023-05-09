@@ -32,6 +32,20 @@
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
     <disable_collisions link1="base_link" link2="link2" reason="Never"/>
+    <disable_collisions link1="gripper_body" link2="left_claw" reason="Adjacent"/>
+    <disable_collisions link1="gripper_body" link2="link3" reason="Never"/>
+    <disable_collisions link1="gripper_body" link2="link5" reason="Never"/>
+    <disable_collisions link1="gripper_body" link2="link6" reason="Never"/>
+    <disable_collisions link1="gripper_body" link2="right_claw" reason="Adjacent"/>
+    <disable_collisions link1="gripper_body" link2="robot_gripper_interface1" reason="Never"/>
+    <disable_collisions link1="gripper_body" link2="robot_gripper_interface2" reason="Adjacent"/>
+    <disable_collisions link1="left_claw" link2="link3" reason="Never"/>
+    <disable_collisions link1="left_claw" link2="link4" reason="Never"/>
+    <disable_collisions link1="left_claw" link2="link5" reason="Never"/>
+    <disable_collisions link1="left_claw" link2="link6" reason="Never"/>
+    <disable_collisions link1="left_claw" link2="right_claw" reason="Never"/>
+    <disable_collisions link1="left_claw" link2="robot_gripper_interface1" reason="Never"/>
+    <disable_collisions link1="left_claw" link2="robot_gripper_interface2" reason="Never"/>
     <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
     <disable_collisions link1="link1" link2="link3" reason="Never"/>
     <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
@@ -40,6 +54,19 @@
     <disable_collisions link1="link3" link2="link4" reason="Adjacent"/>
     <disable_collisions link1="link3" link2="link5" reason="Never"/>
     <disable_collisions link1="link3" link2="link6" reason="Never"/>
+    <disable_collisions link1="link3" link2="right_claw" reason="Never"/>
+    <disable_collisions link1="link3" link2="robot_gripper_interface1" reason="Never"/>
+    <disable_collisions link1="link3" link2="robot_gripper_interface2" reason="Never"/>
     <disable_collisions link1="link4" link2="link5" reason="Adjacent"/>
+    <disable_collisions link1="link4" link2="right_claw" reason="Never"/>
     <disable_collisions link1="link5" link2="link6" reason="Adjacent"/>
+    <disable_collisions link1="link5" link2="right_claw" reason="Never"/>
+    <disable_collisions link1="link5" link2="robot_gripper_interface1" reason="Default"/>
+    <disable_collisions link1="link5" link2="robot_gripper_interface2" reason="Never"/>
+    <disable_collisions link1="link6" link2="right_claw" reason="Never"/>
+    <disable_collisions link1="link6" link2="robot_gripper_interface1" reason="Adjacent"/>
+    <disable_collisions link1="link6" link2="robot_gripper_interface2" reason="Never"/>
+    <disable_collisions link1="right_claw" link2="robot_gripper_interface1" reason="Never"/>
+    <disable_collisions link1="right_claw" link2="robot_gripper_interface2" reason="Never"/>
+    <disable_collisions link1="robot_gripper_interface1" link2="robot_gripper_interface2" reason="Adjacent"/>
 </robot>
