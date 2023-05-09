@@ -35,7 +35,9 @@ function merged_model = merge_subassemblies(submodel1,submodel2)
                 break;
             end
         end
-        
+    end
+    for i = sub1_i:size_sub1
+        merged_model = [merged_model;submodel1(i,:)];
     end
     merged_model(:,1) = 1:size(merged_model);
 end

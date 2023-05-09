@@ -1,5 +1,6 @@
-function A = adjoin(line)
+function adjoint_blocks = adjoin(line)
 %Compute which blocks are adjacent to one another in the block model
+%
 %input: line: every knob in a given layer. (x,y,z,block_type,color,block_number,knob_index)
 %output: A: for each pair of adjacent knobs there are one line in A with 7 info: 
 %           (X axis(1) or Y axis(2), first block_number, first block_type, 
@@ -93,23 +94,23 @@ end
 
 %Assemble A matrix from X and Y
 if((count_x ~= 1) && (count_y ~= 1)) % If there is something in X or Y matrix
-    A = [X(1:(count_x-1), 1:7); Y(1:(count_y-1), 1:7)];
+    adjoint_blocks = [X(1:(count_x-1), 1:7); Y(1:(count_y-1), 1:7)];
 elseif(count_x ~= 1) % If there is something only in X matrix
-    A = X(1:(count_x-1), 1:7);
+    adjoint_blocks = X(1:(count_x-1), 1:7);
 elseif(count_y ~= 1) % If there is something only in Y matrix
-    A = Y(1:(count_y-1), 1:7);
+    adjoint_blocks = Y(1:(count_y-1), 1:7);
 else % There are no adjacent blocks
-    A = -1;
+    adjoint_blocks = -1;
 end
 
 %Correcting some conventions to be used in the next functions
-if(A(1) ~= -1)
-    for i = 1 : size(A,1)
-        if(A(i,7)<10) % If the adjoin block 1 is only one number duplicate this number (x -> xx)
-            A(i,7) = A(i,7)*10+A(i,7);
+if(adjoint_blocks(1) ~= -1)
+    for i = 1 : size(adjoint_blocks,1)
+        if(adjoint_blocks(i,7)<10) % If the adjoin block 1 is only one number duplicate this number (x -> xx)
+            adjoint_blocks(i,7) = adjoint_blocks(i,7)*10+adjoint_blocks(i,7);
         end
-        [col,row] = col_row_converter(A(i, 7)); % Block number of columns and rows        
-        d = A(i,6) + abs(col-row);
-        A(i,6) = A(i,6)*10 + d; % Second block knob
+        [col,row] = col_row_converter(adjoint_blocks(i, 7)); % Block number of columns and rows        
+        d = adjoint_blocks(i,6) + abs(col-row);
+        adjoint_blocks(i,6) = adjoint_blocks(i,6)*10 + d; % Second block knob
     end 
 end

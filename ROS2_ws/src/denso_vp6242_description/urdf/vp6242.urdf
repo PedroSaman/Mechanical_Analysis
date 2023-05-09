@@ -1,8 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="vp6242" xmlns:xacro="http://www.ros.org/wiki/xacro">
   
-  
-
   <link name="world"/>
 	<joint name="joint_w" type="fixed">
 		<parent link="world"/>
@@ -159,6 +157,125 @@
     <child link="tool0"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
-
+  <link name="robot_gripper_interface1">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.0045"/>
+      <geometry>
+        <cylinder length="0.009" radius="0.04"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0045"/>
+      <geometry>
+        <cylinder length="0.009" radius="0.04"/>
+      </geometry>
+      <material name="material_color_robot_gripper_interface1">
+        <color rgba="0.6 1 0.6 1"/>
+      </material>
+    </visual>
+  </link>
+  <link name="robot_gripper_interface2">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.0045"/>
+      <geometry>
+        <cylinder length="0.009" radius="0.04"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0045"/>
+      <geometry>
+        <cylinder length="0.009" radius="0.04"/>
+      </geometry>
+      <material name="material_color_robot_gripper_interface2">
+        <color rgba="0.6 1 0.6 1"/>
+      </material>
+    </visual>
+  </link>
+  <link name="gripper_body">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.042"/>
+      <geometry>
+        <box size="0.11 0.04 0.084"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.042"/>
+      <geometry>
+        <box size="0.11 0.04 0.084"/>
+      </geometry>
+      <material name="material_color_gripper_body">
+        <color rgba="0.2 0.2 0.2 1"/>
+      </material>
+    </visual>
+  </link>
+  <link name="right_claw">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.0068"/>
+      <geometry>
+        <box size="0.05075 0.015 0.0136"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0068"/>
+      <geometry>
+        <box size="0.05075 0.015 0.0136"/>
+      </geometry>
+      <material name="material_color_right_claw">
+        <color rgba="0.6 0.6 1 1"/>
+      </material>
+    </visual>
+  </link>
+  <link name="left_claw">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.0068"/>
+      <geometry>
+        <box size="0.05075 0.015 0.0136"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0068"/>
+      <geometry>
+        <box size="0.05075 0.015 0.0136"/>
+      </geometry>
+      <material name="material_color_left_claw">
+        <color rgba="0.6 0.6 1 1"/>
+      </material>
+    </visual>
+  </link>
+  <link name="peak_tool"/>
+  <!--joint of robot and gripper interface-->
+  <joint name="robot_to_gripper" type="fixed">
+    <parent link="tool0"/>
+    <child link="robot_gripper_interface1"/>
+    <origin rpy="0 0 1.57079632679" xyz="0 0 0"/>
+  </joint>
+  <!--joint of gripper interface and body-->
+  <joint name="robot_to_gripper_interface_2" type="fixed">
+    <parent link="robot_gripper_interface1"/>
+    <child link="robot_gripper_interface2"/>
+    <origin rpy="0 0 0" xyz="0 0 0.009"/>
+  </joint>
+  <joint name="interface_to_gripper_body" type="fixed">
+    <parent link="robot_gripper_interface2"/>
+    <child link="gripper_body"/>
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.009"/>
+  </joint>
+  <!--joint of gripper and claw-->
+  <joint name="right_claw_joint" type="fixed">
+    <parent link="gripper_body"/>
+    <child link="right_claw"/>
+    <origin rpy="0 0 0" xyz="0.029625 0 0.084"/>
+  </joint>
+  <joint name="left_claw_joint" type="fixed">
+    <parent link="gripper_body"/>
+    <child link="left_claw"/>
+    <origin rpy="0 0 0" xyz="-0.029625 0 0.084"/>
+  </joint>
+  <!--joint of gripper and peak tool-->
+  <joint name="peak_tool" type="fixed">
+    <origin rpy="0 3.14159265359 0" xyz="0 0 0.0976"/>
+    <parent link="gripper_body"/>
+    <child link="peak_tool"/>
+  </joint>
 </robot>
 

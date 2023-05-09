@@ -5,9 +5,88 @@
 #include <std_msgs/msg/color_rgba.hpp>
 #include "environment_interface/srv/block_create.hpp"
 #include "environment_interface/srv/block_remove.hpp"
+#include "environment_interface/srv/get_block_color.hpp"
 #include "environment_interface/msg/block.hpp"
 #include "environment_information.h"
 #include <memory>
+
+void get_color(const std::shared_ptr<environment_interface::srv::GetBlockColor::Request> request,
+          std::shared_ptr<environment_interface::srv::GetBlockColor::Response>       response)
+{
+  std_msgs::msg::ColorRGBA block_color;
+  std::string color_name;
+  switch (request->index)
+  {
+  case WHITE:
+    block_color.r = 1;
+    block_color.g = 1;
+    block_color.b = 1;
+    block_color.a = 1;
+    color_name = "White";
+    break;
+  case RED:
+    block_color.r = 1;
+    block_color.g = 0;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Red";
+    break;
+  case ORANGE:
+    block_color.r = 1;
+    block_color.g = 0.65;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Orange";
+    break;
+  case YELLOW:
+    block_color.r = 1;
+    block_color.g = 1;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Yellow";
+    break;
+  case GREEN:
+    block_color.r = 0;
+    block_color.g = 1;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Green";
+    break;
+  case BLUE:
+    block_color.r = 0;
+    block_color.g = 0;
+    block_color.b = 1;
+    block_color.a = 1;
+    color_name = "Blue";
+    break;
+  case BLACK:
+    block_color.r = 0.2;
+    block_color.g = 0.2;
+    block_color.b = 0.2;
+    block_color.a = 1;
+    color_name = "Black";
+    break;
+  case SUPPORT:
+    block_color.r = 0.5;
+    block_color.g = 0.5;
+    block_color.b = 0.5;
+    block_color.a = 0.1;
+    color_name = "Support block color";
+    break;
+  default:
+    block_color.r = 0.2;
+    block_color.g = 0.2;
+    block_color.b = 0.2;
+    block_color.a = 1;
+    color_name = "Non Defined";
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "COLOR NOT DEFINED");
+    break;
+  }
+  
+  response->color = block_color;
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming get color request. \n"); 
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response: color is %s", color_name.c_str());
+}
 
 void remove_block(const std::shared_ptr<environment_interface::srv::BlockRemove::Request> request,
           std::shared_ptr<environment_interface::srv::BlockRemove::Response>       response)
@@ -73,6 +152,9 @@ int main(int argc, char **argv)
   
   rclcpp::Service<environment_interface::srv::BlockRemove>::SharedPtr remove_service =
     node->create_service<environment_interface::srv::BlockRemove>("remove_block_service",  &remove_block);
+
+  rclcpp::Service<environment_interface::srv::GetBlockColor>::SharedPtr get_color_service =
+    node->create_service<environment_interface::srv::GetBlockColor>("get_block_color_service",  &get_color);
 
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to do block services.");
 

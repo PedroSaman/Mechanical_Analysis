@@ -1,41 +1,25 @@
-function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_number,filename,initial_condition)
-%myFun - Description
+function [plan,subassembly_strategy_output] = Subassembly_Strategy(model,block_number,filename,initial_condition)
+% Implement the subassembly strategy. This function decides where to break
+% the input model into two pieces, calls every function needed to adapt the
+% subassemblies, and calls NewPlaner for the second part. This can be seen
+% as recursive function. If the second subassembly need to be divided again,
+% everything will be merged together in the end.
 %
-% Syntax: output = myFun(input)
-%
-% Long description
+% input: model:(block_number ,x, y, z, block_type, color).
+%       block number: is the block being inserted.
+%       filename: this is needed because NewPlaner will be called again.
+% output: plan: (block_number ,x, y, z, block_type, color). Updated plan. 
+%        subassembly_strategy_output: how many support blocks was added. -1 is error 
+
+    %% Preparation
+    layer = model(block_number,4); % Being Inserted block layer
+    break_layer = layer - 1; % Where to divide the two subassemblies
+    [submodel1,submodel2] = Separate_Subassemblies(model,break_layer); % Create both subassemblies data structure
     
     fprintf("\nFrom block %d a Subassembly is necessary.\n",block_number);
-
-    layer = model(block_number,4); % Being Inserted block layer
-    knobs = knob(model,0); % Knob information (entire block model).
-    join_i = join(knobs, layer); % Connected knobs information
-    subassembly_strategy_output = 1;
-    
-    %{
-    floating = 1;
-    for i = 1:size(join_i,1) % Verify if the block is floating
-        if(join_i(i,3) == block_number)
-            floating = 0;
-            break;
-        end
-    end
-    %}
-    
-    % If the problematic block is floating, the first subassembly is: 1 ->
-    % layer -1 but if not, the first subassembly is: 1 -> layer - 2
-    %{
-    if(floating)
-        layer = layer - 1;
-    else
-        layer = layer - 2;
-    end
-    %} 
-    layer = layer - 1;
-    
-    [submodel1,submodel2] = separate_model(model,layer);
-    
     fprintf("\nStarted the Subassembly assembly planning. It has %d blocks\n\n",size(submodel2,1));
+    
+    %% Count support blocks in subassembly one
     i = 1;
     block = 0;
     while(model(i,4) <= submodel1(end,4))
@@ -44,8 +28,17 @@ function [plan,subassembly_strategy_output] = subassembly_strategy(model,block_n
         end
         i = i + 1;
     end
-    initial_condition = initial_condition + [layer,block];
-    [submodel2,~] = NewPlanner(submodel2,filename,initial_condition);
     
-    plan = merge_subassemblies(submodel1,submodel2);
+    %% Call the NewPlaner for the subassembly two
+    initial_condition = initial_condition + [break_layer,block];
+    [submodel2,output] = NewPlanner(submodel2,filename,initial_condition);
+    
+    %% Evaluate the output
+    if(~strcmp(output,'ok'))
+        plan = model;
+        subassembly_strategy_output = -1;
+    else
+        plan = merge_subassemblies(submodel1,submodel2);
+        subassembly_strategy_output = 1;
+    end
 end
