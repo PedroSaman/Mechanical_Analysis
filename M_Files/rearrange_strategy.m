@@ -1,4 +1,4 @@
-function [plan,rearrange_strategy_output] = rearrange_strategy(model,layer)
+function [plan,rearrange_strategy_output] = Rearrange_Strategy(model,layer)
 %Run the Rearranging the inserting order. This function can have any reordering strategy.
 %Currently it is given priority to blocks that has all knobs connected with the lower layer.
 %Can be changed to: count how many connected knobs every block in the layer has and reorder
