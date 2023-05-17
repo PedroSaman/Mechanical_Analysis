@@ -9,11 +9,12 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
     offset = 0; % Keep track of support blocks number to preserve the block iteration
     max_pil_h = 24; % Maximum height a support pillar can have
     max_layer_sup = 500; % Maximum number of support blocks in a single layer
+    incomplete_plan_location = "../../Block_Printer_System/Models/plan/Incomplete_Plans/incomplete_" + filename + "/";
     
     %% First Layer
     fprintf("\nBlocks %d to %d are from the 1st layer and therefore insertion is stable\n",initial_condition(2)+1,range(1,2)+initial_condition(2));
     global_layer = 1 + initial_condition(1);
-    local = "../Block_Printer_System/Models/plan/Incomplete_Plans/incomplete_" + filename + "/";
+    local = incomplete_plan_location;
     fprintf("Layer %d completed, temporary plan available in %s\n",global_layer, local + filename + "_layer_" + num2str(global_layer) + ".csv");
     plan_formatation(plan(1:range(1,2) + offset,:),local + filename + "_layer_" + num2str(global_layer) + ".txt"); %temporary
     
@@ -83,7 +84,7 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
         end
         
         global_layer = layer + initial_condition(1);
-        local = "../Block_Printer_System/Models/plan/Incomplete_Plans/incomplete_" + filename + "/";
+        local = incomplete_plan_location;
         fprintf("Layer %d completed, temporary plan available in %s\n",global_layer, local + filename + "_layer_" + num2str(global_layer) + ".csv");
         plan_formatation(plan(1:block + offset,:),local + filename + "_layer_" + num2str(global_layer) + ".txt"); %temporary
     end
