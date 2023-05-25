@@ -98,7 +98,6 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
   if (!task_.plan(1))
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
-    while(1);
     return;
   }
   //task_.introspection().publishSolution(*task_.solutions().front());
@@ -106,7 +105,6 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
   execute_result = task_.execute(*task_.solutions().front());
   if (execute_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {
     RCLCPP_ERROR_STREAM(LOGGER, "Task execution failed and returned: " << execute_result.val);
-    while(1);
     return;
   }
   return;
@@ -670,22 +668,10 @@ int main(int argc, char **argv)
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   options.automatically_declare_parameters_from_overrides(true);
-
   auto mtc_task_node = std::make_shared<MTCTaskNode>(options);
-  rclcpp::executors::MultiThreadedExecutor executor;
-
-  auto spin_thread = std::make_unique<std::thread>([&executor, &mtc_task_node]()
-    {
-      executor.add_node(mtc_task_node->getNodeBaseInterface());
-      executor.spin();
-      executor.remove_node(mtc_task_node->getNodeBaseInterface()); 
-    }
-  );
 
   std::vector<std::vector<int>> assembly_plan = mtc_task_node->read_assembly_plan();
-
   int assembly_size = assembly_plan.size();
-  std::cout << std::to_string(assembly_size) << std::endl;
   
   //      0      1 2 3   4     5     6       7           8        9      10     11 
   //AssemblyArea,X,Y,Z,SizeX,SizeY,SizeZ,ColorIndex,IsSupport,CanPress,ShiftX,ShiftY
