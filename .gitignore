@@ -28,3 +28,4 @@ Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/ob
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.csproj.AssemblyReference.cache
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.dll
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.pdb
+ROS2_ws/rosbag_files/
