@@ -14,7 +14,7 @@ def generate_launch_description():
             description="Provides the assembly plan csv file path and name",
         )
     )
-    
+
     return LaunchDescription(
         declared_arguments + [OpaqueFunction(function=launch_setup)]
     )
@@ -23,8 +23,8 @@ def launch_setup(context, *args, **kwargs):
     test = LaunchConfiguration("csv_file_path")
     moveit_config = MoveItConfigsBuilder("denso_cobotta").to_dict()
 
-    # MTC Demo node
-    pick_place_demo = Node(
+    # bag node
+    bag_node = Node(
         package="manipulation_task_constructor",
         executable="manipulation_task_constructor",
         output="screen",
@@ -34,8 +34,16 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
+    # MTC Demo node
+    pick_place_demo = Node(
+        package="bag_recorder_nodes",
+        executable="simple_bag_recorder",
+        output="screen",
+    )
+
     nodes_to_start = [
         pick_place_demo,
+        bag_node,
     ]
 
     return nodes_to_start
