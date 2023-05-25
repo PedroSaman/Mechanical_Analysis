@@ -44,10 +44,10 @@
                 "/home/pedro/ws_mycobot/install/mecharm_interfaces/include/**",
                 "/opt/ros/humble/include/**",
                 "/home/pedro/Mechanical_Analysis/ROS2_ws/src/manipulation_task_constructor/include/**",
-                "/home/pedro/Mechanical_Analysis/ROS2_ws/src/tool_cartesian_positioning/include/**",
                 "/usr/include/**",
                 "${workspaceFolder}/build/environment_interface/rosidl_generator_cpp",
-                "${workspaceFolder}/install/environment_interface/include/environment_interface"
+                "${workspaceFolder}/install/environment_interface/include/environment_interface",
+                "/opt/ros/humble/include/control_msgs"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
