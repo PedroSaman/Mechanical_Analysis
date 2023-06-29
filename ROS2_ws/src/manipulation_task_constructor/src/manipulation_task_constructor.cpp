@@ -100,7 +100,7 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
     RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
     return;
   }
-  //task_.introspection().publishSolution(*task_.solutions().front());
+  task_.introspection().publishSolution(*task_.solutions().front()); // Holds the solution for inspection if not commented, the next steps will not be perfomed.
   moveit_msgs::msg::MoveItErrorCodes execute_result;
   execute_result = task_.execute(*task_.solutions().front());
   if (execute_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {
@@ -117,20 +117,15 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   std::string s = std::to_string(block.number);
   std::string object_name = "block_" + s;
 
-  bool block_thickness;
   geometry_msgs::msg::PoseStamped target_pose_msg;
   target_pose_msg.header.frame_id = "base";
-  target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x - 1) + block.x_size*0.5);
-  target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y - 1) + block.y_size*0.5);
+  //target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x - 1) + block.x_size*0.5);
+  //target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y - 1) + block.y_size*0.5);
+  target_pose_msg.pose.position.x = 0;
+  target_pose_msg.pose.position.y = 0;
   target_pose_msg.pose.position.z = base_z_size/2 + block_size*(block.z - 0.5) + INSERT_DISTANCE;
-  if(block.x_size < block.y_size)
+  if(block.x_size > block.y_size)
   {
-    if(block.x_size == 1)
-    {
-      block_thickness = ONE_ROW;
-    }else{
-      block_thickness = TWO_ROW;
-    }
     double cr = cos(0);
     double sr = sin(0);
     double cp = cos(0);
@@ -141,23 +136,15 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     target_pose_msg.pose.orientation.x = sr * cp * cy - cr * sp * sy;
     target_pose_msg.pose.orientation.y = cr * sp * cy + sr * cp * sy;
     target_pose_msg.pose.orientation.z = cr * cp * sy - sr * sp * cy;
-  }else
-  {
-    if(block.y_size == 1)
-    {
-      block_thickness = ONE_ROW;
-    }else{
-      block_thickness = TWO_ROW;
-    }
   }
 
-  task.stages()->setName("assembly task " + object_name);
+  task.stages()->setName("assembly task" + object_name);
   task.loadRobotModel(node_);
 
-  const auto& arm_group_name = "cobotta_arm";
-  const auto& hand_group_name = "cobotta_hand";
-  const auto &end_effector_name = "gripper";
-  const auto& hand_frame = "gripper_base";  
+  const auto& arm_group_name = "vp6242_arm";
+  const auto& hand_group_name = "vp6242_hand";
+  const auto& end_effector_name = "gripper";
+  const auto& hand_frame = "peak_tool";
 
   // Set task properties
   task.setProperty("group", arm_group_name);
@@ -176,15 +163,6 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   cartesian_planner->setMaxVelocityScaling(1.0);
   cartesian_planner->setMaxAccelerationScaling(1.0);
   cartesian_planner->setStepSize(.01);
-
-  // clang-format off
-  auto stage_open_hand =
-      std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
-  // clang-format on
-  stage_open_hand->setGroup(hand_group_name);
-  stage_open_hand->setGoal("open_hand");
-  task.add(std::move(stage_open_hand));
-
   // clang-format off
   auto stage_move_to_pick = std::make_unique<mtc::stages::Connect>(
       "move to pick",
@@ -216,7 +194,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       stage->properties().set("marker_ns", "approach_object");
       stage->properties().set("link", hand_frame);
       stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-      stage->setMinMaxDistance(0.3, 0.5);
+      stage->setMinMaxDistance(0.1, 1);
 
       // Set hand forward direction
       geometry_msgs::msg::Vector3Stamped vec;
@@ -231,7 +209,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       auto stage = std::make_unique<mtc::stages::GenerateGraspPose>("generate grasp pose");
       stage->properties().configureInitFrom(mtc::Stage::PARENT);
       stage->properties().set("marker_ns", "grasp_pose");
-      stage->setPreGraspPose("open_hand");
+      //stage->setPreGraspPose();
       stage->setObject(object_name);
       stage->setAngleDelta(M_PI);
       stage->setMonitoredStage(current_state_ptr); // Hook into current state
@@ -254,37 +232,14 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
       grasp->insert(std::move(wrapper));
     }
-
-    {
-      // clang-format off
-      auto stage =
-          std::make_unique<mtc::stages::ModifyPlanningScene>("allow collision (hand,object)");
-      stage->allowCollisions(object_name,
-                             task.getRobotModel()
-                                 ->getJointModelGroup(hand_group_name)
-                                 ->getLinkModelNamesWithCollisionGeometry(),
-                             true);
-      // clang-format on
-      grasp->insert(std::move(stage));
-    }
-
-    {
-      auto stage = std::make_unique<mtc::stages::MoveTo>("close hand to grab", interpolation_planner);
-      stage->setGroup(hand_group_name);
-      if(block_thickness){
-        stage->setGoal("grab_1"); //Grab a block 1xn
-      }else{
-        stage->setGoal("grab_2"); //Grab a block 2xn
-      }
-      grasp->insert(std::move(stage));
-    }
-
+    
     {
       auto stage = std::make_unique<mtc::stages::ModifyPlanningScene>("attach object");
       stage->attachObject(object_name, hand_frame);
       attach_object_stage = stage.get();
       grasp->insert(std::move(stage));
     }
+    
     task.add(std::move(grasp));
   }
 
@@ -293,7 +248,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     auto stage = std::make_unique<mtc::stages::MoveRelative>("lift object", cartesian_planner);
     // clang-format on
     stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-    stage->setMinMaxDistance(0.3, 0.5);
+    stage->setMinMaxDistance(0.1, 1);
     stage->setIKFrame(hand_frame);
     stage->properties().set("marker_ns", "lift_object");
 
@@ -370,13 +325,6 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     stage->setDirection(vec);
     task.add(std::move(stage));
   }
-
-  {
-    auto stage = std::make_unique<mtc::stages::MoveTo>("open hand", interpolation_planner);
-    stage->setGroup(hand_group_name);
-    stage->setGoal("open_hand");
-    task.add(std::move(stage));
-  }
   
   {
     // clang-format off
@@ -396,7 +344,6 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     stage->detachObject(object_name, hand_frame);
     task.add(std::move(stage));
   }
-
   return task;
 }
 
@@ -406,8 +353,8 @@ mtc::Task MTCTaskNode::retreatTask()
   task.stages()->setName("Retreat");
   task.loadRobotModel(node_);
 
-  const auto& arm_group_name = "cobotta_arm";
-  const auto& hand_frame = "gripper_base";  
+  const auto& arm_group_name = "vp6242_arm";
+  const auto& hand_frame = "peak_tool";  
 
   // Set task properties
   task.setProperty("group", arm_group_name);
@@ -426,7 +373,7 @@ mtc::Task MTCTaskNode::retreatTask()
   {
     auto stage = std::make_unique<mtc::stages::MoveRelative>("retreat", cartesian_planner);
     stage->properties().configureInitFrom(mtc::Stage::PARENT, {"group"});
-    stage->setMinMaxDistance(0.3, 0.5);
+    stage->setMinMaxDistance(0.1, 1);
     stage->setIKFrame(hand_frame);
     stage->properties().set("marker_ns", "retreat");
 
@@ -447,8 +394,8 @@ mtc::Task MTCTaskNode::return_homeTaks()
   task.stages()->setName("Return Home");
   task.loadRobotModel(node_);
 
-  const auto& arm_group_name = "cobotta_arm";
-  const auto& hand_group_name = "cobotta_hand";
+  const auto& arm_group_name = "vp6242_arm";
+  const auto& hand_group_name = "vp6242_hand";
 
   // Set task properties
   task.setProperty("group", arm_group_name);
@@ -471,13 +418,6 @@ mtc::Task MTCTaskNode::return_homeTaks()
     // clang-format on
     stage->setGroup(arm_group_name);
     stage->setGoal("Home");
-    task.add(std::move(stage));
-  }
-  
-  {
-    auto stage = std::make_unique<mtc::stages::MoveTo>("close hand", interpolation_planner);
-    stage->setGroup(hand_group_name);
-    stage->setGoal("close_hand");
     task.add(std::move(stage));
   }
 
@@ -586,7 +526,7 @@ moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interfa
   replacement_block = object;
   remove_old_block(block.name);
   block.name = "block_" + std::to_string(block.number);
-  block.frame_id = "dispenser";
+  //block.frame_id = "dispenser";
 
   if(block.is_support)
   {
@@ -711,11 +651,11 @@ int main(int argc, char **argv)
     mtc_task_node->refil_block(replacement_block);
     mtc_task_node->correct_color(block);
 
-    mtc_task_node->doTask(block,RETREAT);
+    //mtc_task_node->doTask(block,RETREAT);
   }
 
   environment_interface::msg::Block block;
-  mtc_task_node->doTask(block,RETURN_HOME);
+  //mtc_task_node->doTask(block,RETURN_HOME);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Assembly time was: %.2f minutes", static_cast< float >(duration.count())/60000000);

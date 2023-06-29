@@ -23,8 +23,8 @@ def launch_setup(context, *args, **kwargs):
     test = LaunchConfiguration("csv_file_path")
     moveit_config = MoveItConfigsBuilder("denso_cobotta").to_dict()
 
-    # bag node
-    bag_node = Node(
+    # MTC Demo node
+    pick_place_demo = Node(
         package="manipulation_task_constructor",
         executable="manipulation_task_constructor",
         output="screen",
@@ -34,8 +34,8 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
 
-    # MTC Demo node
-    pick_place_demo = Node(
+    # Bag node
+    bag_node = Node(
         package="bag_recorder_nodes",
         executable="simple_bag_recorder",
         output="screen",
@@ -43,7 +43,7 @@ def launch_setup(context, *args, **kwargs):
 
     nodes_to_start = [
         pick_place_demo,
-        bag_node,
+        #bag_node,
     ]
 
     return nodes_to_start
