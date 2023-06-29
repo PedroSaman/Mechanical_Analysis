@@ -1,15 +1,19 @@
+//This value here, for the scale_value used in vp6242 urdf file, corresponds to cm
 #define block_size 0.3
 #define table_x_size 30.0
-#define table_y_size 20.0
-#define table_z_size 20.0
-#define base_x_size 15.0
-#define base_y_size 15.0
-#define base_z_size 0.2
+#define table_y_size 60.0
+#define table_z_size 18.0
+#define base_x_size 7.92
+#define base_y_size 7.92
+#define base_z_size 0.3
 #define dispenser_x_size 2.4
 #define dispenser_y_size 12.0
 #define dispenser_z_size 0.2
+#define bar_x_size 3.0
+#define bar_y_size 62.1
+#define bar_z_size 3.0
 #define minimum_resolution 0.01
-#define table_y_position 23.0
+#define table_x_position 25.64
 #define WHITE 0
 #define RED 1
 #define ORANGE 2

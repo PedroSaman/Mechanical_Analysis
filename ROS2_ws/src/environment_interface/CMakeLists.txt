@@ -7,11 +7,10 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
-find_package(environment_interface REQUIRED)
 
 set(msg_files
   "msg/Block.msg"
@@ -50,10 +49,14 @@ endif()
 include_directories(include)
  
 # this line to exports the library
-ament_export_targets(environment_interface HAS_LIBRARY_TARGET)
+#ament_export_targets(environment_interface HAS_LIBRARY_TARGET)
  
 # install the include/my_cpp_library directory to the install/include/my_cpp_library
 install(
   DIRECTORY include/environment_interface
   DESTINATION include
 )
+
+ament_export_dependencies(rosidl_default_runtime)
+ament_package()
+
