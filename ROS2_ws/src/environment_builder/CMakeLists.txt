@@ -34,10 +34,21 @@ ament_target_dependencies(
   "environment_interface"
 )
 
+add_executable(world_builder src/world_builder.cpp)
+ament_target_dependencies(
+  world_builder 
+  "moveit_ros_planning_interface"
+  "environment_interface"
+  "rclcpp"
+)
+
+install(DIRECTORY meshes DESTINATION share/${PROJECT_NAME})
+
 install(TARGETS
 block_services
 dummy_client
 block_cleaner
+world_builder
 DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
