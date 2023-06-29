@@ -11,11 +11,11 @@ moveit_simple_controller_manager:
     action_ns: follow_joint_trajectory
     default: true
     joints:
-      - joint_1
-      - joint_2
-      - joint_3
-      - joint_4
-      - joint_5
-      - joint_6
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
     action_ns: follow_joint_trajectory
     default: true

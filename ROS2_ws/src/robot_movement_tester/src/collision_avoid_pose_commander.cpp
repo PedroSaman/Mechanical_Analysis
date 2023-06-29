@@ -115,21 +115,15 @@ int main(int argc, char * argv[])
   move_group_interface.setPoseTarget(target_pose);
 
   // Create a plan to that target pose
-  auto const [success, plan] = [&move_group_interface]{
-    moveit::planning_interface::MoveGroupInterface::Plan msg;
-    auto const ok = static_cast<bool>(move_group_interface.plan(msg));
-    return std::make_pair(ok, msg);
-  }();
-
+  moveit::planning_interface::MoveGroupInterface::Plan plan;
+  auto const success = static_cast<bool>(move_group_interface.plan(plan));
+  
   // Execute the plan
   if(success) {
     move_group_interface.execute(plan);
   } else {
     RCLCPP_ERROR(logger, "Planing failed!");
   }
-
-  
-  
 
   // Shutdown ROS
   rclcpp::shutdown();
