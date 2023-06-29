@@ -1,6 +1,5 @@
 Unused/
 Photos/
-<<<<<<< HEAD
 Dat_Files/Bridge/
 Block_Printer_System/Models/plan/Incomplete_Plans/
 Block_Printer_System/Models/plan/Fails/
@@ -10,7 +9,6 @@ Block_Printer_System/Software/windows/BlockPainter-UnityExecutable/
 Block_Printer_System/Software/windows/BlockModelGenerator/BlockModelGenerator/
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/bin/
 Block_Printer_System/Software/windows/xTests/
-=======
 Dat_Files/Bridge
 Block_Printer_System/Models/plan/Incomplete_Plans
 Block_Printer_System/Models/plan/Fails
@@ -21,7 +19,6 @@ Block_Printer_System/Software/windows/BlockModelGenerator/BlockModelGenerator/.
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/bin
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj
 Block_Printer_System/Software/windows/xTests
->>>>>>> main
 Block_Printer_System/Software/windows/BlockModelGenerator/.vs
 .vscode/
 Block_Printer_System/Software/windows/BlockModelGenerator/VoxelModelConverter/obj/Debug/netcoreapp2.1/VoxelModelConverter.AssemblyInfo.cs
