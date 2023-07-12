@@ -1,10 +1,10 @@
 moveit_setup_assistant_config:
   urdf:
     package: denso_vp6242_description
-    relative_path: urdf/vp6242.urdf
+    relative_path: urdf/vp6242.urdf.xacro
   srdf:
     relative_path: config/vp6242.srdf
   package_settings:
     author_name: pedro
     author_email: pedro@pedro.com
-    generated_timestamp: 1683519166
+    generated_timestamp: 1689138227

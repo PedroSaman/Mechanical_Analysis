@@ -7,6 +7,10 @@ controller_manager:
       type: joint_trajectory_controller/JointTrajectoryController
 
 
+    vp6242_hand_controller:
+      type: position_controllers/GripperActionController
+
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
@@ -24,3 +28,6 @@ vp6242_arm_controller:
     state_interfaces:
       - position
       - velocity
+vp6242_hand_controller:
+  ros__parameters:
+    joint: right_claw_joint
