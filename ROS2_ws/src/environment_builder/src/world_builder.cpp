@@ -74,11 +74,12 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   */
   environment_interface::msg::Block block;
   block.frame_id = "dispenser2by1";
-  block.name = "12";
+  block.name = "21";
   block.x_size = 2;
   block.y_size = 1;
   block.x = 0.1 + block_size*block.x_size/2;
   block.y = 0;
+  //block.z = 2.51 + block_size/2;
   block.z = 0.51 + block_size/2;
   block.number = 0;
   block.color.r = 0.7;
@@ -95,6 +96,7 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block1.y_size = 2;
   block1.x = 0.1 + block_size*block1.x_size/2;
   block1.y = 0;
+  //block1.z = 2.51 + block_size/2;
   block1.z = 0.51 + block_size/2;
   block1.number = 0;
   block1.color.r = 0;

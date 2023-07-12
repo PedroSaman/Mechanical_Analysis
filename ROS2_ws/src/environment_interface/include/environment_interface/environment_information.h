@@ -24,5 +24,6 @@
 #define SUPPORT 7
 #define ONE_ROW 1
 #define TWO_ROW 0
-#define INSERT_DISTANCE 1.5
-#define CLAW_STOP_DISTANCE 6.15
+#define INSERT_DISTANCE 3*block_size
+#define GRASP_CLAW_STOP_DISTANCE -1.5*block_size
+#define BASE_CORRECTION_VALUE -2

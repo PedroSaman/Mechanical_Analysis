@@ -98,6 +98,7 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
   if (!task_.plan(1))
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
+    sleep(1999);
     return;
   }
   task_.introspection().publishSolution(*task_.solutions().front()); // Holds the solution for inspection if not commented, the next steps will not be perfomed.
@@ -119,19 +120,17 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
 
   geometry_msgs::msg::PoseStamped target_pose_msg;
   target_pose_msg.header.frame_id = "base";
-  //target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x - 1) + block.x_size*0.5);
-  //target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y - 1) + block.y_size*0.5);
-  target_pose_msg.pose.position.x = 0;
-  target_pose_msg.pose.position.y = 0;
+  target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
+  target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
   target_pose_msg.pose.position.z = base_z_size/2 + block_size*(block.z - 0.5) + INSERT_DISTANCE;
-  if(block.x_size > block.y_size)
+  if(block.x_size >= block.y_size) // Correct the orientation for blocks that should be placed in an orientation different from its original blocks feeder orientation
   {
     double cr = cos(0);
     double sr = sin(0);
     double cp = cos(0);
     double sp = sin(0);
-    double cy = cos(M_PI_2 * 0.5);
-    double sy = sin(M_PI_2 * 0.5);
+    double cy = cos(M_PI/4); // Yaw turn of 90 degrees
+    double sy = sin(M_PI/4); 
     target_pose_msg.pose.orientation.w = cr * cp * cy + sr * sp * sy;
     target_pose_msg.pose.orientation.x = sr * cp * cy - cr * sp * sy;
     target_pose_msg.pose.orientation.y = cr * sp * cy + sr * cp * sy;
@@ -194,7 +193,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       stage->properties().set("marker_ns", "approach_object");
       stage->properties().set("link", hand_frame);
       stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-      stage->setMinMaxDistance(0.1, 1);
+      stage->setMinMaxDistance(0.01, 1);
 
       // Set hand forward direction
       geometry_msgs::msg::Vector3Stamped vec;
@@ -209,16 +208,16 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       auto stage = std::make_unique<mtc::stages::GenerateGraspPose>("generate grasp pose");
       stage->properties().configureInitFrom(mtc::Stage::PARENT);
       stage->properties().set("marker_ns", "grasp_pose");
-      //stage->setPreGraspPose();
+      stage->setPreGraspPose("Open");
       stage->setObject(object_name);
-      stage->setAngleDelta(M_PI);
+      stage->setAngleDelta(M_PI_2);
       stage->setMonitoredStage(current_state_ptr); // Hook into current state
 
       // This is the transform from the object frame to the end-effector frame
       Eigen::Isometry3d grasp_frame_transform;
-      Eigen::Quaterniond q(0,1,0,0); // Approach from Z axis from top to bottom
+      Eigen::Quaterniond q(0,0,0,1); // Approach from Z axis from top to bottom
       grasp_frame_transform.linear() = q.matrix();
-      grasp_frame_transform.translation().z() = CLAW_STOP_DISTANCE; //Stop at 65cm from object
+      grasp_frame_transform.translation().z() = GRASP_CLAW_STOP_DISTANCE; //Stop at CLAW_STOP_DISTANCE from object
 
       // Compute IK
       // clang-format off
@@ -291,7 +290,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
 
       // This is the transform from the object frame to the end-effector frame
       Eigen::Isometry3d grasp_frame_transform;
-      Eigen::Quaterniond q(0,1,0,0);
+      Eigen::Quaterniond q(0,0,0,1);
       grasp_frame_transform.linear() = q.matrix();
 
       // Compute IK
@@ -314,7 +313,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     auto stage = std::make_unique<mtc::stages::MoveRelative>("insert object", cartesian_planner);
     // clang-format on
     stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-    stage->setMinMaxDistance(INSERT_DISTANCE - 0.01 , INSERT_DISTANCE + 0.01);
+    stage->setMinMaxDistance(INSERT_DISTANCE - minimum_resolution , INSERT_DISTANCE + minimum_resolution);
     stage->setIKFrame(hand_frame);
     stage->properties().set("marker_ns", "lift_object");
 
@@ -651,11 +650,11 @@ int main(int argc, char **argv)
     mtc_task_node->refil_block(replacement_block);
     mtc_task_node->correct_color(block);
 
-    //mtc_task_node->doTask(block,RETREAT);
+    mtc_task_node->doTask(block,RETREAT);
   }
 
   environment_interface::msg::Block block;
-  //mtc_task_node->doTask(block,RETURN_HOME);
+  mtc_task_node->doTask(block,RETURN_HOME);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Assembly time was: %.2f minutes", static_cast< float >(duration.count())/60000000);
