@@ -124,9 +124,9 @@ void add_block(const std::shared_ptr<environment_interface::srv::BlockCreate::Re
   block_pose.orientation.x = 0;
   block_pose.orientation.y = 0;
   block_pose.orientation.z = 0;
-  block_pose.position.x = -dispenser_x_size/2 + block_size*(request->block.x_size/2 + (request->block.x - 1));
-  block_pose.position.y = -dispenser_y_size/2 + block_size*(request->block.y_size/2 + (request->block.y - 1));
-  block_pose.position.z = dispenser_z_size/2 + block_size/2 + request->block.z;
+  block_pose.position.x = request->block.x;
+  block_pose.position.y = request->block.y;
+  block_pose.position.z = request->block.z;
 
   block_object.primitives.push_back(primitive);
   block_object.primitive_poses.push_back(block_pose);
