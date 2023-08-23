@@ -14,14 +14,22 @@ def generate_launch_description():
             description="Provides the assembly plan csv file path and name",
         )
     )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "robot_name",
+            default_value="denso_vp6242",
+            description="Determine the robot name for the MTC correct functioning",
+        )
+    )
 
     return LaunchDescription(
         declared_arguments + [OpaqueFunction(function=launch_setup)]
     )
 
 def launch_setup(context, *args, **kwargs):
-    test = LaunchConfiguration("csv_file_path")
-    moveit_config = MoveItConfigsBuilder("denso_cobotta").to_dict()
+    csv_file_path = LaunchConfiguration("csv_file_path")
+    robot_name = context.perform_substitution(LaunchConfiguration('robot_name'))
+    moveit_config = MoveItConfigsBuilder(robot_name).to_dict()
 
     # MTC Demo node
     pick_place_demo = Node(
@@ -30,7 +38,8 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
         parameters=[
             moveit_config,
-            {"csv_file_path": test},
+            {"csv_file_path": csv_file_path},
+            {"robot_name": robot_name},
         ],
     )
 
