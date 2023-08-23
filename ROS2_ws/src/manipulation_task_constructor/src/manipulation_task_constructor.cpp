@@ -38,18 +38,18 @@ public:
   MTCTaskNode(const rclcpp::NodeOptions &options);
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr getNodeBaseInterface();
 
-  void doTask(environment_interface::msg::Block block, size_t OPERATION);
+  void doTask(environment_interface::msg::Block block, size_t OPERATION, std::string robot_name);
   moveit_msgs::msg::CollisionObject request_block(environment_interface::msg::Block& block);
-  std::vector<std::vector<int>> read_assembly_plan();
+  std::tuple<std::vector<std::vector<int>>, std::string> input_arguments_setup();
   void remove_old_block(std::string object_name);
   void refil_block(moveit_msgs::msg::CollisionObject object);
   void correct_color(environment_interface::msg::Block block);
 private:
   // Compose an MTC task from a series of stages.
   void create_new_block(environment_interface::msg::Block block);
-  mtc::Task pick_and_placeTask(environment_interface::msg::Block block);
-  mtc::Task return_homeTaks();
-  mtc::Task retreatTask();
+  mtc::Task pick_and_placeTask(environment_interface::msg::Block block, std::string robot_name);
+  mtc::Task return_homeTaks(std::string robot_name);
+  mtc::Task retreatTask(std::string robot_name);
   mtc::Task task_;
   rclcpp::Node::SharedPtr node_;
 };
@@ -64,20 +64,20 @@ MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions &options)
 {
 }
 
-void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATION)
+void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATION, std::string robot_name)
 {
   switch (OPERATION)
   {
   case PICK_AND_PLACE:
-    task_ = pick_and_placeTask(block);
+    task_ = pick_and_placeTask(block, robot_name);
     break;
   
   case RETREAT:
-    task_ = retreatTask();
+    task_ = retreatTask(robot_name);
     break;
   
   case RETURN_HOME:
-    task_ = return_homeTaks();
+    task_ = return_homeTaks(robot_name);
     break;
   default:
     RCLCPP_ERROR_STREAM(LOGGER, "Opperation not defined.");
@@ -94,14 +94,14 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
     RCLCPP_ERROR_STREAM(LOGGER, e);
     return;
   }
-
+  
   if (!task_.plan(1))
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
     sleep(1999);
     return;
   }
-  task_.introspection().publishSolution(*task_.solutions().front()); // Holds the solution for inspection if not commented, the next steps will not be perfomed.
+  //task_.introspection().publishSolution(*task_.solutions().front()); // Holds the solution for inspection if not commented, the next steps will not be perfomed.
   moveit_msgs::msg::MoveItErrorCodes execute_result;
   execute_result = task_.execute(*task_.solutions().front());
   if (execute_result.val != moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {
@@ -111,19 +111,38 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
   return;
 }
 
-mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block block)
+mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block block, std::string robot_name)
 {
   mtc::Task task;
 
+  const auto& arm_group_name = robot_name + "_arm";
+  const auto& hand_group_name = robot_name + "_hand";
+  const auto& end_effector_name = "gripper";
+  const auto& hand_frame = "peak_tool";
   std::string s = std::to_string(block.number);
   std::string object_name = "block_" + s;
+
+  // Set task properties
+  task.setProperty("group", arm_group_name);
+  task.setProperty("eef", end_effector_name);
+  task.setProperty("ik_frame", hand_frame);
+  task.stages()->setName("assembly task" + object_name);
+  task.loadRobotModel(node_);
 
   geometry_msgs::msg::PoseStamped target_pose_msg;
   target_pose_msg.header.frame_id = "base";
   target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
   target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
-  target_pose_msg.pose.position.z = base_z_size/2 + block_size*(block.z - 0.5) + INSERT_DISTANCE;
-  if(block.x_size >= block.y_size) // Correct the orientation for blocks that should be placed in an orientation different from its original blocks feeder orientation
+  target_pose_msg.pose.position.z = base_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE) + INSERT_DISTANCE;
+  /*
+  if((block.x_size == 2 && block.y_size == 1) || (block.x_size == 1 && block.y_size == 2)) // 2x1 blocks are in a diferent orientation in the parts feeder, so this is necessary to maintain the logic for other block types
+  {
+    int swap_aux = block.x_size;
+    block.x_size = block.y_size;
+    block.y_size = swap_aux;
+  }
+  */
+  if(block.x_size > block.y_size) // If the assembly orientation is the same as the parts feeder, correct the tool orientation
   {
     double cr = cos(0);
     double sr = sin(0);
@@ -136,19 +155,6 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     target_pose_msg.pose.orientation.y = cr * sp * cy + sr * cp * sy;
     target_pose_msg.pose.orientation.z = cr * cp * sy - sr * sp * cy;
   }
-
-  task.stages()->setName("assembly task" + object_name);
-  task.loadRobotModel(node_);
-
-  const auto& arm_group_name = "vp6242_arm";
-  const auto& hand_group_name = "vp6242_hand";
-  const auto& end_effector_name = "gripper";
-  const auto& hand_frame = "peak_tool";
-
-  // Set task properties
-  task.setProperty("group", arm_group_name);
-  task.setProperty("eef", end_effector_name);
-  task.setProperty("ik_frame", hand_frame);
   
   mtc::Stage* current_state_ptr = nullptr;  // Forward current_state on to grasp pose generator
   auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
@@ -215,7 +221,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
 
       // This is the transform from the object frame to the end-effector frame
       Eigen::Isometry3d grasp_frame_transform;
-      Eigen::Quaterniond q(0,0,0,1); // Approach from Z axis from top to bottom
+      Eigen::Quaterniond q(1,0,0,0); // (w,x,y,z)
       grasp_frame_transform.linear() = q.matrix();
       grasp_frame_transform.translation().z() = GRASP_CLAW_STOP_DISTANCE; //Stop at CLAW_STOP_DISTANCE from object
 
@@ -313,7 +319,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     auto stage = std::make_unique<mtc::stages::MoveRelative>("insert object", cartesian_planner);
     // clang-format on
     stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-    stage->setMinMaxDistance(INSERT_DISTANCE - minimum_resolution , INSERT_DISTANCE + minimum_resolution);
+    stage->setMinMaxDistance(INSERT_DISTANCE - minimum_resolution, INSERT_DISTANCE);
     stage->setIKFrame(hand_frame);
     stage->properties().set("marker_ns", "lift_object");
 
@@ -346,17 +352,15 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   return task;
 }
 
-mtc::Task MTCTaskNode::retreatTask()
+mtc::Task MTCTaskNode::retreatTask(std::string robot_name)
 {
   mtc::Task task;
-  task.stages()->setName("Retreat");
-  task.loadRobotModel(node_);
-
-  const auto& arm_group_name = "vp6242_arm";
-  const auto& hand_frame = "peak_tool";  
-
+  const auto& arm_group_name = robot_name + "_arm";
+  const auto& hand_frame = "peak_tool";
   // Set task properties
   task.setProperty("group", arm_group_name);
+  task.stages()->setName("Retreat");
+  task.loadRobotModel(node_);
 
   auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
   task.add(std::move(stage_state_current));
@@ -387,17 +391,15 @@ mtc::Task MTCTaskNode::retreatTask()
   return task;
 }
 
-mtc::Task MTCTaskNode::return_homeTaks()
+mtc::Task MTCTaskNode::return_homeTaks(std::string robot_name)
 {
   mtc::Task task;
-  task.stages()->setName("Return Home");
-  task.loadRobotModel(node_);
-
-  const auto& arm_group_name = "vp6242_arm";
-  const auto& hand_group_name = "vp6242_hand";
-
+  const auto& arm_group_name = robot_name + "_arm";
+  
   // Set task properties
   task.setProperty("group", arm_group_name);
+  task.stages()->setName("Return Home");
+  task.loadRobotModel(node_);
 
   auto stage_state_current = std::make_unique<mtc::stages::CurrentState>("current");
   task.add(std::move(stage_state_current));
@@ -475,10 +477,12 @@ void MTCTaskNode::create_new_block(environment_interface::msg::Block block)
   }
 }
 
-std::vector<std::vector<int>> MTCTaskNode::read_assembly_plan()
+std::tuple<std::vector<std::vector<int>>, std::string> MTCTaskNode::input_arguments_setup()
 {
   std::string myFilePath = node_->get_parameter("csv_file_path").as_string();
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "parameter name: %s", myFilePath.c_str());
+  std::string robot_name = node_->get_parameter("robot_name").as_string();
+  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "parameter name: %s", myFilePath.c_str());
+  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "parameter name: %s", robot_name.c_str());
   std::ifstream assemblyfile;
   assemblyfile.open(myFilePath);
   
@@ -486,7 +490,7 @@ std::vector<std::vector<int>> MTCTaskNode::read_assembly_plan()
   if(assemblyfile.fail())
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Csv file not found.");
-    return assembly_plan;
+    return std::make_tuple(assembly_plan,robot_name);
   }
   int assembly_size = 0;
   while(assemblyfile.peek()!=EOF)
@@ -506,7 +510,7 @@ std::vector<std::vector<int>> MTCTaskNode::read_assembly_plan()
     }
   }
   assemblyfile.close();
-  return assembly_plan;
+  return std::make_tuple(assembly_plan,robot_name);
 }
 
 moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interface::msg::Block& block)
@@ -534,7 +538,7 @@ moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interfa
     support_block_object.header.frame_id = "world";
     support_block_object.primitives.resize(1);
     support_block_object.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
-    support_block_object.primitives[0].dimensions = { block_size - minimum_resolution, block_size/2 - minimum_resolution };
+    support_block_object.primitives[0].dimensions = { block_size_z - minimum_resolution, block_size/2 - minimum_resolution };
     support_block_object.pose = object.pose;
     support_block_object.operation = support_block_object.ADD;
     psi.applyCollisionObject(support_block_object, block.color);
@@ -604,12 +608,14 @@ void MTCTaskNode::refil_block(moveit_msgs::msg::CollisionObject refil_object)
 int main(int argc, char **argv)
 {
   auto start = std::chrono::high_resolution_clock::now();
-  rclcpp::init(argc, argv);
+  rclcpp::init(argc, argv); 
   rclcpp::NodeOptions options;
   options.automatically_declare_parameters_from_overrides(true);
   auto mtc_task_node = std::make_shared<MTCTaskNode>(options);
 
-  std::vector<std::vector<int>> assembly_plan = mtc_task_node->read_assembly_plan();
+  std::vector<std::vector<int>> assembly_plan;
+  std::string robot_name;
+  std::tie(assembly_plan, robot_name) = mtc_task_node->input_arguments_setup();
   int assembly_size = assembly_plan.size();
   
   //      0      1 2 3   4     5     6       7           8        9      10     11 
@@ -631,6 +637,24 @@ int main(int argc, char **argv)
       block.color = getColor(assembly_plan[i][7]);
     }
     block.number = i+1;
+    
+    /*if((assembly_plan[i][4] == 2 && assembly_plan[i][5] == 1) || (assembly_plan[i][4] == 1 && assembly_plan[i][5] == 2)) //Special case for 2x1 block due its different positioning in the parts feeder
+    {
+      block.name = "21";
+      block.x_size = 2;
+      block.y_size = 1;
+    }else if(assembly_plan[i][4] < assembly_plan[i][5])
+    {
+      block.name = std::to_string(assembly_plan[i][4]) + std::to_string(assembly_plan[i][5]);
+      block.x_size = assembly_plan[i][4];
+      block.y_size = assembly_plan[i][5];
+    }else
+    {
+      block.name = std::to_string(assembly_plan[i][5]) + std::to_string(assembly_plan[i][4]);
+      block.x_size = assembly_plan[i][5];
+      block.y_size = assembly_plan[i][4];
+    }*/
+
     if(assembly_plan[i][4] >= assembly_plan[i][5])
     {
       block.name = std::to_string(assembly_plan[i][4]) + std::to_string(assembly_plan[i][5]);
@@ -642,19 +666,24 @@ int main(int argc, char **argv)
       block.x_size = assembly_plan[i][5];
       block.y_size = assembly_plan[i][4];
     }
-    replacement_block = mtc_task_node->request_block(block);
-    block.x_size = assembly_plan[i][4];
+
+    replacement_block = mtc_task_node->request_block(block); //Refil the block in the feeder
+    block.x_size = assembly_plan[i][4]; // Correct the sizes for the assembly
     block.y_size = assembly_plan[i][5];
-    mtc_task_node->doTask(block,PICK_AND_PLACE);
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "x pos: %s", std::to_string(assembly_plan[i][1]).c_str());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "y pos: %s", std::to_string(assembly_plan[i][2]).c_str());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "x_size: %s", std::to_string(assembly_plan[i][4]).c_str());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "y_size: %s", std::to_string(assembly_plan[i][5]).c_str());
+    mtc_task_node->doTask(block,PICK_AND_PLACE,robot_name);
 
     mtc_task_node->refil_block(replacement_block);
     mtc_task_node->correct_color(block);
 
-    mtc_task_node->doTask(block,RETREAT);
+    mtc_task_node->doTask(block,RETREAT,robot_name);
   }
 
   environment_interface::msg::Block block;
-  mtc_task_node->doTask(block,RETURN_HOME);
+  mtc_task_node->doTask(block,RETURN_HOME,robot_name);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Assembly time was: %.2f minutes", static_cast< float >(duration.count())/60000000);
