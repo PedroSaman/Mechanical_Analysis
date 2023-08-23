@@ -42,6 +42,24 @@ ament_target_dependencies(
   "rclcpp"
 )
 
+add_executable(assembly_plan_visualizer src/assembly_plan_visualizer.cpp)
+ament_target_dependencies(
+  assembly_plan_visualizer 
+  "moveit_task_constructor_core"
+  "moveit_ros_planning_interface"
+  "environment_interface"
+  "rclcpp"
+)
+
+add_executable(world_builder_simple src/world_builder_simple.cpp)
+ament_target_dependencies(
+  world_builder_simple
+  "moveit_ros_planning_interface"
+  "environment_interface"
+  "rclcpp"
+)
+
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY meshes DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS
@@ -49,6 +67,8 @@ block_services
 dummy_client
 block_cleaner
 world_builder
+world_builder_simple
+assembly_plan_visualizer
 DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
