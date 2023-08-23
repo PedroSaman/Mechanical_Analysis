@@ -3,18 +3,21 @@ controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
 
-    vp6242_arm_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
-
-    vp6242_hand_controller:
+    denso_vp6242_hand_controller:
       type: position_controllers/GripperActionController
+
+
+    denso_vp6242_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
 
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-vp6242_arm_controller:
+denso_vp6242_hand_controller:
+  ros__parameters:
+    joint: right_claw_joint
+denso_vp6242_arm_controller:
   ros__parameters:
     joints:
       - joint1
@@ -28,6 +31,3 @@ vp6242_arm_controller:
     state_interfaces:
       - position
       - velocity
-vp6242_hand_controller:
-  ros__parameters:
-    joint: right_claw_joint

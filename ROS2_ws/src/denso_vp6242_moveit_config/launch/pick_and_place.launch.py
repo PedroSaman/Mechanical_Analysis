@@ -20,7 +20,7 @@ def generate_launch_description():
     # planning_context
     moveit_config = (
         MoveItConfigsBuilder("denso_vp6242")
-        .robot_description(file_path="config/vp6242.urdf.xacro")
+        .robot_description(file_path="config/denso_vp6242.urdf.xacro")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
         .to_moveit_configs()
     )
@@ -98,8 +98,8 @@ def generate_launch_description():
     # Load controllers
     load_controllers = []
     for controller in [
-        "vp6242_arm_controller",
-        "vp6242_hand_controller",
+        "denso_vp6242_arm_controller",
+        "denso_vp6242_hand_controller",
         "joint_state_broadcaster",
     ]:
         load_controllers += [
