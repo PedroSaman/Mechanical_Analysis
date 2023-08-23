@@ -85,10 +85,12 @@ int main(int argc, char** argv)
     while(it != object_name_map.end())
     {
         std::string object_name = it->first;
-        if(object_name.length() > block_name_ref.length() && object_name != "dispenser")
+        if(object_name.length() >= block_name_ref.length())
         {
+          if (object_name.substr(0, 6) == block_name_ref.substr(0, 6)) {
             RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Removing object: %s", object_name.c_str());
             setup_builder->cleanBlocks(object_name);
+          }
         }
         it++;
     }
