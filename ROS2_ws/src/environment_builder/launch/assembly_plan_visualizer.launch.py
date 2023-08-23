@@ -23,27 +23,18 @@ def launch_setup(context, *args, **kwargs):
     test = LaunchConfiguration("csv_file_path")
     moveit_config = MoveItConfigsBuilder("denso_vp6242").to_dict()
 
-    # bag node
-    bag_node = Node(
-        package="manipulation_task_constructor",
-        executable="manipulation_task_constructor",
+    # MTC Demo node
+    pick_place_demo = Node(
+        package="environment_builder",
+        executable="assembly_plan_visualizer",
         output="screen",
         parameters=[
-            moveit_config,
             {"csv_file_path": test},
         ],
     )
 
-    # MTC Demo node
-    pick_place_demo = Node(
-        package="bag_recorder_nodes",
-        executable="simple_bag_recorder",
-        output="screen",
-    )
-
     nodes_to_start = [
         pick_place_demo,
-        bag_node,
     ]
 
     return nodes_to_start

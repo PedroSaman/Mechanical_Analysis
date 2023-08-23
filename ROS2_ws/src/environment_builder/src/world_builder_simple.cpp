@@ -8,8 +8,8 @@
 #include <moveit/robot_model/robot_model.h>
 #include <geometric_shapes/shape_operations.h>
 //std::list<std::string> Blocks_List = {"28","24","14","23","13","22","12","11"};
-//std::list<std::string> Blocks_List = {"82","42","41","32","31","22","21","11"};
-std::list<std::string> Blocks_List = {"22","21","11"};
+std::list<std::string> Blocks_List = {"82","42","41","32","31","22","21","11"};
+//std::list<std::string> Blocks_List = {"22","21","11"};
 std::list<size_t> Color_List = {WHITE,RED,ORANGE,YELLOW,GREEN,BLUE,BLACK,SUPPORT};
 #include <chrono>
 using namespace std::chrono_literals;
@@ -29,6 +29,8 @@ public:
   void setupDispenser2();
   void setupDispenser3();
   void setupDispenser4();
+  void setupDispenser();
+  void setupBloquer();
   void setupBar();
   void setupBlocks(std::list<std::string> List);
 
@@ -47,8 +49,108 @@ Setup_Builder::Setup_Builder(const rclcpp::NodeOptions& options)
 {
 }
 
+void Setup_Builder::setupDispenser()
+{
+  moveit_msgs::msg::CollisionObject object;
+  object.header.frame_id = "base";
+  object.id = "dispenser";
+  shape_msgs::msg::SolidPrimitive primitive;
+
+  // Define the size of the box in meters
+  primitive.type = primitive.BOX;
+  primitive.dimensions.resize(3);
+  primitive.dimensions[primitive.BOX_X] = dispenser_x_size;
+  primitive.dimensions[primitive.BOX_Y] = dispenser_y_size;
+  primitive.dimensions[primitive.BOX_Z] = dispenser_z_size;
+
+  // Define the pose of the box (relative to the frame_id)
+  geometry_msgs::msg::Pose pose;
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.position.x = 0.5 + base_x_size/2 + dispenser_x_size/2 + minimum_resolution;
+  pose.position.y = -base_y_size/2 + dispenser_y_size/2;
+  pose.position.z = dispenser_z_size/2 -base_z_size/2;
+
+  object.primitives.push_back(primitive);
+  object.primitive_poses.push_back(pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  std_msgs::msg::ColorRGBA color;
+  color.r = 16;
+  color.g = 16;
+  color.b = 0;
+  color.a = 1;
+
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(object, color);
+}
+
+void Setup_Builder::setupBloquer()
+{
+  moveit_msgs::msg::CollisionObject object;
+  object.header.frame_id = "dispenser";
+  object.id = "bloquer";
+  shape_msgs::msg::SolidPrimitive primitive;
+
+  // Define the size of the box in meters
+  primitive.type = primitive.BOX;
+  primitive.dimensions.resize(3);
+  primitive.dimensions[primitive.BOX_X] = 0.3;
+  primitive.dimensions[primitive.BOX_Y] = dispenser_y_size;
+  primitive.dimensions[primitive.BOX_Z] = 5;
+
+  // Define the pose of the box (relative to the frame_id)
+  geometry_msgs::msg::Pose pose;
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.position.x = 1 + dispenser_x_size/2;
+  pose.position.y = 0;
+  pose.position.z = 5/2 ;
+
+  object.primitives.push_back(primitive);
+  object.primitive_poses.push_back(pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  std_msgs::msg::ColorRGBA color;
+  color.r = 16;
+  color.g = 16;
+  color.b = 0;
+  color.a = 1;
+
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(object, color);
+}
+
 void Setup_Builder::setupBlocks(std::list<std::string> List)
 {
+  
+  std::list<std::string>::iterator it;
+  size_t iterator = 0;
+
+  for (it = List.begin(); it != List.end(); it++)
+  {
+    environment_interface::msg::Block block;
+    block.frame_id = "dispenser";
+    block.name = it->c_str();
+    block.x_size = std::stoi(it->c_str())/10;
+    block.y_size = std::stoi(it->c_str()) - block.x_size*10;
+    block.x = 0;
+    block.y = -dispenser_y_size/2 + block_size + 1*iterator;
+    block.z = dispenser_z_size/2 + block_size_z/2 + 5*minimum_resolution;
+    block.number = 0;
+    block.color.r = 0.7;
+    block.color.g = 0;
+    block.color.b = 1;
+    block.color.a = 1;
+    iterator = iterator + block.y_size/2 + 2*block_size;
+    setupBlock(block);
+  }
+  
+ /*
   environment_interface::msg::Block block;
   block.frame_id = "dispenser2by1";
   block.name = "21";
@@ -109,6 +211,7 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block3.color.b = 0;
   block3.color.a = 1;
   setupBlock(block3);
+*/
 }
 
 void Setup_Builder::setupBlock(environment_interface::msg::Block block)
@@ -154,7 +257,7 @@ void Setup_Builder::setupBase()
   pose.orientation.x = 0.0;
   pose.orientation.y = 0.0;
   pose.orientation.z = 0;
-  pose.position.x = -0.94;//measured in the real setup
+  pose.position.x = -2.94;//measured in the real setup
   pose.position.y = 6.26;//measured in the real setup
   pose.position.z = table_z_size/2 + base_z_size/2 + minimum_resolution;
 
@@ -407,12 +510,13 @@ int main(int argc, char** argv)
   setup_builder->setupTable();
   setup_builder->setupBase();
   setup_builder->setupBar();
-
-  setup_builder->setupDispenser1();
-  setup_builder->setupDispenser2();
-  setup_builder->setupDispenser3();
-  setup_builder->setupDispenser4();
+  setup_builder->setupDispenser();
+  //setup_builder->setupDispenser1();
+  //setup_builder->setupDispenser2();
+  //setup_builder->setupDispenser3();
+  //setup_builder->setupDispenser4();
   setup_builder->setupBlocks(Blocks_List);
+  setup_builder->setupBloquer();
   
   spin_thread->join();
   rclcpp::shutdown();

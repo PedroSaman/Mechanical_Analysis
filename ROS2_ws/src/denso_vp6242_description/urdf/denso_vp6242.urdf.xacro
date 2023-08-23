@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot name="vp6242" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="denso_vp6242" xmlns:xacro="http://www.ros.org/wiki/xacro">
 	<xacro:property name="scale_value" value="100.0"/>
 
 	<link name="world"/>
@@ -172,7 +172,7 @@
 		<parent link="link6"/>
 		<child link="tool0"/>
 		<origin rpy="0 0 0" xyz="0 0 0"/>
-	</joint>
+  	</joint>
 
 	<link name="robot_gripper_interface1">
 		<collision>
@@ -287,21 +287,28 @@
 	</joint>
 
 	<!--joint of gripper and claw-->
-	<joint name="right_claw_joint" type="fixed">
+	<joint name="right_claw_joint" type="prismatic">
 		<parent link="gripper_body"/>
 		<child link="right_claw"/>
-		<origin rpy="0 0 0" xyz="${scale_value*0.029625} 0 ${scale_value*0.084}"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="${scale_value*0.029625} 0 ${scale_value*0.084}"/>
+		<axis xyz="1.000000 0.000000 -0.000000"/>
+		<limit effort="${scale_value * 200000}" lower="-${scale_value * 0.0015000}" upper="0.0" velocity="0.1"/>
+		<dynamics damping="0" friction="0"/>
 	</joint>
 
-	<joint name="left_claw_joint" type="fixed">
+	<joint name="left_claw_joint" type="prismatic">
 		<parent link="gripper_body"/>
 		<child link="left_claw"/>
-		<origin rpy="0 0 0" xyz="${scale_value*(-0.029625)} 0 ${scale_value*0.084}"/>
+		<mimic joint="right_claw_joint" multiplier="-1.000000" offset="0.000000"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="${scale_value*(-0.029625)} 0 ${scale_value*0.084}"/>
+		<axis xyz="1.000000 0.000000 -0.000000"/>
+		<limit effort="${scale_value * 200000}" lower="0.0" upper="${scale_value * (0.00150000)}" velocity="0.1"/>
+		<dynamics damping="0" friction="0"/>
 	</joint>
 
 	<!--joint of gripper and peak tool-->
 	<joint name="peak_tool" type="fixed">
-		<origin rpy="0 .14159265359 0" xyz="0 0 ${scale_value*0.0976}"/>
+		<origin rpy="0 3.14159265359 0" xyz="0 0 ${scale_value*0.0976}"/>
 		<parent link="gripper_body"/>
 		<child link="peak_tool"/>
 	</joint>
