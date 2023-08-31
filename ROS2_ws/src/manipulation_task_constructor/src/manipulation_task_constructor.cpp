@@ -95,7 +95,7 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
     return;
   }
   
-  if (!task_.plan(1))
+  if(!task_.plan(10))
   {
     RCLCPP_ERROR_STREAM(LOGGER, "Task planning failed");
     sleep(1999);
@@ -134,15 +134,15 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
   target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
   target_pose_msg.pose.position.z = base_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE) + INSERT_DISTANCE;
-  /*
+  
   if((block.x_size == 2 && block.y_size == 1) || (block.x_size == 1 && block.y_size == 2)) // 2x1 blocks are in a diferent orientation in the parts feeder, so this is necessary to maintain the logic for other block types
   {
     int swap_aux = block.x_size;
     block.x_size = block.y_size;
     block.y_size = swap_aux;
   }
-  */
-  if(block.x_size > block.y_size) // If the assembly orientation is the same as the parts feeder, correct the tool orientation
+
+  if(block.x_size < block.y_size) // If the assembly orientation is the same as the parts feeder, correct the tool orientation
   {
     double cr = cos(0);
     double sr = sin(0);
@@ -199,7 +199,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       stage->properties().set("marker_ns", "approach_object");
       stage->properties().set("link", hand_frame);
       stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-      stage->setMinMaxDistance(0.01, 1);
+      stage->setMinMaxDistance(0, 0.01);
 
       // Set hand forward direction
       geometry_msgs::msg::Vector3Stamped vec;
@@ -216,7 +216,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       stage->properties().set("marker_ns", "grasp_pose");
       stage->setPreGraspPose("Open");
       stage->setObject(object_name);
-      stage->setAngleDelta(M_PI_2);
+      stage->setAngleDelta(M_PI / 12);
       stage->setMonitoredStage(current_state_ptr); // Hook into current state
 
       // This is the transform from the object frame to the end-effector frame
@@ -253,7 +253,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
     auto stage = std::make_unique<mtc::stages::MoveRelative>("lift object", cartesian_planner);
     // clang-format on
     stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
-    stage->setMinMaxDistance(0.1, 1);
+    stage->setMinMaxDistance(0.2, 0.3);
     stage->setIKFrame(hand_frame);
     stage->properties().set("marker_ns", "lift_object");
 
@@ -305,7 +305,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
           std::make_unique<mtc::stages::ComputeIK>("place pose IK", std::move(stage));
       // clang-format on
       wrapper->setMaxIKSolutions(10);
-      wrapper->setMinSolutionDistance(10.0);
+      wrapper->setMinSolutionDistance(1.0);
       wrapper->setIKFrame(grasp_frame_transform, hand_frame);
       wrapper->properties().configureInitFrom(mtc::Stage::PARENT, { "eef", "group" });
       wrapper->properties().configureInitFrom(mtc::Stage::INTERFACE, { "target_pose" });
@@ -376,7 +376,7 @@ mtc::Task MTCTaskNode::retreatTask(std::string robot_name)
   {
     auto stage = std::make_unique<mtc::stages::MoveRelative>("retreat", cartesian_planner);
     stage->properties().configureInitFrom(mtc::Stage::PARENT, {"group"});
-    stage->setMinMaxDistance(0.1, 1);
+    stage->setMinMaxDistance(0.2, 0.5);
     stage->setIKFrame(hand_frame);
     stage->properties().set("marker_ns", "retreat");
 
@@ -638,7 +638,7 @@ int main(int argc, char **argv)
     }
     block.number = i+1;
     
-    /*if((assembly_plan[i][4] == 2 && assembly_plan[i][5] == 1) || (assembly_plan[i][4] == 1 && assembly_plan[i][5] == 2)) //Special case for 2x1 block due its different positioning in the parts feeder
+    if((assembly_plan[i][4] == 2 && assembly_plan[i][5] == 1) || (assembly_plan[i][4] == 1 && assembly_plan[i][5] == 2)) //Special case for 2x1 block due its different positioning in the parts feeder
     {
       block.name = "21";
       block.x_size = 2;
@@ -653,8 +653,8 @@ int main(int argc, char **argv)
       block.name = std::to_string(assembly_plan[i][5]) + std::to_string(assembly_plan[i][4]);
       block.x_size = assembly_plan[i][5];
       block.y_size = assembly_plan[i][4];
-    }*/
-
+    }
+    /*
     if(assembly_plan[i][4] >= assembly_plan[i][5])
     {
       block.name = std::to_string(assembly_plan[i][4]) + std::to_string(assembly_plan[i][5]);
@@ -665,13 +665,11 @@ int main(int argc, char **argv)
       block.name = std::to_string(assembly_plan[i][5]) + std::to_string(assembly_plan[i][4]);
       block.x_size = assembly_plan[i][5];
       block.y_size = assembly_plan[i][4];
-    }
+    }*/
 
     replacement_block = mtc_task_node->request_block(block); //Refil the block in the feeder
     block.x_size = assembly_plan[i][4]; // Correct the sizes for the assembly
     block.y_size = assembly_plan[i][5];
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "x pos: %s", std::to_string(assembly_plan[i][1]).c_str());
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "y pos: %s", std::to_string(assembly_plan[i][2]).c_str());
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "x_size: %s", std::to_string(assembly_plan[i][4]).c_str());
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "y_size: %s", std::to_string(assembly_plan[i][5]).c_str());
     mtc_task_node->doTask(block,PICK_AND_PLACE,robot_name);

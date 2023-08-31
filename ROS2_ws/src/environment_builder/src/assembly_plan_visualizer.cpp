@@ -98,9 +98,9 @@ void APV_Node::request_block(environment_interface::msg::Block& block)
   block_pose.orientation.x = 0;
   block_pose.orientation.y = 0;
   block_pose.orientation.z = 0;
-  block_pose.position.x = -base_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
-  block_pose.position.y = -base_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
-  block_pose.position.z = base_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE);
+  block_pose.position.x = -table_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
+  block_pose.position.y = -table_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
+  block_pose.position.z = table_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE);
   
   block_object.primitives.push_back(primitive);
   block_object.primitive_poses.push_back(block_pose);
