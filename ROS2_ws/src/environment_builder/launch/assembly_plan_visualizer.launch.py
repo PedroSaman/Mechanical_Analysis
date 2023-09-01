@@ -20,21 +20,20 @@ def generate_launch_description():
     )
 
 def launch_setup(context, *args, **kwargs):
-    test = LaunchConfiguration("csv_file_path")
-    moveit_config = MoveItConfigsBuilder("denso_vp6242").to_dict()
+    csv_file_path = LaunchConfiguration("csv_file_path")
 
-    # MTC Demo node
-    pick_place_demo = Node(
+    # Visualization Node
+    assembly_plan_visualizer = Node(
         package="environment_builder",
         executable="assembly_plan_visualizer",
         output="screen",
         parameters=[
-            {"csv_file_path": test},
+            {"csv_file_path": csv_file_path},
         ],
     )
 
     nodes_to_start = [
-        pick_place_demo,
+        assembly_plan_visualizer,
     ]
 
     return nodes_to_start
