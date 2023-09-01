@@ -47,7 +47,8 @@
                 "/usr/include/**",
                 "${workspaceFolder}/build/environment_interface/rosidl_generator_cpp",
                 "${workspaceFolder}/install/environment_interface/include/environment_interface",
-                "/opt/ros/humble/include/control_msgs"
+                "/opt/ros/humble/include/control_msgs",
+                "${workspaceFolder}/install/environment_interface/include/environment_interface"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

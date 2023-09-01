@@ -35,7 +35,7 @@
     <group_state name="close_hand" group="cobotta_hand">
         <joint name="joint_gripper" value="0"/>
     </group_state>
-    <group_state name="open_hand" group="cobotta_hand">
+    <group_state name="Open" group="cobotta_hand">
         <joint name="joint_gripper" value="0.4"/>
     </group_state>
     <group_state name="grab_1" group="cobotta_hand">

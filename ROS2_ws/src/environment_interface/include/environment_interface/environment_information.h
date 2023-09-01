@@ -1,13 +1,16 @@
 //This value here, for the scale_value used in vp6242 urdf file, corresponds to cm
-#define block_size 0.3
+#define block_size 0.38
+#define block_size_z 0.3
 #define table_x_size 30.0
 #define table_y_size 60.0
 #define table_z_size 18.0
-#define base_x_size 7.92
-#define base_y_size 7.92
+#define base_x_number_of_blocks 20
+#define base_y_number_of_blocks 20
+#define base_x_size block_size*base_x_number_of_blocks
+#define base_y_size block_size*base_y_number_of_blocks
 #define base_z_size 0.3
-#define dispenser_x_size 2.4
-#define dispenser_y_size 12.0
+#define dispenser_x_size 9*block_size
+#define dispenser_y_size 20*block_size
 #define dispenser_z_size 0.2
 #define bar_x_size 3.0
 #define bar_y_size 62.1
@@ -24,5 +27,6 @@
 #define SUPPORT 7
 #define ONE_ROW 1
 #define TWO_ROW 0
-#define INSERT_DISTANCE 1.5
-#define CLAW_STOP_DISTANCE 6.15
+#define INSERT_DISTANCE 2*block_size
+#define GRASP_CLAW_STOP_DISTANCE -block_size
+#define BASE_CORRECTION_VALUE -1

@@ -28,6 +28,11 @@ public:
   void setupDispenser1();
   void setupDispenser2();
   void setupDispenser3();
+  void setupDispenser4();
+  void setupDispenser5();
+  void setupDispenser6();
+  void setupDispenser7();
+  void setupDispenser8();
   void setupBar();
   void setupBlocks(std::list<std::string> List);
 
@@ -48,42 +53,18 @@ Setup_Builder::Setup_Builder(const rclcpp::NodeOptions& options)
 
 void Setup_Builder::setupBlocks(std::list<std::string> List)
 {
-  /*
-  std::list<std::string>::iterator it;
-  size_t iterator = 0;
-
-  
-  for (it = List.begin(); it != List.end(); it++)
-  {
-    environment_interface::msg::Block block;
-    block.frame_id = "dispenser";
-    block.name = it->c_str();
-    block.x_size = std::stoi(it->c_str())/10;
-    block.y_size = std::stoi(it->c_str()) - block.x_size*10;
-    block.x = 1;
-    block.y = 1 + 1.5*iterator;
-    block.z = 0;
-    block.number = 0;
-    block.color.r = 0.7;
-    block.color.g = 0;
-    block.color.b = 1;
-    block.color.a = 1;
-    iterator = iterator + block.y_size + 1;
-    setupBlock(block);
-  }
-  */
   environment_interface::msg::Block block;
   block.frame_id = "dispenser2by1";
-  block.name = "12";
+  block.name = "21";
   block.x_size = 2;
   block.y_size = 1;
   block.x = 0.1 + block_size*block.x_size/2;
   block.y = 0;
   block.z = 0.51 + block_size/2;
   block.number = 0;
-  block.color.r = 0.7;
-  block.color.g = 0;
-  block.color.b = 1;
+  block.color.r = 0.5;
+  block.color.g = 0.5;
+  block.color.b = 0.5;
   block.color.a = 1;
   setupBlock(block);
 
@@ -97,9 +78,9 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block1.y = 0;
   block1.z = 0.51 + block_size/2;
   block1.number = 0;
-  block1.color.r = 0;
-  block1.color.g = 0.7;
-  block1.color.b = 1;
+  block1.color.r = 0.5;
+  block1.color.g = 0.5;
+  block1.color.b = 0.5;
   block1.color.a = 1;
   setupBlock(block1);
 
@@ -112,12 +93,86 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block2.y = 0.3;
   block2.z = 0.51 + block_size/2;
   block2.number = 0;
-  block2.color.r = 1;
-  block2.color.g = 0;
-  block2.color.b = 0.7;
+  block2.color.r = 0.5;
+  block2.color.g = 0.5;
+  block2.color.b = 0.5;
   block2.color.a = 1;
   setupBlock(block2);
 
+  environment_interface::msg::Block block3;
+  block3.frame_id = "dispenser8by2";
+  block3.name = "28";
+  block3.x_size = 2;
+  block3.y_size = 8;
+  block3.x = 0.52;
+  block3.y = 0;
+  block3.z = 0.2 + block_size/2;
+  block3.number = 0;
+  block3.color.r = 0.5;
+  block3.color.g = 0.5;
+  block3.color.b = 0.5;
+  block3.color.a = 1;
+  setupBlock(block3);
+
+  environment_interface::msg::Block block4;
+  block4.frame_id = "dispenser4by2";
+  block4.name = "24";
+  block4.x_size = 2;
+  block4.y_size = 4;
+  block4.x = 0.52;
+  block4.y = 0;
+  block4.z = 0.2 + block_size/2;
+  block4.number = 0;
+  block4.color.r = 0.5;
+  block4.color.g = 0.5;
+  block4.color.b = 0.5;
+  block4.color.a = 1;
+  setupBlock(block4);
+
+  environment_interface::msg::Block block5;
+  block5.frame_id = "dispenser4by1";
+  block5.name = "14";
+  block5.x_size = 1;
+  block5.y_size = 4;
+  block5.x = 0.52;
+  block5.y = 0;
+  block5.z = 0.2 + block_size/2;
+  block5.number = 0;
+  block5.color.r = 0.5;
+  block5.color.g = 0.5;
+  block5.color.b = 0.5;
+  block5.color.a = 1;
+  setupBlock(block5);
+
+  environment_interface::msg::Block block6;
+  block6.frame_id = "dispenser3by1";
+  block6.name = "13";
+  block6.x_size = 1;
+  block6.y_size = 3;
+  block6.x = 0.52;
+  block6.y = 0;
+  block6.z = 0.2 + block_size/2;
+  block6.number = 0;
+  block6.color.r = 0.5;
+  block6.color.g = 0.5;
+  block6.color.b = 0.5;
+  block6.color.a = 1;
+  setupBlock(block6);
+
+  environment_interface::msg::Block block7;
+  block7.frame_id = "dispenser3by2";
+  block7.name = "23";
+  block7.x_size = 2;
+  block7.y_size = 3;
+  block7.x = 0.52;
+  block7.y = 0;
+  block7.z = 0.2 + block_size/2;
+  block7.number = 0;
+  block7.color.r = 0.5;
+  block7.color.g = 0.5;
+  block7.color.b = 0.5;
+  block7.color.a = 1;
+  setupBlock(block7);
 }
 
 void Setup_Builder::setupBlock(environment_interface::msg::Block block)
@@ -163,8 +218,8 @@ void Setup_Builder::setupBase()
   pose.orientation.x = 0.0;
   pose.orientation.y = 0.0;
   pose.orientation.z = 0;
-  pose.position.x = -2.94;//measured in the real setup
-  pose.position.y = 6.26;//measured in the real setup
+  pose.position.x = -0.94;//measured in the real setup
+  pose.position.y = 0;//measured in the real setup
   pose.position.z = table_z_size/2 + base_z_size/2 + minimum_resolution;
 
   object.primitives.push_back(primitive);
@@ -235,7 +290,7 @@ void Setup_Builder::setupDispenser1()
   std_msgs::msg::ColorRGBA color;
   color.r = 1;
   color.g = 1;
-  color.b = 0;
+  color.b = 1;
   color.a = 1;
 
   /* A pose for the box (specified relative to frame_id) */
@@ -245,7 +300,7 @@ void Setup_Builder::setupDispenser1()
   shelf_pose.orientation.y = 0;
   shelf_pose.orientation.z = 0;
   shelf_pose.position.x = -4.2; //The parts feeder origin is not in its geometric center. I do not know why. Looked this using meshlab an selecting to draw axes in world coordinates.
-  shelf_pose.position.y = 1.5; //Measured from the setup
+  shelf_pose.position.y = 1.1; //Measured from the setup
   shelf_pose.position.z = bar_z_size/2 + minimum_resolution;
 
   collision_object2.meshes.push_back(shelf_mesh);
@@ -270,7 +325,7 @@ void Setup_Builder::setupDispenser2()
   shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
   std_msgs::msg::ColorRGBA color;
   color.r = 1;
-  color.g = 0;
+  color.g = 1;
   color.b = 1;
   color.a = 1;
 
@@ -303,7 +358,7 @@ void Setup_Builder::setupDispenser3()
   shapes::constructMsgFromShape(m,shelf_mesh_msg);
   shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
   std_msgs::msg::ColorRGBA color;
-  color.r = 0;
+  color.r = 1;
   color.g = 1;
   color.b = 1;
   color.a = 1;
@@ -316,6 +371,191 @@ void Setup_Builder::setupDispenser3()
   shelf_pose.orientation.z = 0;
   shelf_pose.position.x = 0.40; //In regard to the central 2x1 parts feeder
   shelf_pose.position.y = - 4.63 - minimum_resolution; //In regard to the central 2x1 parts feeder
+
+  collision_object2.meshes.push_back(shelf_mesh);
+  collision_object2.mesh_poses.push_back(shelf_pose);
+  collision_object2.operation = collision_object2.ADD;
+  // Add object to planning scene
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(collision_object2, color);
+}
+
+void Setup_Builder::setupDispenser4()
+{
+  moveit_msgs::msg::CollisionObject collision_object2;
+  collision_object2.header.frame_id = "world";
+  collision_object2.id = "dispenser8by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
+  shape_msgs::msg::Mesh shelf_mesh;
+  shapes::ShapeMsg shelf_mesh_msg;
+  shapes::constructMsgFromShape(m,shelf_mesh_msg);
+  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
+  std_msgs::msg::ColorRGBA color;
+  color.r = 1;
+  color.g = 1;
+  color.b = 1;
+  color.a = 1;
+
+  /* A pose for the box (specified relative to frame_id) */
+  geometry_msgs::msg::Pose shelf_pose;
+  shelf_pose.orientation.w = 1;
+  shelf_pose.orientation.x = 0;
+  shelf_pose.orientation.y = 0;
+  shelf_pose.orientation.z = 0;
+  //in regard to world
+  shelf_pose.position.x = 35.14;
+  shelf_pose.position.y = 11.79;
+  shelf_pose.position.z = 21.34;
+
+  collision_object2.meshes.push_back(shelf_mesh);
+  collision_object2.mesh_poses.push_back(shelf_pose);
+  collision_object2.operation = collision_object2.ADD;
+  // Add object to planning scene
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(collision_object2, color);
+}
+
+void Setup_Builder::setupDispenser5()
+{
+  moveit_msgs::msg::CollisionObject collision_object2;
+  collision_object2.header.frame_id = "world";
+  collision_object2.id = "dispenser3by1";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
+  shape_msgs::msg::Mesh shelf_mesh;
+  shapes::ShapeMsg shelf_mesh_msg;
+  shapes::constructMsgFromShape(m,shelf_mesh_msg);
+  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
+  std_msgs::msg::ColorRGBA color;
+  color.r = 1;
+  color.g = 1;
+  color.b = 1;
+  color.a = 1;
+
+  /* A pose for the box (specified relative to frame_id) */
+  geometry_msgs::msg::Pose shelf_pose;
+  shelf_pose.orientation.w = 1;
+  shelf_pose.orientation.x = 0;
+  shelf_pose.orientation.y = 0;
+  shelf_pose.orientation.z = 0;
+  //in regard to world
+  shelf_pose.position.x = 35.14;
+  shelf_pose.position.y = -12.15;
+  shelf_pose.position.z = 21.34;
+
+  collision_object2.meshes.push_back(shelf_mesh);
+  collision_object2.mesh_poses.push_back(shelf_pose);
+  collision_object2.operation = collision_object2.ADD;
+  // Add object to planning scene
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(collision_object2, color);
+}
+
+void Setup_Builder::setupDispenser6()
+{
+  moveit_msgs::msg::CollisionObject collision_object2;
+  collision_object2.header.frame_id = "world";
+  collision_object2.id = "dispenser3by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
+  shape_msgs::msg::Mesh shelf_mesh;
+  shapes::ShapeMsg shelf_mesh_msg;
+  shapes::constructMsgFromShape(m,shelf_mesh_msg);
+  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
+  std_msgs::msg::ColorRGBA color;
+  color.r = 1;
+  color.g = 1;
+  color.b = 1;
+  color.a = 1;
+
+  /* A pose for the box (specified relative to frame_id) */
+  geometry_msgs::msg::Pose shelf_pose;
+  shelf_pose.orientation.w = 1;
+  shelf_pose.orientation.x = 0;
+  shelf_pose.orientation.y = 0;
+  shelf_pose.orientation.z = 0;
+  //in regard to world
+  shelf_pose.position.x = 35.14;
+  shelf_pose.position.y = -8.49;
+  shelf_pose.position.z = 21.34;
+
+  collision_object2.meshes.push_back(shelf_mesh);
+  collision_object2.mesh_poses.push_back(shelf_pose);
+  collision_object2.operation = collision_object2.ADD;
+  // Add object to planning scene
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(collision_object2, color);
+}
+
+void Setup_Builder::setupDispenser7()
+{
+  moveit_msgs::msg::CollisionObject collision_object2;
+  collision_object2.header.frame_id = "world";
+  collision_object2.id = "dispenser4by1";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
+  shape_msgs::msg::Mesh shelf_mesh;
+  shapes::ShapeMsg shelf_mesh_msg;
+  shapes::constructMsgFromShape(m,shelf_mesh_msg);
+  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
+  std_msgs::msg::ColorRGBA color;
+  color.r = 1;
+  color.g = 1;
+  color.b = 1;
+  color.a = 1;
+
+  /* A pose for the box (specified relative to frame_id) */
+  geometry_msgs::msg::Pose shelf_pose;
+  shelf_pose.orientation.w = 1;
+  shelf_pose.orientation.x = 0;
+  shelf_pose.orientation.y = 0;
+  shelf_pose.orientation.z = 0;
+  //in regard to world
+  shelf_pose.position.x = 35.14;
+  shelf_pose.position.y = 19.11;
+  shelf_pose.position.z = 21.34;
+
+  collision_object2.meshes.push_back(shelf_mesh);
+  collision_object2.mesh_poses.push_back(shelf_pose);
+  collision_object2.operation = collision_object2.ADD;
+  // Add object to planning scene
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(collision_object2, color);
+}
+
+void Setup_Builder::setupDispenser8()
+{
+  moveit_msgs::msg::CollisionObject collision_object2;
+  collision_object2.header.frame_id = "world";
+  collision_object2.id = "dispenser4by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
+  shape_msgs::msg::Mesh shelf_mesh;
+  shapes::ShapeMsg shelf_mesh_msg;
+  shapes::constructMsgFromShape(m,shelf_mesh_msg);
+  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
+  std_msgs::msg::ColorRGBA color;
+  color.r = 1;
+  color.g = 1;
+  color.b = 1;
+  color.a = 1;
+
+  /* A pose for the box (specified relative to frame_id) */
+  geometry_msgs::msg::Pose shelf_pose;
+  shelf_pose.orientation.w = 1;
+  shelf_pose.orientation.x = 0;
+  shelf_pose.orientation.y = 0;
+  shelf_pose.orientation.z = 0;
+  //in regard to world
+  shelf_pose.position.x = 35.14;
+  shelf_pose.position.y = 15.42;
+  shelf_pose.position.z = 21.34;
 
   collision_object2.meshes.push_back(shelf_mesh);
   collision_object2.mesh_poses.push_back(shelf_pose);
@@ -381,9 +621,15 @@ int main(int argc, char** argv)
   setup_builder->setupTable();
   setup_builder->setupBase();
   setup_builder->setupBar();
+
   setup_builder->setupDispenser1();
   setup_builder->setupDispenser2();
   setup_builder->setupDispenser3();
+  setup_builder->setupDispenser4();
+  setup_builder->setupDispenser5();
+  setup_builder->setupDispenser6();
+  setup_builder->setupDispenser7();
+  setup_builder->setupDispenser8();
   setup_builder->setupBlocks(Blocks_List);
   
   spin_thread->join();
