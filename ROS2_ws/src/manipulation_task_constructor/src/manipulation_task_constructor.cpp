@@ -15,17 +15,6 @@
 #include <fstream>
 #include <iostream>
 
-#if __has_include(<tf2_geometry_msgs/tf2_geometry_msgs.hpp>)
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#else
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#endif
-#if __has_include(<tf2_eigen/tf2_eigen.hpp>)
-#include <tf2_eigen/tf2_eigen.hpp>
-#else
-#include <tf2_eigen/tf2_eigen.h>
-#endif
-
 using namespace std::chrono_literals;
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("manipulation_task_constructor");
@@ -43,6 +32,7 @@ public:
   std::tuple<std::vector<std::vector<int>>, std::string> input_arguments_setup();
   void remove_old_block(std::string object_name);
   void refil_block(moveit_msgs::msg::CollisionObject object);
+  void append_block(environment_interface::msg::Block block);
   void correct_color(environment_interface::msg::Block block);
 private:
   // Compose an MTC task from a series of stages.
@@ -66,6 +56,8 @@ MTCTaskNode::MTCTaskNode(const rclcpp::NodeOptions &options)
 
 void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATION, std::string robot_name)
 {
+  task_.clear();
+  task_.reset();
   switch (OPERATION)
   {
   case PICK_AND_PLACE:
@@ -114,7 +106,6 @@ void MTCTaskNode::doTask(environment_interface::msg::Block block, size_t OPERATI
 mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block block, std::string robot_name)
 {
   mtc::Task task;
-
   const auto& arm_group_name = robot_name + "_arm";
   const auto& hand_group_name = robot_name + "_hand";
   const auto& end_effector_name = "gripper";
@@ -161,6 +152,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   current_state_ptr = stage_state_current.get();
   task.add(std::move(stage_state_current));
 
+  //auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
   auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_);
   auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
 
@@ -605,6 +597,28 @@ void MTCTaskNode::refil_block(moveit_msgs::msg::CollisionObject refil_object)
   return;
 }
 
+void MTCTaskNode::append_block(environment_interface::msg::Block block)
+//does not work as intended.
+{ 
+  moveit::planning_interface::PlanningSceneInterface psi;
+  std::vector<std::string> object_name = {block.name,"/0"};
+  moveit_msgs::msg::CollisionObject original_block;
+  moveit_msgs::msg::CollisionObject appended_block;
+  std::map<std::string, moveit_msgs::msg::CollisionObject> original_block_msg;
+  original_block_msg = psi.getObjects(object_name);
+  original_block = original_block_msg.begin()->second;
+  appended_block = original_block;
+  //appended_block.header.frame_id = "base";
+  appended_block.operation = appended_block.APPEND;
+  original_block.operation = original_block.REMOVE;
+  moveit_msgs::msg::AttachedCollisionObject a;
+  a.object = original_block;
+  a.link_name = "base";
+  //psi.applyCollisionObject(appended_block);
+  psi.applyAttachedCollisionObject(a);
+  //psi.applyCollisionObject(original_block);
+}
+
 int main(int argc, char **argv)
 {
   auto start = std::chrono::high_resolution_clock::now();
@@ -670,14 +684,16 @@ int main(int argc, char **argv)
     replacement_block = mtc_task_node->request_block(block); //Refil the block in the feeder
     block.x_size = assembly_plan[i][4]; // Correct the sizes for the assembly
     block.y_size = assembly_plan[i][5];
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "x_size: %s", std::to_string(assembly_plan[i][4]).c_str());
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "y_size: %s", std::to_string(assembly_plan[i][5]).c_str());
+    //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "x_size: %s", std::to_string(assembly_plan[i][4]).c_str());
+    //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "y_size: %s", std::to_string(assembly_plan[i][5]).c_str());
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Block Name: %s", block.name.c_str());
     mtc_task_node->doTask(block,PICK_AND_PLACE,robot_name);
 
     mtc_task_node->refil_block(replacement_block);
     mtc_task_node->correct_color(block);
 
     mtc_task_node->doTask(block,RETREAT,robot_name);
+    //mtc_task_node->append_block(block);
   }
 
   environment_interface::msg::Block block;

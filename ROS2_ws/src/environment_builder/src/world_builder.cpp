@@ -7,12 +7,13 @@
 #include "environment_information.h"
 #include <moveit/robot_model/robot_model.h>
 #include <geometric_shapes/shape_operations.h>
+#include <chrono>
 //std::list<std::string> Blocks_List = {"28","24","14","23","13","22","12","11"};
 //std::list<std::string> Blocks_List = {"82","42","41","32","31","22","21","11"};
-std::list<std::string> Blocks_List = {"22","21","11"};
-std::list<size_t> Color_List = {WHITE,RED,ORANGE,YELLOW,GREEN,BLUE,BLACK,SUPPORT};
-#include <chrono>
+//std::list<std::string> Blocks_List = {"22","21","11"};
+//std::list<size_t> Color_List = {WHITE,RED,ORANGE,YELLOW,GREEN,BLUE,BLACK,SUPPORT};
 using namespace std::chrono_literals;
+using namespace moveit_msgs::msg;
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("world_builder");
 
@@ -23,21 +24,22 @@ public:
 
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr getNodeBaseInterface();
 
-  void setupTable();
-  void setupBase();
-  void setupDispenser1();
-  void setupDispenser2();
-  void setupDispenser3();
-  void setupDispenser4();
-  void setupDispenser5();
-  void setupDispenser6();
-  void setupDispenser7();
-  void setupDispenser8();
-  void setupBar();
-  void setupBlocks(std::list<std::string> List);
+  void setupWorld();
+  void setupBlocks();//std::list<std::string> List);
 
 private:
   rclcpp::Node::SharedPtr node_;
+  std::pair<CollisionObject, ObjectColor> setupTable();
+  std::pair<CollisionObject, ObjectColor> setupBase();
+  std::pair<CollisionObject, ObjectColor> setupBar();
+  std::pair<CollisionObject, ObjectColor> setupDispenser1();
+  std::pair<CollisionObject, ObjectColor> setupDispenser2();
+  std::pair<CollisionObject, ObjectColor> setupDispenser3();
+  std::pair<CollisionObject, ObjectColor> setupDispenser4();
+  std::pair<CollisionObject, ObjectColor> setupDispenser5();
+  std::pair<CollisionObject, ObjectColor> setupDispenser6();
+  std::pair<CollisionObject, ObjectColor> setupDispenser7();
+  std::pair<CollisionObject, ObjectColor> setupDispenser8();
   void setupBlock(environment_interface::msg::Block block);
 };
 
@@ -51,7 +53,439 @@ Setup_Builder::Setup_Builder(const rclcpp::NodeOptions& options)
 {
 }
 
-void Setup_Builder::setupBlocks(std::list<std::string> List)
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupTable()
+{
+  CollisionObject object;
+  object.header.frame_id = "world";
+  object.id = "table";
+  shape_msgs::msg::SolidPrimitive primitive;
+
+  // Define the size of the box in meters
+  primitive.type = primitive.BOX;
+  primitive.dimensions.resize(3);
+  primitive.dimensions[primitive.BOX_X] = table_x_size;
+  primitive.dimensions[primitive.BOX_Y] = table_y_size;
+  primitive.dimensions[primitive.BOX_Z] = table_z_size;
+
+  // Define the pose of the box (relative to the frame_id)
+  geometry_msgs::msg::Pose pose;
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.position.x = table_x_position;
+  pose.position.y = 0.0;
+  pose.position.z = table_z_size/2;
+
+  object.primitives.push_back(primitive);
+  object.primitive_poses.push_back(pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 0.5;
+  rgba_color.g = 0.5;
+  rgba_color.b = 0.5;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object, object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupBase()
+{
+  CollisionObject object;
+  object.header.frame_id = "table";
+  object.id = "base";
+  shape_msgs::msg::SolidPrimitive primitive;
+
+  // Define the size of the box in meters
+  primitive.type = primitive.BOX;
+  primitive.dimensions.resize(3);
+  primitive.dimensions[primitive.BOX_X] = base_x_size;
+  primitive.dimensions[primitive.BOX_Y] = base_y_size;
+  primitive.dimensions[primitive.BOX_Z] = base_z_size;
+
+  // Define the pose of the box (relative to the frame_id)
+  geometry_msgs::msg::Pose pose;
+  pose.orientation.x = 0.0;
+  pose.orientation.y = 0.0;
+  pose.orientation.z = 0;
+  pose.position.x = -0.94;//measured in the real setup
+  pose.position.y = 0;//measured in the real setup
+  pose.position.z = table_z_size/2 + base_z_size/2 + minimum_resolution;
+
+  object.primitives.push_back(primitive);
+  object.primitive_poses.push_back(pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 0.85;
+  rgba_color.g = 0.85;
+  rgba_color.b = 0.85;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupBar()
+{
+  CollisionObject object;
+  object.header.frame_id = "table";
+  object.id = "bar";
+  shape_msgs::msg::SolidPrimitive primitive;
+
+  // Define the size of the box in meters
+  primitive.type = primitive.BOX;
+  primitive.dimensions.resize(3);
+  primitive.dimensions[primitive.BOX_X] = bar_x_size;
+  primitive.dimensions[primitive.BOX_Y] = bar_y_size;
+  primitive.dimensions[primitive.BOX_Z] = bar_z_size;
+
+  // Define the pose of the box (relative to the frame_id)
+  geometry_msgs::msg::Pose pose;
+  pose.orientation.x = 0.0;
+  pose.orientation.y = 0.0;
+  pose.orientation.z = 0;
+  pose.position.x = table_x_size/2 - bar_x_size/2 + 0.2;//measured in the real setup
+  pose.position.y = -0.5;//measured in the real setup
+  pose.position.z = table_z_size/2 + bar_z_size/2 + minimum_resolution;
+
+  object.primitives.push_back(primitive);
+  object.primitive_poses.push_back(pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 0;
+  rgba_color.g = 0;
+  rgba_color.b = 0;
+  rgba_color.a = 0;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser1()
+{
+  CollisionObject object;
+  object.header.frame_id = "bar";
+  object.id = "dispenser2by1";
+  Eigen::Vector3d scale(100,100,100);
+
+  // Create the object from the mesh file
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/2x1_lanes_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  object_pose.position.x = -4.2; //The parts feeder origin is not in its geometric center. I do not know why. Looked this using meshlab an selecting to draw axes in world coordinates.
+  object_pose.position.y = 1.1; //Measured from the setup
+  object_pose.position.z = bar_z_size/2 + minimum_resolution;
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser2()
+{
+  CollisionObject object;
+  object.header.frame_id = "dispenser2by1";
+  object.id = "dispenser2by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/2x2_lanes_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  object_pose.position.y = 5.72 + minimum_resolution; //In regard to the central 2x1 parts feeder
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser3()
+{
+  CollisionObject object;
+  object.header.frame_id = "dispenser2by1";
+  object.id = "dispenser1by1";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/1x1_lanes_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  object_pose.position.x = 0.40; //In regard to the central 2x1 parts feeder
+  object_pose.position.y = - 4.63 - minimum_resolution; //In regard to the central 2x1 parts feeder
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser4()
+{
+  CollisionObject object;
+  object.header.frame_id = "world";
+  object.id = "dispenser8by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lane_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  //in regard to world
+  object_pose.position.x = 35.14;
+  object_pose.position.y = 11.79;
+  object_pose.position.z = 21.34;
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser5()
+{
+  CollisionObject object;
+  object.header.frame_id = "world";
+  object.id = "dispenser3by1";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/3x2_lane_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  //in regard to world
+  object_pose.position.x = 35.14;
+  object_pose.position.y = -9.04;
+  object_pose.position.z = 21.34;
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser6()
+{
+  CollisionObject object;
+  object.header.frame_id = "world";
+  object.id = "dispenser3by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/3x2_lane_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  //in regard to world
+  object_pose.position.x = 35.14;
+  object_pose.position.y = -7.38;
+  object_pose.position.z = 21.34;
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser7()
+{
+  CollisionObject object;
+  object.header.frame_id = "world";
+  object.id = "dispenser4by1";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/4x2_lane_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  //in regard to world
+  object_pose.position.x = 35.14;
+  object_pose.position.y = 16.60;
+  object_pose.position.z = 21.34;
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser8()
+{
+  CollisionObject object;
+  object.header.frame_id = "world";
+  object.id = "dispenser4by2";
+  Eigen::Vector3d scale(100,100,100);
+
+  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/4x2_lane_base.dae", scale);
+  shape_msgs::msg::Mesh object_mesh;
+  shapes::ShapeMsg object_mesh_msg;
+  shapes::constructMsgFromShape(m,object_mesh_msg);
+  object_mesh = boost::get<shape_msgs::msg::Mesh>(object_mesh_msg);
+
+  // The pose for the object relative to frame_id
+  geometry_msgs::msg::Pose object_pose;
+  object_pose.orientation.w = 1;
+  object_pose.orientation.x = 0;
+  object_pose.orientation.y = 0;
+  object_pose.orientation.z = 0;
+  //in regard to world
+  object_pose.position.x = 35.14;
+  object_pose.position.y = 14.60;
+  object_pose.position.z = 21.34;
+
+  object.meshes.push_back(object_mesh);
+  object.mesh_poses.push_back(object_pose);
+  object.operation = object.ADD;
+
+  // Add color to the object
+  ObjectColor object_color;
+  std_msgs::msg::ColorRGBA rgba_color;
+  rgba_color.r = 1;
+  rgba_color.g = 1;
+  rgba_color.b = 1;
+  rgba_color.a = 1;
+  object_color.color = rgba_color;
+
+  return std::make_pair(object,object_color);
+}
+
+void Setup_Builder::setupBlocks()//std::list<std::string> List)
 {
   environment_interface::msg::Block block;
   block.frame_id = "dispenser2by1";
@@ -199,408 +633,60 @@ void Setup_Builder::setupBlock(environment_interface::msg::Block block)
   }
 }
 
-void Setup_Builder::setupBase()
+void Setup_Builder::setupWorld()
 {
-  moveit_msgs::msg::CollisionObject object;
-  object.header.frame_id = "table";
-  object.id = "base";
-  shape_msgs::msg::SolidPrimitive primitive;
+  std::vector<CollisionObject> collision_objects;
+  std::vector<ObjectColor> object_colors;
+  std::pair<CollisionObject, ObjectColor> object;
 
-  // Define the size of the box in meters
-  primitive.type = primitive.BOX;
-  primitive.dimensions.resize(3);
-  primitive.dimensions[primitive.BOX_X] = base_x_size;
-  primitive.dimensions[primitive.BOX_Y] = base_y_size;
-  primitive.dimensions[primitive.BOX_Z] = base_z_size;
+  object = setupTable();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
 
-  // Define the pose of the box (relative to the frame_id)
-  geometry_msgs::msg::Pose pose;
-  pose.orientation.x = 0.0;
-  pose.orientation.y = 0.0;
-  pose.orientation.z = 0;
-  pose.position.x = -0.94;//measured in the real setup
-  pose.position.y = 0;//measured in the real setup
-  pose.position.z = table_z_size/2 + base_z_size/2 + minimum_resolution;
+  object = setupBase();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
 
-  object.primitives.push_back(primitive);
-  object.primitive_poses.push_back(pose);
-  object.operation = object.ADD;
+  object = setupBar();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
 
-  // Add color to the object
-  std_msgs::msg::ColorRGBA color;
-  color.r = 0.85;
-  color.g = 0.85;
-  color.b = 0.85;
-  color.a = 1;
+  object = setupDispenser1();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser2();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser3();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser4();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser5();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser6();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser7();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
+
+  object = setupDispenser8();
+  collision_objects.insert(collision_objects.end(),object.first);
+  object_colors.insert(object_colors.end(),object.second);
 
   moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(object, color);
-}
+  psi.applyCollisionObjects(collision_objects,object_colors);
 
-void Setup_Builder::setupBar()
-{
-  moveit_msgs::msg::CollisionObject object;
-  object.header.frame_id = "table";
-  object.id = "bar";
-  shape_msgs::msg::SolidPrimitive primitive;
-
-  // Define the size of the box in meters
-  primitive.type = primitive.BOX;
-  primitive.dimensions.resize(3);
-  primitive.dimensions[primitive.BOX_X] = bar_x_size;
-  primitive.dimensions[primitive.BOX_Y] = bar_y_size;
-  primitive.dimensions[primitive.BOX_Z] = bar_z_size;
-
-  // Define the pose of the box (relative to the frame_id)
-  geometry_msgs::msg::Pose pose;
-  pose.orientation.x = 0.0;
-  pose.orientation.y = 0.0;
-  pose.orientation.z = 0;
-  pose.position.x = table_x_size/2 - bar_x_size/2 + 0.2;//measured in the real setup
-  pose.position.y = -0.5;//measured in the real setup
-  pose.position.z = table_z_size/2 + bar_z_size/2 + minimum_resolution;
-
-  object.primitives.push_back(primitive);
-  object.primitive_poses.push_back(pose);
-  object.operation = object.ADD;
-
-  // Add color to the object
-  std_msgs::msg::ColorRGBA color;
-  color.r = 0;
-  color.g = 0;
-  color.b = 0;
-  color.a = 0;
-
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(object, color);
-}
-
-void Setup_Builder::setupDispenser1()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "bar";
-  collision_object2.id = "dispenser2by1";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/2x1_lanes_base.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  shelf_pose.position.x = -4.2; //The parts feeder origin is not in its geometric center. I do not know why. Looked this using meshlab an selecting to draw axes in world coordinates.
-  shelf_pose.position.y = 1.1; //Measured from the setup
-  shelf_pose.position.z = bar_z_size/2 + minimum_resolution;
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser2()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "dispenser2by1";
-  collision_object2.id = "dispenser2by2";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/2x2_lanes_base.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  shelf_pose.position.y = 5.72 + minimum_resolution; //In regard to the central 2x1 parts feeder
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser3()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "dispenser2by1";
-  collision_object2.id = "dispenser1by1";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/1x1_lanes_base.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  shelf_pose.position.x = 0.40; //In regard to the central 2x1 parts feeder
-  shelf_pose.position.y = - 4.63 - minimum_resolution; //In regard to the central 2x1 parts feeder
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser4()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "world";
-  collision_object2.id = "dispenser8by2";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  //in regard to world
-  shelf_pose.position.x = 35.14;
-  shelf_pose.position.y = 11.79;
-  shelf_pose.position.z = 21.34;
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser5()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "world";
-  collision_object2.id = "dispenser3by1";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  //in regard to world
-  shelf_pose.position.x = 35.14;
-  shelf_pose.position.y = -12.15;
-  shelf_pose.position.z = 21.34;
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser6()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "world";
-  collision_object2.id = "dispenser3by2";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  //in regard to world
-  shelf_pose.position.x = 35.14;
-  shelf_pose.position.y = -8.49;
-  shelf_pose.position.z = 21.34;
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser7()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "world";
-  collision_object2.id = "dispenser4by1";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  //in regard to world
-  shelf_pose.position.x = 35.14;
-  shelf_pose.position.y = 19.11;
-  shelf_pose.position.z = 21.34;
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupDispenser8()
-{
-  moveit_msgs::msg::CollisionObject collision_object2;
-  collision_object2.header.frame_id = "world";
-  collision_object2.id = "dispenser4by2";
-  Eigen::Vector3d scale(100,100,100);
-
-  shapes::Mesh * m = shapes::createMeshFromResource("package://environment_builder/meshes/8x2_lanes_base_test.dae", scale);
-  shape_msgs::msg::Mesh shelf_mesh;
-  shapes::ShapeMsg shelf_mesh_msg;
-  shapes::constructMsgFromShape(m,shelf_mesh_msg);
-  shelf_mesh = boost::get<shape_msgs::msg::Mesh>(shelf_mesh_msg);
-  std_msgs::msg::ColorRGBA color;
-  color.r = 1;
-  color.g = 1;
-  color.b = 1;
-  color.a = 1;
-
-  /* A pose for the box (specified relative to frame_id) */
-  geometry_msgs::msg::Pose shelf_pose;
-  shelf_pose.orientation.w = 1;
-  shelf_pose.orientation.x = 0;
-  shelf_pose.orientation.y = 0;
-  shelf_pose.orientation.z = 0;
-  //in regard to world
-  shelf_pose.position.x = 35.14;
-  shelf_pose.position.y = 15.42;
-  shelf_pose.position.z = 21.34;
-
-  collision_object2.meshes.push_back(shelf_mesh);
-  collision_object2.mesh_poses.push_back(shelf_pose);
-  collision_object2.operation = collision_object2.ADD;
-  // Add object to planning scene
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(collision_object2, color);
-}
-
-void Setup_Builder::setupTable()
-{
-  moveit_msgs::msg::CollisionObject object;
-  object.header.frame_id = "world";
-  object.id = "table";
-  shape_msgs::msg::SolidPrimitive primitive;
-
-  // Define the size of the box in meters
-  primitive.type = primitive.BOX;
-  primitive.dimensions.resize(3);
-  primitive.dimensions[primitive.BOX_X] = table_x_size;
-  primitive.dimensions[primitive.BOX_Y] = table_y_size;
-  primitive.dimensions[primitive.BOX_Z] = table_z_size;
-
-  // Define the pose of the box (relative to the frame_id)
-  geometry_msgs::msg::Pose pose;
-  pose.orientation.x = 0;
-  pose.orientation.y = 0;
-  pose.orientation.z = 0;
-  pose.position.x = table_x_position;
-  pose.position.y = 0.0;
-  pose.position.z = table_z_size/2;
-
-  object.primitives.push_back(primitive);
-  object.primitive_poses.push_back(pose);
-  object.operation = object.ADD;
-
-  // Add color to the object
-  std_msgs::msg::ColorRGBA color;
-  color.r = 0.5;
-  color.g = 0.5;
-  color.b = 0.5;
-  color.a = 1;
-
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(object, color);
+  return;
 }
 
 int main(int argc, char** argv)
@@ -617,20 +703,9 @@ int main(int argc, char** argv)
     executor.add_node(setup_builder->getNodeBaseInterface());
     executor.remove_node(setup_builder->getNodeBaseInterface());
   });
-
-  setup_builder->setupTable();
-  setup_builder->setupBase();
-  setup_builder->setupBar();
-
-  setup_builder->setupDispenser1();
-  setup_builder->setupDispenser2();
-  setup_builder->setupDispenser3();
-  setup_builder->setupDispenser4();
-  setup_builder->setupDispenser5();
-  setup_builder->setupDispenser6();
-  setup_builder->setupDispenser7();
-  setup_builder->setupDispenser8();
-  setup_builder->setupBlocks(Blocks_List);
+  
+  setup_builder->setupWorld();
+  setup_builder->setupBlocks();//Blocks_List);
   
   spin_thread->join();
   rclcpp::shutdown();
