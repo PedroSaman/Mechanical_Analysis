@@ -5,6 +5,7 @@
 #include <std_msgs/msg/color_rgba.hpp>
 #include "environment_interface/srv/block_create.hpp"
 #include "environment_interface/srv/block_remove.hpp"
+#include "environment_interface/srv/block_remove_all.hpp"
 #include "environment_interface/srv/get_block_color.hpp"
 #include "environment_interface/msg/block.hpp"
 #include "environment_information.h"
@@ -99,7 +100,21 @@ void remove_block(const std::shared_ptr<environment_interface::srv::BlockRemove:
   psi.applyCollisionObject(block_object);
   
   response->output = request->block.number;
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming remove block request \n\n\nBlock name: %s" , request->block.name.c_str()); 
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming remove block request \nBlock name: %s" , request->block.name.c_str()); 
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response: removed block");
+}
+
+void remove_block_all(const std::shared_ptr<environment_interface::srv::BlockRemoveAll::Request> request,
+          std::shared_ptr<environment_interface::srv::BlockRemoveAll::Response>       response)
+{
+  std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
+  collision_objects = request->blocks;
+  
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObjects(collision_objects);
+  
+  response->output = 1;
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming remove all block request"); 
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response: removed block");
 }
 
@@ -152,6 +167,9 @@ int main(int argc, char **argv)
   
   rclcpp::Service<environment_interface::srv::BlockRemove>::SharedPtr remove_service =
     node->create_service<environment_interface::srv::BlockRemove>("remove_block_service",  &remove_block);
+
+  rclcpp::Service<environment_interface::srv::BlockRemoveAll>::SharedPtr remove_all_service =
+    node->create_service<environment_interface::srv::BlockRemoveAll>("remove_all_blocks_service",  &remove_block_all);
 
   rclcpp::Service<environment_interface::srv::GetBlockColor>::SharedPtr get_color_service =
     node->create_service<environment_interface::srv::GetBlockColor>("get_block_color_service",  &get_color);
