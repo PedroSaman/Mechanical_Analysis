@@ -3,7 +3,7 @@ moveit_setup_assistant_config:
     package: denso_cobotta_description
     relative_path: urdf/cobotta.urdf
   srdf:
-    relative_path: config/cobotta.srdf
+    relative_path: config/denso_cobotta.srdf
   package_settings:
     author_name: pedro
     author_email: pedro@pedro.com

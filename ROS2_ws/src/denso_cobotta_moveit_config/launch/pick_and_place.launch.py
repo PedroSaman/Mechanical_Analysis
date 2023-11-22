@@ -20,8 +20,15 @@ def generate_launch_description():
     # planning_context
     moveit_config = (
         MoveItConfigsBuilder("denso_cobotta")
-        .robot_description(file_path="config/cobotta.urdf.xacro")
+        .robot_description(file_path="config/denso_cobotta.urdf.xacro")
+        .robot_description_semantic(file_path="config/denso_cobotta.srdf")
+        .planning_scene_monitor(
+            publish_robot_description=True, publish_robot_description_semantic=True
+        )
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
+        .planning_pipelines(
+            pipelines=["ompl", "pilz_industrial_motion_planner", "stomp"]
+        )
         .to_moveit_configs()
     )
 
@@ -63,7 +70,7 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
+        arguments=["--frame-id", "world", "--child-frame-id", "base_link"],
     )
 
     # Publish TF
@@ -98,8 +105,8 @@ def generate_launch_description():
     # Load controllers
     load_controllers = []
     for controller in [
-        "cobotta_arm_controller",
-        "cobotta_hand_controller",
+        "denso_cobotta_arm_controller",
+        "denso_cobotta_hand_controller",
         "joint_state_broadcaster",
     ]:
         load_controllers += [

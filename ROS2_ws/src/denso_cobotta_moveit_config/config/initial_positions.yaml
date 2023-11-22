@@ -1,4 +1,4 @@
-# Default initial positions for cobotta's ros2_control fake system
+# Default initial positions for denso_cobotta's ros2_control fake system
 
 initial_positions:
   joint_1: 1.5708
