@@ -164,7 +164,7 @@ std::pair<CollisionObject, ObjectColor> Setup_Builder::setupBar()
   rgba_color.r = 0;
   rgba_color.g = 0;
   rgba_color.b = 0;
-  rgba_color.a = 0;
+  rgba_color.a = 1;
   object_color.color = rgba_color;
 
   return std::make_pair(object,object_color);

@@ -25,8 +25,9 @@
 #define BLUE 5
 #define BLACK 6
 #define SUPPORT 7
+#define GRAY 8
 #define ONE_ROW 1
 #define TWO_ROW 0
-#define INSERT_DISTANCE 2*block_size
-#define GRASP_CLAW_STOP_DISTANCE -block_size
+#define INSERT_DISTANCE 10*block_size
+#define GRASP_CLAW_STOP_DISTANCE block_size
 #define BASE_CORRECTION_VALUE -1
