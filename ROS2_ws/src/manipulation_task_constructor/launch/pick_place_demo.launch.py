@@ -11,14 +11,21 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "csv_file_path",
             default_value="no_csv_provided",
-            description="Provides the assembly plan csv file path and name",
+            description="Provides the assembly plan csv file path and name.",
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             "robot_name",
             default_value="denso_vp6242",
-            description="Determine the robot name for the MTC correct functioning",
+            description="Determine the robot name for the MTC correct functioning.",
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "first_block",
+            default_value="1",
+            description="From what block should the planner start. Uses 'normal' notation, the first block is 1.",
         )
     )
 
@@ -30,16 +37,18 @@ def launch_setup(context, *args, **kwargs):
     csv_file_path = LaunchConfiguration("csv_file_path")
     robot_name = context.perform_substitution(LaunchConfiguration('robot_name'))
     moveit_config = MoveItConfigsBuilder(robot_name).to_dict()
+    first_block = LaunchConfiguration("first_block")
 
     # MTC Demo node
     pick_place_demo = Node(
         package="manipulation_task_constructor",
-        executable="manipulation_task_constructor",
+        executable="new_manipulation_task_constructor",
         output="screen",
         parameters=[
             moveit_config,
             {"csv_file_path": csv_file_path},
             {"robot_name": robot_name},
+            {"first_block": first_block},
         ],
     )
 
@@ -52,7 +61,7 @@ def launch_setup(context, *args, **kwargs):
 
     nodes_to_start = [
         pick_place_demo,
-        #bag_node,
+        bag_node,
     ]
 
     return nodes_to_start
