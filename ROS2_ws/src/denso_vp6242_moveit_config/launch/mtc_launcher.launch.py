@@ -3,11 +3,30 @@ from launch import LaunchDescription
 from launch.actions import ExecuteProcess, DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 
+
 def generate_launch_description():
-    
+
+    # Command-line arguments
+    rviz_config_arg = DeclareLaunchArgument(
+        "rviz_config",
+        default_value="moveit.rviz",
+        description="RViz configuration file",
+    )
+
+    db_arg = DeclareLaunchArgument(
+        "db", default_value="False", description="Database flag"
+    )
+
+    ros2_control_hardware_type = DeclareLaunchArgument(
+        "ros2_control_hardware_type",
+        default_value="mock_components",
+        description="ROS 2 control hardware interface type to use for the launch file -- possible values: [mock_components, isaac]",
+    )
+
     # planning_context
     moveit_config = (
         MoveItConfigsBuilder("denso_vp6242")
@@ -16,20 +35,15 @@ def generate_launch_description():
         .planning_scene_monitor(
             publish_robot_description=True, publish_robot_description_semantic=True
         )
-        .trajectory_execution(file_path="config/moveit_controllers.yaml")
+        .trajectory_execution(file_path="config/gripper_moveit_controllers.yaml")
         .planning_pipelines(
-            pipelines=["ompl", "pilz_industrial_motion_planner", "stomp"]
+            pipelines=["ompl", "chomp", "pilz_industrial_motion_planner", "stomp"]
         )
         .to_moveit_configs()
     )
 
-    # Load  ExecuteTaskSolutionCapability so we can execute found solutions in simulation
-    move_group_capabilities = {
-        "capabilities": "move_group/ExecuteTaskSolutionCapability"
-    }
-
     # Start the actual move_group node/action server
-    run_move_group_node = Node(
+    move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
@@ -38,18 +52,22 @@ def generate_launch_description():
     )
 
     # RViz
-    rviz_config_file = (
-        get_package_share_directory("denso_vp6242_moveit_config") + "/launch/moveit.rviz"
+    rviz_base = LaunchConfiguration("rviz_config")
+    rviz_config = PathJoinSubstitution(
+        [FindPackageShare("denso_vp6242_moveit_config"), "launch", rviz_base]
     )
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
         output="log",
-        arguments=["-d", rviz_config_file],
+        arguments=["-d", rviz_config],
         parameters=[
             moveit_config.robot_description,
             moveit_config.robot_description_semantic,
+            moveit_config.planning_pipelines,
+            moveit_config.robot_description_kinematics,
+            moveit_config.joint_limits,
         ],
     )
 
@@ -68,9 +86,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="both",
-        parameters=[
-            moveit_config.robot_description,
-        ],
+        parameters=[moveit_config.robot_description],
     )
 
     # ros2_control using FakeSystem as hardware
@@ -82,13 +98,8 @@ def generate_launch_description():
     ros2_control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
-        parameters=[moveit_config.to_dict(), ros2_controllers_path],
-        output="both",
-    )
-
-    block_services = Node(
-        package="environment_builder",
-        executable="block_services",
+        parameters=[moveit_config.robot_description, ros2_controllers_path],
+        output="screen",
     )
 
     # Load controllers
@@ -107,13 +118,15 @@ def generate_launch_description():
         ]
 
     return LaunchDescription(
-        [
+        [   
+            rviz_config_arg,
+            db_arg,
+            ros2_control_hardware_type,
             rviz_node,
             static_tf,
             robot_state_publisher,
-            run_move_group_node,
+            move_group_node,
             ros2_control_node,
-            block_services,
         ]
         + load_controllers
     )

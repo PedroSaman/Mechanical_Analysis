@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot name="denso_vp6242" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<link name="gripper_base">
+		<visual>
+			<origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/visual/tool/gripper_base.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/collision/tool/gripper_base.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+	<link name="gripper_tip"/>
+	<joint name="joint_tip" type="fixed">
+		<parent link="gripper_base"/>
+		<child link="gripper_tip"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * 0.06500}"/>
+	</joint>
+	<joint name="joint_gripper_base" type="fixed">
+		<parent link="link_6"/>
+		<child link="gripper_base"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.0000000"/>
+	</joint>
+	<link name="left_finger">
+		<visual>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/visual/tool/left_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/collision/tool/left_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+	<joint name="joint_gripper" type="prismatic">
+		<parent link="gripper_base"/>
+		<child link="left_finger"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * 0.060000}"/>
+		<axis xyz="-0.000000 1.000000 -0.000000"/>
+		<limit effort="${scale_value * 200000}" lower="0.000000" upper="${scale_value * 0.0150000}" velocity="${scale_value * 18.000000}"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+
+	<link name="right_finger">
+		<visual>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/visual/tool/right_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0.000000 0.000000 ${scale_value * (-0.060000)}"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/collision/tool/right_finger.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+	<joint name="joint_gripper_mimic" type="prismatic">
+		<parent link="gripper_base"/>
+		<child link="right_finger"/>
+		<mimic joint="joint_gripper" multiplier="-1.000000" offset="0.000000"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value * (0.060000)}"/>
+		<axis xyz="-0.000000 1.000000 -0.000000"/>
+		<limit effort="${scale_value * 200000}" lower="${scale_value * (-0.0150000)}" upper="0.000000" velocity="${scale_value * 18.00000}"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+</robot>
