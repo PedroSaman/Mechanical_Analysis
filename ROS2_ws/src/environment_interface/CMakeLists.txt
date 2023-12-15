@@ -26,9 +26,15 @@ set(srv_files
    # etc
 )
 
+set(action_files
+  "action/TaskCreator.action"
+  # etc
+)
+
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
   ${srv_files}
+  ${action_files}
   DEPENDENCIES std_msgs moveit_msgs
 )
 
@@ -61,4 +67,3 @@ install(
 
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
-

@@ -136,8 +136,8 @@ void add_block(const std::shared_ptr<environment_interface::srv::BlockCreate::Re
   // Define the size of the box in meters
   primitive.type = primitive.BOX;
   primitive.dimensions.resize(3);
-  primitive.dimensions[primitive.BOX_X] = block_size*request->block.x_size - minimum_resolution;
-  primitive.dimensions[primitive.BOX_Y] = block_size*request->block.y_size - minimum_resolution;
+  primitive.dimensions[primitive.BOX_X] = block_size_x*request->block.x_size - minimum_resolution;
+  primitive.dimensions[primitive.BOX_Y] = block_size_x*request->block.y_size - minimum_resolution;
   primitive.dimensions[primitive.BOX_Z] = block_size_z - minimum_resolution;
 
   // Define the pose of the box (relative to the frame_id)

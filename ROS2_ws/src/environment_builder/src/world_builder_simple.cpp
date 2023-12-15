@@ -139,14 +139,14 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
     block.x_size = std::stoi(it->c_str())/10;
     block.y_size = std::stoi(it->c_str()) - block.x_size*10;
     block.x = 0;
-    block.y = -dispenser_y_size/2 + block_size + 1*iterator;
+    block.y = -dispenser_y_size/2 + block_size_x + 1*iterator;
     block.z = dispenser_z_size/2 + block_size_z/2 + 5*minimum_resolution;
     block.number = 0;
     block.color.r = 0.7;
     block.color.g = 0;
     block.color.b = 1;
     block.color.a = 1;
-    iterator = iterator + block.y_size/2 + 2*block_size;
+    iterator = iterator + block.y_size/2 + 2*block_size_x;
     setupBlock(block);
   }
   
@@ -156,9 +156,9 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block.name = "21";
   block.x_size = 2;
   block.y_size = 1;
-  block.x = 0.1 + block_size*block.x_size/2;
+  block.x = 0.1 + block_size_x*block.x_size/2;
   block.y = 0;
-  block.z = 0.51 + block_size/2;
+  block.z = 0.51 + block_size_x/2;
   block.number = 0;
   block.color.r = 0.7;
   block.color.g = 0;
@@ -172,9 +172,9 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block1.name = "22";
   block1.x_size = 2;
   block1.y_size = 2;
-  block1.x = 0.1 + block_size*block1.x_size/2;
+  block1.x = 0.1 + block_size_x*block1.x_size/2;
   block1.y = 0;
-  block1.z = 0.51 + block_size/2;
+  block1.z = 0.51 + block_size_x/2;
   block1.number = 0;
   block1.color.r = 0;
   block1.color.g = 0.7;
@@ -187,9 +187,9 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block2.name = "11";
   block2.x_size = 1;
   block2.y_size = 1;
-  block2.x = 0.1 + block_size*block2.x_size/2;
+  block2.x = 0.1 + block_size_x*block2.x_size/2;
   block2.y = 0.3;
-  block2.z = 0.51 + block_size/2;
+  block2.z = 0.51 + block_size_x/2;
   block2.number = 0;
   block2.color.r = 1;
   block2.color.g = 0;
@@ -204,7 +204,7 @@ void Setup_Builder::setupBlocks(std::list<std::string> List)
   block3.y_size = 8;
   block3.x = 0.52;
   block3.y = 0;
-  block3.z = 0.2 + block_size/2;
+  block3.z = 0.2 + block_size_x/2;
   block3.number = 0;
   block3.color.r = 1;
   block3.color.g = 0.7;

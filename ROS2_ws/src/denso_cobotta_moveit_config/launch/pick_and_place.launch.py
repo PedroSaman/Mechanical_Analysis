@@ -7,15 +7,6 @@ from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 
 def generate_launch_description():
-
-    declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "robot_model",
-            default_value="denso_cobotta",
-            description="Robot model to be used in the simulation",
-        )
-    )
     
     # planning_context
     moveit_config = (
@@ -79,9 +70,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="both",
-        parameters=[
-            moveit_config.robot_description,
-        ],
+        parameters=[moveit_config.robot_description],
     )
 
     # ros2_control using FakeSystem as hardware

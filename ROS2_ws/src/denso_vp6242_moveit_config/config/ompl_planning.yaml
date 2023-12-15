@@ -2,14 +2,14 @@ planning_plugin: ompl_interface/OMPLPlanner
 # To optionally use Ruckig for jerk-limited smoothing, add this line to the request adapters below
 # default_planner_request_adapters/AddRuckigTrajectorySmoothing
 request_adapters: >-
+  default_planner_request_adapters/AddRuckigTrajectorySmoothing
   default_planner_request_adapters/AddTimeOptimalParameterization
   default_planner_request_adapters/ResolveConstraintFrames
   default_planner_request_adapters/FixWorkspaceBounds
   default_planner_request_adapters/FixStartStateBounds
   default_planner_request_adapters/FixStartStateCollision
   default_planner_request_adapters/FixStartStatePathConstraints
-  stomp_moveit/StompSmoothingAdapter
-start_state_max_bounds_error: 0.1
+#  stomp_moveit/StompSmoothingAdapter
 planner_configs:
   APSConfigDefault:
     type: geometric::AnytimePathShortening
@@ -143,33 +143,6 @@ planner_configs:
     type: geometric::TrajOpt
 
 denso_vp6242_arm:
-  planner_configs:
-    - APSConfigDefault
-    - SBLkConfigDefault
-    - ESTkConfigDefault
-    - LBKPIECEkConfigDefault
-    - BKPIECEkConfigDefault
-    - KPIECEkConfigDefault
-    - RRTkConfigDefault
-    - RRTConnectkConfigDefault
-    - RRTstarkConfigDefault
-    - TRRTkConfigDefault
-    - PRMkConfigDefault
-    - PRMstarkConfigDefault
-    - FMTkConfigDefault
-    - BFMTkConfigDefault
-    - PDSTkConfigDefault
-    - STRIDEkConfigDefault
-    - BiTRRTkConfigDefault
-    - LBTRRTkConfigDefault
-    - BiESTkConfigDefault
-    - ProjESTkConfigDefault
-    - LazyPRMkConfigDefault
-    - LazyPRMstarkConfigDefault
-    - SPARSkConfigDefault
-    - SPARStwokConfigDefault
-    - TrajOptDefault
-denso_vp6242_arm_hand:
   planner_configs:
     - APSConfigDefault
     - SBLkConfigDefault

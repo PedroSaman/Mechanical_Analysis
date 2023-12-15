@@ -47,7 +47,7 @@ int main(int argc, char * argv[])
 	}
 	else
 		std::cout<<"Could not open the file\n";
-    return;
+    return 0;
 
   size_t content_size = content.size();
   double joint_values[7];

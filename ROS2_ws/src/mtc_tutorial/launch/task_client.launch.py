@@ -40,9 +40,9 @@ def launch_setup(context, *args, **kwargs):
     first_block = LaunchConfiguration("first_block")
 
     # MTC Demo node
-    pick_place_demo = Node(
-        package="manipulation_task_constructor",
-        executable="manipulation_task_constructor",
+    action_client_node = Node(
+        package="mtc_tutorial",
+        executable="task_creator_action_client",
         output="screen",
         parameters=[
             moveit_config,
@@ -60,7 +60,7 @@ def launch_setup(context, *args, **kwargs):
     )
 
     nodes_to_start = [
-        pick_place_demo,
+        action_client_node,
         bag_node,
     ]
 

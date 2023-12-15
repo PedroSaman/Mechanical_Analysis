@@ -9,7 +9,6 @@
 #include "environment_interface/srv/block_remove.hpp"
 #include "environment_interface/srv/get_block_color.hpp"
 #include "environment_information.h"
-#include "manipulation_task_constructor/manipulation_task_constructor.h"
 #include <chrono>
 #include <string>
 #include <fstream>
@@ -123,8 +122,8 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
 
   geometry_msgs::msg::PoseStamped target_pose_msg;
   target_pose_msg.header.frame_id = "base";
-  target_pose_msg.pose.position.x = -base_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
-  target_pose_msg.pose.position.y = -base_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
+  target_pose_msg.pose.position.x = -base_x_size/2 + block_size_x*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
+  target_pose_msg.pose.position.y = -base_y_size/2 + block_size_x*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
   target_pose_msg.pose.position.z = base_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE) + INSERT_DISTANCE;
   
   if((block.x_size == 2 && block.y_size == 1) || (block.x_size == 1 && block.y_size == 2)) // 2x1 blocks are in a diferent orientation in the parts feeder, so this is necessary to maintain the logic for other block types
@@ -153,19 +152,17 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   task.add(std::move(stage_state_current));
 
   auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_,"ompl");
-  auto interpolation_planner = std::make_shared<mtc::solvers::JointInterpolationPlanner>();
   //sampling_planner->setPlannerId("stomp", solver);
   //auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(node_,"pilz_industrial_motion_planner");
   //sampling_planner->setPlannerId("PTP");
 
   auto cartesian_planner = std::make_shared<mtc::solvers::CartesianPath>();
-  cartesian_planner->setStepSize(.01);
   // clang-format off
   auto stage_move_to_pick = std::make_unique<mtc::stages::Connect>(
       "move to pick",
       mtc::stages::Connect::GroupPlannerVector{ { arm_group_name, sampling_planner } });
   // clang-format on
-  stage_move_to_pick->setTimeout(15.0);
+  stage_move_to_pick->setTimeout(10.0);
   stage_move_to_pick->properties().configureInitFrom(mtc::Stage::PARENT);
   task.add(std::move(stage_move_to_pick));
 
@@ -223,6 +220,7 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
       // clang-format off
       cartesian_planner->setMaxVelocityScalingFactor(0.7);
       cartesian_planner->setMaxAccelerationScalingFactor(0.7);
+      cartesian_planner->setStepSize(.01);
       auto stage = std::make_unique<mtc::stages::MoveRelative>("lift object", cartesian_planner);
       // clang-format on
       stage->properties().configureInitFrom(mtc::Stage::PARENT, { "group" });
@@ -244,10 +242,9 @@ mtc::Task MTCTaskNode::pick_and_placeTask(environment_interface::msg::Block bloc
   // clang-format off
   auto stage_move_to_place = std::make_unique<mtc::stages::Connect>(
       "move to place",
-      mtc::stages::Connect::GroupPlannerVector{ { arm_group_name, sampling_planner },
-                                                { hand_group_name, interpolation_planner } });
+      mtc::stages::Connect::GroupPlannerVector{ { arm_group_name, sampling_planner }});
   // clang-format on
-  stage_move_to_place->setTimeout(15.0);
+  stage_move_to_place->setTimeout(10.0);
   stage_move_to_place->properties().configureInitFrom(mtc::Stage::PARENT);
   task.add(std::move(stage_move_to_place));
   
@@ -465,7 +462,7 @@ moveit_msgs::msg::CollisionObject MTCTaskNode::request_block(environment_interfa
     support_block_object.header.frame_id = "world";
     support_block_object.primitives.resize(1);
     support_block_object.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
-    support_block_object.primitives[0].dimensions = { block_size_z - minimum_resolution, block_size/2 - minimum_resolution };
+    support_block_object.primitives[0].dimensions = { block_size_z - minimum_resolution, block_size_x/2 - minimum_resolution };
     support_block_object.pose = object.pose;
     support_block_object.operation = support_block_object.ADD;
     psi.applyCollisionObject(support_block_object, block.color);
@@ -529,28 +526,6 @@ void MTCTaskNode::refil_block(moveit_msgs::msg::CollisionObject refil_object)
   refil_object.operation = refil_object.ADD;
   moveit::planning_interface::PlanningSceneInterface psi;
   psi.applyCollisionObject(refil_object, refil_color);
-}
-
-void MTCTaskNode::append_block(environment_interface::msg::Block block)
-//does not work as intended.
-{ 
-  moveit::planning_interface::PlanningSceneInterface psi;
-  std::vector<std::string> object_name = {block.name,"/0"};
-  moveit_msgs::msg::CollisionObject original_block;
-  moveit_msgs::msg::CollisionObject appended_block;
-  std::map<std::string, moveit_msgs::msg::CollisionObject> original_block_msg;
-  original_block_msg = psi.getObjects(object_name);
-  original_block = original_block_msg.begin()->second;
-  appended_block = original_block;
-  //appended_block.header.frame_id = "base";
-  appended_block.operation = appended_block.APPEND;
-  original_block.operation = original_block.REMOVE;
-  moveit_msgs::msg::AttachedCollisionObject a;
-  a.object = original_block;
-  a.link_name = "base";
-  //psi.applyCollisionObject(appended_block);
-  psi.applyAttachedCollisionObject(a);
-  //psi.applyCollisionObject(original_block);
 }
 
 int main(int argc, char **argv)

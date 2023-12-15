@@ -83,9 +83,9 @@ std::pair<CollisionObject, ObjectColor> Setup_Builder::setupTable()
   // Add color to the object
   ObjectColor object_color;
   std_msgs::msg::ColorRGBA rgba_color;
-  rgba_color.r = 0.5;
-  rgba_color.g = 0.5;
-  rgba_color.b = 0.5;
+  rgba_color.r = 97.0/255;
+  rgba_color.g = 54.0/255;
+  rgba_color.b = 19.0/255;
   rgba_color.a = 1;
   object_color.color = rgba_color;
 
@@ -122,10 +122,10 @@ std::pair<CollisionObject, ObjectColor> Setup_Builder::setupBase()
   // Add color to the object
   ObjectColor object_color;
   std_msgs::msg::ColorRGBA rgba_color;
-  rgba_color.r = 0.85;
-  rgba_color.g = 0.85;
-  rgba_color.b = 0.85;
-  rgba_color.a = 1;
+  rgba_color.r = 0.11372549019;
+  rgba_color.g = 0.65098039215;
+  rgba_color.b = 0.93333333333 ;
+  rgba_color.a = 0.4;
   object_color.color = rgba_color;
 
   return std::make_pair(object,object_color);
@@ -487,14 +487,15 @@ std::pair<CollisionObject, ObjectColor> Setup_Builder::setupDispenser8()
 
 void Setup_Builder::setupBlocks()//std::list<std::string> List)
 {
+
   environment_interface::msg::Block block;
   block.frame_id = "dispenser2by1";
   block.name = "21";
   block.x_size = 2;
   block.y_size = 1;
-  block.x = 0.1 + block_size*block.x_size/2;
+  block.x = 0.1 + block_size_x*block.x_size/2;
   block.y = 0;
-  block.z = 0.51 + block_size/2;
+  block.z = 0.65 + block_size_x/2;
   block.number = 0;
   block.color.r = 0.5;
   block.color.g = 0.5;
@@ -508,9 +509,9 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block1.name = "22";
   block1.x_size = 2;
   block1.y_size = 2;
-  block1.x = 0.1 + block_size*block1.x_size/2;
+  block1.x = 0.1 + block_size_x*block1.x_size/2;
   block1.y = 0;
-  block1.z = 0.51 + block_size/2;
+  block1.z = 0.65 + block_size_x/2;
   block1.number = 0;
   block1.color.r = 0.5;
   block1.color.g = 0.5;
@@ -523,9 +524,9 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block2.name = "11";
   block2.x_size = 1;
   block2.y_size = 1;
-  block2.x = 0.1 + block_size*block2.x_size/2;
+  block2.x = 0.1 + block_size_x*block2.x_size/2;
   block2.y = 0.3;
-  block2.z = 0.51 + block_size/2;
+  block2.z = 0.65 + block_size_x/2;
   block2.number = 0;
   block2.color.r = 0.5;
   block2.color.g = 0.5;
@@ -540,7 +541,7 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block3.y_size = 8;
   block3.x = 0.52;
   block3.y = 0;
-  block3.z = 0.2 + block_size/2;
+  block3.z = 0.34 + block_size_x/2;
   block3.number = 0;
   block3.color.r = 0.5;
   block3.color.g = 0.5;
@@ -555,7 +556,7 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block4.y_size = 4;
   block4.x = 0.52;
   block4.y = 0;
-  block4.z = 0.2 + block_size/2;
+  block4.z = 0.34 + block_size_x/2;
   block4.number = 0;
   block4.color.r = 0.5;
   block4.color.g = 0.5;
@@ -570,7 +571,7 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block5.y_size = 4;
   block5.x = 0.52;
   block5.y = 0;
-  block5.z = 0.2 + block_size/2;
+  block5.z = 0.34 + block_size_x/2;
   block5.number = 0;
   block5.color.r = 0.5;
   block5.color.g = 0.5;
@@ -585,7 +586,7 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block6.y_size = 3;
   block6.x = 0.52;
   block6.y = 0;
-  block6.z = 0.2 + block_size/2;
+  block6.z = 0.34 + block_size_x/2;
   block6.number = 0;
   block6.color.r = 0.5;
   block6.color.g = 0.5;
@@ -600,7 +601,7 @@ void Setup_Builder::setupBlocks()//std::list<std::string> List)
   block7.y_size = 3;
   block7.x = 0.52;
   block7.y = 0;
-  block7.z = 0.2 + block_size/2;
+  block7.z = 0.34 + block_size_x/2;
   block7.number = 0;
   block7.color.r = 0.5;
   block7.color.g = 0.5;
@@ -685,7 +686,7 @@ void Setup_Builder::setupWorld()
 
   moveit::planning_interface::PlanningSceneInterface psi;
   psi.applyCollisionObjects(collision_objects,object_colors);
-
+  sleep(1);
   return;
 }
 
@@ -697,10 +698,11 @@ int main(int argc, char** argv)
   options.automatically_declare_parameters_from_overrides(true);
 
   auto setup_builder = std::make_shared<Setup_Builder>(options);
+  
   rclcpp::executors::MultiThreadedExecutor executor;
-
   auto spin_thread = std::make_unique<std::thread>([&executor, &setup_builder]() {
     executor.add_node(setup_builder->getNodeBaseInterface());
+    //executor.spin();
     executor.remove_node(setup_builder->getNodeBaseInterface());
   });
   

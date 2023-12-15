@@ -6,10 +6,8 @@ controller_manager:
     denso_vp6242_arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
-
     denso_vp6242_hand_controller:
       type: position_controllers/GripperActionController
-
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster

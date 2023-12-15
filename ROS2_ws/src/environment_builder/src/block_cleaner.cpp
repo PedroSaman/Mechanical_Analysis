@@ -122,7 +122,6 @@ int main(int argc, char** argv)
           object.operation = object.REMOVE;
           collision_objects.insert(collision_objects.end(),object);
           RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Removing object: %s", object_name.c_str());
-          //setup_builder->cleanBlocks(object_name);
         }
       }
       it++;
