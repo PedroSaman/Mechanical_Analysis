@@ -242,8 +242,8 @@ std::string MTCTaskNode::position_to_pickPlan(environment_interface::msg::Block 
   retrieved_pose.orientation.y = 1;
   move_group_interface.setPoseTarget(retrieved_pose,hand_frame);
   move_group_interface.setPlannerId(planner_id);
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
@@ -271,8 +271,8 @@ std::string MTCTaskNode::descend_to_pickPlan(std::string robot_name, std::string
   //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
   move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
   move_group_interface.setPlannerId(planner_id);
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
@@ -339,8 +339,8 @@ std::string MTCTaskNode::ascend_with_blockPlan(environment_interface::msg::Block
   //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
   move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
   move_group_interface.setPlannerId(planner_id);
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
@@ -390,8 +390,8 @@ std::string MTCTaskNode::position_to_placePlan(environment_interface::msg::Block
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
   move_group_interface.setPoseTarget(target_pose_msg,object_name);
   move_group_interface.setPlannerId(planner_id);
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
@@ -419,8 +419,8 @@ std::string MTCTaskNode::descend_to_placePlan(std::string robot_name, std::strin
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
   move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
   move_group_interface.setPlannerId(planner_id);
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
@@ -451,8 +451,8 @@ std::string MTCTaskNode::retreat_from_structurePlan(environment_interface::msg::
   //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
   move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
   move_group_interface.setPlannerId(planner_id);
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  move_group_interface.setMaxVelocityScalingFactor(1.0);
+  move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   moveit::planning_interface::MoveGroupInterface::Plan plan;
   auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
