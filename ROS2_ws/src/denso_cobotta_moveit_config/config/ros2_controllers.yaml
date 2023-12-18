@@ -3,18 +3,18 @@ controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
 
-    cobotta_arm_controller:
+    denso_cobotta_arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
 
-    cobotta_hand_controller:
+    denso_cobotta_hand_controller:
       type: position_controllers/GripperActionController
 
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-cobotta_arm_controller:
+denso_cobotta_arm_controller:
   ros__parameters:
     joints:
       - joint_1
@@ -28,6 +28,6 @@ cobotta_arm_controller:
     state_interfaces:
       - position
       - velocity
-cobotta_hand_controller:
+denso_cobotta_hand_controller:
   ros__parameters:
     joint: joint_gripper

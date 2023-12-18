@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(moveit_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(moveit_task_constructor_core REQUIRED)
 
@@ -20,14 +21,21 @@ set(msg_files
 set(srv_files
   "srv/BlockCreate.srv"
   "srv/BlockRemove.srv"
+  "srv/BlockRemoveAll.srv"
   "srv/GetBlockColor.srv"
    # etc
+)
+
+set(action_files
+  "action/TaskCreator.action"
+  # etc
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${msg_files}
   ${srv_files}
-  DEPENDENCIES std_msgs
+  ${action_files}
+  DEPENDENCIES std_msgs moveit_msgs
 )
 
 install(TARGETS
@@ -59,4 +67,3 @@ install(
 
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()
-

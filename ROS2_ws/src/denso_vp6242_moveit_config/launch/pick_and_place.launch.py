@@ -7,21 +7,19 @@ from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 
 def generate_launch_description():
-
-    declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "robot_model",
-            default_value="denso_vp6242",
-            description="Robot model to be used in the simulation",
-        )
-    )
     
     # planning_context
     moveit_config = (
         MoveItConfigsBuilder("denso_vp6242")
         .robot_description(file_path="config/denso_vp6242.urdf.xacro")
+        .robot_description_semantic(file_path="config/denso_vp6242.srdf")
+        .planning_scene_monitor(
+            publish_robot_description=True, publish_robot_description_semantic=True
+        )
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
+        .planning_pipelines(
+            pipelines=["ompl"]
+        )
         .to_moveit_configs()
     )
 
@@ -35,17 +33,17 @@ def generate_launch_description():
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        parameters=[
-            moveit_config.to_dict(),
-            move_group_capabilities,
-        ],
+        parameters=[moveit_config.to_dict(),
+                    move_group_capabilities,
+                   ],
+        arguments=["--ros-args", "--log-level", "info"],
     )
 
     # RViz
     rviz_config_file = (
         get_package_share_directory("denso_vp6242_moveit_config") + "/launch/moveit.rviz"
     )
-    rviz_node = Node(
+    rviz_node_moveit = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
@@ -63,7 +61,7 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
+        arguments=["--frame-id", "world", "--child-frame-id", "base_link"],
     )
 
     # Publish TF
@@ -95,6 +93,11 @@ def generate_launch_description():
         executable="block_services",
     )
 
+    world_builder = Node(
+        package="environment_builder",
+        executable="world_builder",
+    )
+
     # Load controllers
     load_controllers = []
     for controller in [
@@ -112,12 +115,13 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            rviz_node,
+            rviz_node_moveit,
             static_tf,
             robot_state_publisher,
             run_move_group_node,
             ros2_control_node,
             block_services,
+            world_builder,
         ]
         + load_controllers
     )

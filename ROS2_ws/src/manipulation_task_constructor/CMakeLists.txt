@@ -19,7 +19,20 @@ ament_target_dependencies(
   "environment_interface"
   "rclcpp"
 )
+
+add_executable(new_manipulation_task_constructor src/new_manipulation_task_constructor.cpp)
+ament_target_dependencies(
+  new_manipulation_task_constructor 
+  "moveit_task_constructor_core"
+  "moveit_ros_planning_interface"
+  "environment_interface"
+  "rclcpp"
+)
+
 target_include_directories(manipulation_task_constructor PUBLIC
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<INSTALL_INTERFACE:include>)
+target_include_directories(new_manipulation_task_constructor PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
 target_compile_features(manipulation_task_constructor PUBLIC c_std_99 cxx_std_17)  
@@ -31,7 +44,7 @@ install(
   DESTINATION include
 )
 
-install(TARGETS manipulation_task_constructor DESTINATION lib/${PROJECT_NAME})
+install(TARGETS manipulation_task_constructor new_manipulation_task_constructor DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
 find_package(ament_lint_auto REQUIRED)

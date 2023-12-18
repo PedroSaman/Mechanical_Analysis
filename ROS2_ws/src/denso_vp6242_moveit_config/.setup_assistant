@@ -2,12 +2,13 @@ moveit_setup_assistant_config:
   urdf:
     package: denso_vp6242_description
     relative_path: urdf/denso_vp6242.urdf.xacro
+    xacro_args: gripper_type:=tayo
   srdf:
     relative_path: config/denso_vp6242.srdf
   package_settings:
     author_name: pedro
     author_email: pedro@pedro.com
-    generated_timestamp: 1692771696
+    generated_timestamp: 1701235715
   control_xacro:
     command:
       - position

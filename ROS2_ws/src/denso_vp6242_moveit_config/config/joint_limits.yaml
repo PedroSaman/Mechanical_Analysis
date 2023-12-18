@@ -8,43 +8,43 @@ default_acceleration_scaling_factor: 0.1
 # Specific joint properties can be changed with the keys [max_position, min_position, max_velocity, max_acceleration]
 # Joint limits can be turned off with [has_velocity_limits, has_acceleration_limits]
 joint_limits:
-  joint1:
+  joint_1:
     has_velocity_limits: true
-    max_velocity: 4.3633231299900004
-    has_acceleration_limits: false
-    max_acceleration: 0
-  joint2:
+    max_velocity: 0.40317105721069005
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_2:
     has_velocity_limits: true
-    max_velocity: 3.2637657012300001
-    has_acceleration_limits: false
-    max_acceleration: 0
-  joint3:
+    max_velocity: 0.392175482923126
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_3:
     has_velocity_limits: true
-    max_velocity: 4.3633231299900004
-    has_acceleration_limits: false
-    max_acceleration: 0
-  joint4:
+    max_velocity: 0.72570790297924205
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_4:
     has_velocity_limits: true
-    max_velocity: 5.2359877559800001
-    has_acceleration_limits: false
-    max_acceleration: 0
-  joint5:
+    max_velocity: 0.73914693821959901
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_5:
     has_velocity_limits: true
-    max_velocity: 5.2359877559800001
-    has_acceleration_limits: false
-    max_acceleration: 0
-  joint6:
+    max_velocity: 0.73914693821959901
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_6:
     has_velocity_limits: true
-    max_velocity: 5.2359877559800001
-    has_acceleration_limits: false
-    max_acceleration: 0
-  left_claw_joint:
+    max_velocity: 1.1093312725675999
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_gripper:
     has_velocity_limits: true
-    max_velocity: 0.10000000000000001
-    has_acceleration_limits: false
-    max_acceleration: 0
-  right_claw_joint:
+    max_velocity: 0.100
+    has_acceleration_limits: true
+    max_acceleration: 1.0
+  joint_gripper_mimic:
     has_velocity_limits: true
-    max_velocity: 0.10000000000000001
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 0.100
+    has_acceleration_limits: true
+    max_acceleration: 1.0

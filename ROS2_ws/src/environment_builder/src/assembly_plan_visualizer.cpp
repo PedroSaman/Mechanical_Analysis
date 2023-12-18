@@ -20,9 +20,7 @@ class APV_Node
 public:
   
   APV_Node(const rclcpp::NodeOptions &options);
-
-  void request_block(environment_interface::msg::Block& block);
-  void setupTable();
+  moveit_msgs::msg::CollisionObject request_block(environment_interface::msg::Block& block);
   std::vector<std::vector<int>> read_assembly_plan();
 private:
   rclcpp::Node::SharedPtr node_;
@@ -33,48 +31,10 @@ APV_Node::APV_Node(const rclcpp::NodeOptions &options)
 {
 }
 
-void APV_Node::setupTable()
-{
-  moveit_msgs::msg::CollisionObject object;
-  object.header.frame_id = "world";
-  object.id = "table";
-  shape_msgs::msg::SolidPrimitive primitive;
-
-  // Define the size of the box in meters
-  primitive.type = primitive.BOX;
-  primitive.dimensions.resize(3);
-  primitive.dimensions[primitive.BOX_X] = table_x_size;
-  primitive.dimensions[primitive.BOX_Y] = table_y_size;
-  primitive.dimensions[primitive.BOX_Z] = table_z_size;
-
-  // Define the pose of the box (relative to the frame_id)
-  geometry_msgs::msg::Pose pose;
-  pose.orientation.x = 0;
-  pose.orientation.y = 0;
-  pose.orientation.z = 0;
-  pose.position.x = table_x_position;
-  pose.position.y = 0.0;
-  pose.position.z = table_z_size/2;
-
-  object.primitives.push_back(primitive);
-  object.primitive_poses.push_back(pose);
-  object.operation = object.ADD;
-
-  // Add color to the object
-  std_msgs::msg::ColorRGBA color;
-  color.r = 0.5;
-  color.g = 0.5;
-  color.b = 0.5;
-  color.a = 1;
-
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(object, color);
-}
-
-void APV_Node::request_block(environment_interface::msg::Block& block)
+moveit_msgs::msg::CollisionObject APV_Node::request_block(environment_interface::msg::Block& block)
 { 
   moveit_msgs::msg::CollisionObject block_object;
-  block_object.header.frame_id = "table";
+  block_object.header.frame_id = "base";
   block_object.id = "block_" + std::to_string(block.number);
   shape_msgs::msg::SolidPrimitive primitive;
 
@@ -83,13 +43,13 @@ void APV_Node::request_block(environment_interface::msg::Block& block)
     primitive.type = primitive.CYLINDER;
     primitive.dimensions.resize(3);
     primitive.dimensions[primitive.CYLINDER_HEIGHT] = block_size_z - minimum_resolution;
-    primitive.dimensions[primitive.CYLINDER_RADIUS] = block_size/2 - minimum_resolution;
+    primitive.dimensions[primitive.CYLINDER_RADIUS] = block_size_x/2 - minimum_resolution;
   }else{
     // Define the size of the box in meters
     primitive.type = primitive.BOX;
     primitive.dimensions.resize(3);
-    primitive.dimensions[primitive.BOX_X] = block_size*block.x_size - minimum_resolution;
-    primitive.dimensions[primitive.BOX_Y] = block_size*block.y_size - minimum_resolution;
+    primitive.dimensions[primitive.BOX_X] = block_size_x*block.x_size - minimum_resolution;
+    primitive.dimensions[primitive.BOX_Y] = block_size_x*block.y_size - minimum_resolution;
     primitive.dimensions[primitive.BOX_Z] = block_size_z - minimum_resolution;
 
     // Define the pose of the box (relative to the frame_id)
@@ -98,48 +58,89 @@ void APV_Node::request_block(environment_interface::msg::Block& block)
   block_pose.orientation.x = 0;
   block_pose.orientation.y = 0;
   block_pose.orientation.z = 0;
-  block_pose.position.x = -table_x_size/2 + block_size*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
-  block_pose.position.y = -table_y_size/2 + block_size*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
-  block_pose.position.z = table_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE);
+  block_pose.position.x = -base_x_size/2 + block_size_x*((block.x + BASE_CORRECTION_VALUE) + block.x_size/2);
+  block_pose.position.y = -base_y_size/2 + block_size_x*((block.y + BASE_CORRECTION_VALUE) + block.y_size/2);
+  block_pose.position.z = base_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE);
   
   block_object.primitives.push_back(primitive);
   block_object.primitive_poses.push_back(block_pose);
   block_object.operation = block_object.ADD;
-  moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(block_object, block.color);
 
-  return;
+  return block_object;
 }
 
 std_msgs::msg::ColorRGBA getColor(int color_index)
 {
-  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("block_service_client");  
-  rclcpp::Client<environment_interface::srv::GetBlockColor>::SharedPtr client =                
-    node->create_client<environment_interface::srv::GetBlockColor>("get_block_color_service");          
-
-  std_msgs::msg::ColorRGBA color;
-  auto request = std::make_shared<environment_interface::srv::GetBlockColor::Request>();       
-  
-  request->index = color_index;
-  while (!client->wait_for_service(1s)) {
-    if (!rclcpp::ok()) {
-      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-      color.r = 1;
-      color.g = 1;
-      color.b = 1;
-      color.a = 1;
-      return color;
-    }
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
-  }
-
-  auto result = client->async_send_request(request);
-  // Wait for the result.
-  if (rclcpp::spin_until_future_complete(node, result) != rclcpp::FutureReturnCode::SUCCESS)
+  std_msgs::msg::ColorRGBA block_color;
+  std::string color_name;
+  switch (color_index)
   {
-    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service create_block");    
+  case WHITE:
+    block_color.r = 1;
+    block_color.g = 1;
+    block_color.b = 1;
+    block_color.a = 1;
+    color_name = "White";
+    break;
+  case RED:
+    block_color.r = 1;
+    block_color.g = 0;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Red";
+    break;
+  case ORANGE:
+    block_color.r = 1;
+    block_color.g = 0.65;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Orange";
+    break;
+  case YELLOW:
+    block_color.r = 1;
+    block_color.g = 1;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Yellow";
+    break;
+  case GREEN:
+    block_color.r = 0;
+    block_color.g = 1;
+    block_color.b = 0;
+    block_color.a = 1;
+    color_name = "Green";
+    break;
+  case BLUE:
+    block_color.r = 0;
+    block_color.g = 0;
+    block_color.b = 1;
+    block_color.a = 1;
+    color_name = "Blue";
+    break;
+  case BLACK:
+    block_color.r = 0.2;
+    block_color.g = 0.2;
+    block_color.b = 0.2;
+    block_color.a = 1;
+    color_name = "Black";
+    break;
+  case SUPPORT:
+    block_color.r = 0.5;
+    block_color.g = 0.5;
+    block_color.b = 0.5;
+    block_color.a = 0.1;
+    color_name = "Support block color";
+    break;
+  default:
+    block_color.r = 0.2;
+    block_color.g = 0.2;
+    block_color.b = 0.2;
+    block_color.a = 1;
+    color_name = "Non Defined";
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "COLOR NOT DEFINED");
+    break;
   }
-  return result.get()->color;
+  return block_color;
 }
 
 std::vector<std::vector<int>> APV_Node::read_assembly_plan()
@@ -184,41 +185,43 @@ int main(int argc, char **argv)
   auto visualizer_node = std::make_shared<APV_Node>(options);
 
   std::vector<std::vector<int>> assembly_plan = visualizer_node->read_assembly_plan();
+  std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
+  std::vector<moveit_msgs::msg::ObjectColor> object_colors;
   int assembly_size = assembly_plan.size();
   
   //      0      1 2 3   4     5     6       7           8        9      10     11 
   //AssemblyArea,X,Y,Z,SizeX,SizeY,SizeZ,ColorIndex,IsSupport,CanPress,ShiftX,ShiftY
-  
-  //Create the table
-  visualizer_node->setupTable();
 
-  
   for (int i = 0; i < assembly_size; i++)
   {
     environment_interface::msg::Block block;
-    std::stringstream result;
-    std::copy(assembly_plan[i].begin(), assembly_plan[i].end(), std::ostream_iterator<int>(result, " "));
+    moveit_msgs::msg::ObjectColor object_color;
+    //std::stringstream result;
+    //std::copy(assembly_plan[i].begin(), assembly_plan[i].end(), std::ostream_iterator<int>(result, " "));
 
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Block %d information:: %s", i+1 ,result.str().c_str());
+    //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Block %d information:: %s", i+1 ,result.str().c_str());
     
     block.x = assembly_plan[i][1] + 1;
     block.y = assembly_plan[i][2] + 1;
     block.z = assembly_plan[i][3];
     if(assembly_plan[i][8] == 1)
     {
-      block.color = getColor(SUPPORT);
+      object_color.color = getColor(SUPPORT);
       block.is_support = 1;
     }else 
     {
-      block.color = getColor(assembly_plan[i][7]);
+      object_color.color = getColor(assembly_plan[i][7]);
     }
     block.number = i+1;
 
     block.x_size = assembly_plan[i][4]; // Correct the sizes for the assembly
     block.y_size = assembly_plan[i][5];
-    visualizer_node->request_block(block); //Refil the block in the feeder
+    collision_objects.insert(collision_objects.end(),visualizer_node->request_block(block));
+    object_colors.insert(object_colors.end(),object_color);
   }
 
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObjects(collision_objects,object_colors);
   rclcpp::shutdown();
   return 0;
 }

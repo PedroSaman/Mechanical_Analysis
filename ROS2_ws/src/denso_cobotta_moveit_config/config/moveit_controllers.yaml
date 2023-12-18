@@ -4,10 +4,10 @@ moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControll
 
 moveit_simple_controller_manager:
   controller_names:
-    - cobotta_arm_controller
-    - cobotta_hand_controller
+    - denso_cobotta_arm_controller
+    - denso_cobotta_hand_controller
 
-  cobotta_arm_controller:
+  denso_cobotta_arm_controller:
     type: FollowJointTrajectory
     action_ns: follow_joint_trajectory
     default: true
@@ -20,7 +20,7 @@ moveit_simple_controller_manager:
       - joint_6
     action_ns: follow_joint_trajectory
     default: true
-  cobotta_hand_controller:
+  denso_cobotta_hand_controller:
     type: GripperCommand
     joints:
       - joint_gripper

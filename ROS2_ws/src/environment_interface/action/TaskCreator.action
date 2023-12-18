@@ -1,0 +1,9 @@
+environment_interface/Block block
+int32 operation_id
+string robot_name
+string solver "ompl"
+string planner_id "RRTConnectkConfigDefault"
+---
+string task_resposnse
+---
+string partial_output

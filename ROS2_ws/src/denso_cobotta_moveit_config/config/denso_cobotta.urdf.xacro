@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="denso_cobotta">
+    <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+
+    <!-- Import denso_cobotta urdf file -->
+    <xacro:include filename="$(find denso_cobotta_description)/urdf/denso_cobotta.urdf.xacro" />
+
+    <!-- Import control_xacro -->
+    <xacro:include filename="denso_cobotta.ros2_control.xacro" />
+
+
+    <xacro:denso_cobotta_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+
+</robot>
