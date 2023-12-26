@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<robot name="scara_robot" 
+    xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:arg name="use_gripper" default="true"/>
+    <xacro:property name="radius" value="0.03" />
+    <xacro:property name="length1" value="0.5" />
+    <xacro:property name="length2" value="0.25" />
+    <xacro:property name="length3" value="0.25" />
+    <xacro:property name="length4" value="0.3" />
+    <xacro:property name="length5" value="0.01" />
+    <xacro:property name="mass" value="0.1"/>
+    <xacro:property name="revolute_effort" value="10"/>
+    <xacro:property name="revolute_velocity" value="${3*2*pi}"/>
+    <xacro:property name="prismatic_effort" value="100"/>
+    <xacro:property name="prismatic_velocity" value="1.0"/>
+
+    <xacro:include filename="$(find urdf_macro)/urdf/primitive_shape.xacro" />
+
+    <!--link-->
+    <link name="base_link"/>
+    <xacro:cylinder_link name="link1" radius="${radius}" length="${length1}" mass="${mass}" rgba="1 1 1 1" />
+    <xacro:cylinder_link name="link2" radius="${radius}" length="${length2}" mass="${mass}" rgba="1 0 0 1" />
+    <xacro:cylinder_link name="link3" radius="${radius}" length="${length3}" mass="${mass}" rgba="0 1 0 1" />
+    <xacro:cylinder_link name="link4" radius="${radius}" length="${length4}" mass="${mass}" rgba="0 0 1 1" />
+    <xacro:cylinder_link name="link5" radius="${radius}" length="${length5}" mass="${mass}" rgba="1 1 0 1" />
+    <link name="tool0" />
+
+    <!--joint-->
+    <joint name="base_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="link1"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="joint1" type="revolute">
+        <parent link="link1"/>
+        <child link="link2"/>
+        <origin xyz="0 0 ${length1}" rpy="0 ${pi/2} 0"/>
+        <limit lower="${-pi}" upper="${pi}" effort="${revolute_effort}" velocity="${revolute_velocity}"/>
+    </joint>
+
+    <joint name="joint2" type="revolute">
+        <parent link="link2"/>
+        <child link="link3"/>
+        <origin xyz="${-radius*2} 0 ${length2-radius*2}" rpy="0 0 0"/>
+        <limit lower="${-pi}" upper="${pi}" effort="${revolute_effort}" velocity="${revolute_velocity}"/>
+    </joint>
+
+    <joint name="joint3" type="prismatic">
+        <parent link="link3"/>
+        <child link="link4"/>
+        <origin xyz="${-length4/2} 0 ${length3}" rpy="0 ${pi/2} 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="${-length4/2}" upper="${length4/2}" effort="${prismatic_effort}" velocity="${prismatic_velocity}"/>
+    </joint>
+
+    <joint name="joint4" type="revolute">
+        <parent link="link4"/>
+        <child link="link5"/>
+        <origin xyz="0 0 ${length4}" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="${-2*pi}" upper="${2*pi}" effort="${revolute_effort}" velocity="${revolute_velocity}"/>
+    </joint>
+
+    <joint name="tool_joint" type="fixed">
+        <origin xyz="0.0 0.0 ${length5}" rpy="0.0 0.0 0.0"/>
+        <parent link="link5"/>
+        <child link="tool0"/>
+    </joint>
+
+    <!--merge gripper-->
+    <xacro:if value="$(arg use_gripper)">
+        <xacro:include filename="$(find gripper_description)/urdf/simple_esg1_fs_2840_macro.xacro">
+            <arg name="tool_roll" value="0"/>
+            <arg name="tool_pitch" value="3.141592653589793238"/>
+            <arg name="tool_yaw" value="0"/>
+        </xacro:include>
+    </xacro:if>
+</robot>
