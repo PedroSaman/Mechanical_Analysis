@@ -12,7 +12,6 @@
 #include "environment_interface/srv/block_create.hpp"
 #include "environment_interface/srv/block_remove.hpp"
 #include "environment_interface/srv/get_block_color.hpp"
-#include "environment_interface/srv/task_create.hpp"
 #include "environment_information.h"
 #include <chrono>
 #include <string>
