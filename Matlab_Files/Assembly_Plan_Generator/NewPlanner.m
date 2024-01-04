@@ -74,9 +74,6 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
                 offset = offset + sup_strat_output; % Correct the next block to be analyzed
             end
             global_block = block + initial_condition(2);
-            if(global_block == 492)
-                global_block;
-            end
             fprintf("\n Block %d/%d insertion is stable\n",global_block,range(end,2)+initial_condition(2));
             if(sup_strat_output ~= 0)
                 fprintf("Was necessary %d support blocks\n",sup_strat_output);

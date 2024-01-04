@@ -5,13 +5,8 @@ function merged_model = merge_subassemblies(submodel1,submodel2)
 %
 % Long description
     merged_model = [];
-
-    new_size = size(submodel1,1) + size(submodel2,1);
-    
     displacement = max(submodel1(:,2)) + 2;
-    
     submodel2(:,2) = submodel2(:,2) + displacement;
-    
     size_sub1 = submodel1(end,1);
     size_sub2 = submodel2(end,1);
     max_z2 = submodel2(end,4);
