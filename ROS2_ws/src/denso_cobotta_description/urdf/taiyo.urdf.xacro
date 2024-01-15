@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot name="taiyo_gripper" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<link name="gripper_base">
+		<visual>
+			<origin rpy="0 0 1.57079632679" xyz="0 0 ${scale_value*0.07222}"/>
+			<geometry>
+				<mesh filename="package://denso_vp6242_description/meshes/visual/tool/ESG1-FS-2840.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
+			</geometry>
+		</visual>
+		<collision>
+			<origin rpy="0 0 1.57079632679" xyz="0 0 ${scale_value*0.042135}"/>
+			<geometry>
+				<box size="${scale_value*0.11095} ${scale_value*0.04021} ${scale_value*0.08427}"/>
+			</geometry>
+		</collision>
+		<inertial>
+			<mass value="1"/>
+			<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000"/>
+			<inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+		</inertial>
+	</link>
+
+	<link name="robot_gripper_interface">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 ${scale_value*0.00902}"/>
+			<geometry>
+				<cylinder length="${scale_value*0.01804}" radius="${scale_value*0.04}"/>
+			</geometry>
+			<material name="material_color_robot_gripper_interface">
+				<color rgba="0.6 1 0.6 1"/>
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 ${scale_value*0.00902}"/>
+			<geometry>
+				<cylinder length="${scale_value*0.01804}" radius="${scale_value*0.04}"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="robot_to_gripper" type="fixed">
+		<parent link="link_6"/>
+		<child link="robot_gripper_interface"/>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+	</joint>
+
+	<joint name="joint_gripper_base" type="fixed">
+		<parent link="robot_gripper_interface"/>
+		<child link="gripper_base"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value*0.01804}"/>
+	</joint>
+
+	<link name="left_finger">
+		<visual>
+		<origin rpy="0 0 0" xyz="0 0 ${scale_value*0.004045}"/>
+			<geometry>
+				<box size="${scale_value*0.03573} ${scale_value*0.01813} ${scale_value*0.00809}"/>
+			</geometry>
+			<material name="material_color_left_claw">
+				<color rgba="0.6 0.6 1 1"/>
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 ${scale_value*0.004045}"/>
+			<geometry>
+				<box size="${scale_value*0.03573} ${scale_value*0.01813} ${scale_value*0.00809}"/>
+			</geometry>
+		</collision>
+	</link>
+	<joint name="joint_gripper" type="prismatic">
+		<parent link="gripper_base"/>
+		<child link="left_finger"/>
+		<origin rpy="0.000000 0.000000 1.57079632679" xyz="0 ${scale_value*0.036789} ${scale_value*0.08427}"/>
+		<axis xyz="-1.000000 0.000000 -0.000000"/>
+		<limit effort="${scale_value * 200000}" lower="0.000000" upper="${scale_value * 0.018819}" velocity="${scale_value * 18.000001}"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+
+	<link name="left_finger_tip">
+		<visual>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<box size="${scale_value*0.00610} ${scale_value*0.01260} ${scale_value*0.0055}"/>
+			</geometry>
+			<material name="material_color_left_finger_tip">
+				<color rgba="0.6 0.6 1 1"/>
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<box size="${scale_value*0.00610} ${scale_value*0.01260} ${scale_value*0.0055}"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="gripper_left_graspping_tip" type="fixed">
+		<parent link="left_finger"/>
+		<child link="left_finger_tip"/>
+		<origin rpy="0.000000 0.000000 0" xyz="-${scale_value*0.0148} 0 ${scale_value*0.00809}"/>
+	</joint>
+
+	<link name="right_finger">
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 ${scale_value*0.004045}"/>
+			<geometry>
+				<box size="${scale_value*0.03573} ${scale_value*0.01813} ${scale_value*0.00809}"/>
+			</geometry>
+		</collision>
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 ${scale_value*0.004045}"/>
+			<geometry>
+				<box size="${scale_value*0.03573} ${scale_value*0.01813} ${scale_value*0.00809}"/>
+			</geometry>
+			<material name="material_color_right_claw">
+				<color rgba="0.6 0.6 1 1"/>
+			</material>
+		</visual>
+	</link>
+	<joint name="joint_gripper_mimic" type="prismatic">
+		<parent link="gripper_base"/>
+		<child link="right_finger"/>
+		<mimic joint="joint_gripper" multiplier="-1.000000" offset="0.000000"/>
+		<origin rpy="0.000000 0.000000 1.57079632679" xyz="0 -${scale_value*0.036789} ${scale_value*0.08427}"/>
+		<axis xyz="-1.000000 0.000000 -0.000000"/>
+		<limit effort="${scale_value * 200000}" lower="-${scale_value * 0.018819}" upper="0.000000" velocity="${scale_value * 18.00001}"/>
+		<dynamics damping="0" friction="0"/>
+	</joint>
+
+	<link name="right_finger_tip">
+		<visual>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<box size="${scale_value*0.00610} ${scale_value*0.01260} ${scale_value*0.0055}"/>
+			</geometry>
+			<material name="material_color_right_finger_tip">
+				<color rgba="0.6 0.6 1 1"/>
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<box size="${scale_value*0.00610} ${scale_value*0.01260} ${scale_value*0.0055}"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="gripper_right_graspping_tip" type="fixed">
+		<parent link="right_finger"/>
+		<child link="right_finger_tip"/>
+		<origin rpy="0.000000 0.000000 0" xyz="${scale_value*0.0148} 0 ${scale_value*0.00809}"/>
+	</joint>
+
+	<link name="gripper_tip"/>
+	<joint name="joint_tip" type="fixed">
+		<parent link="gripper_base"/>
+		<child link="gripper_tip"/>
+		<origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 ${scale_value*0.09511}"/>
+	</joint>
+
+</robot>
