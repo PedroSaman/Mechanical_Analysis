@@ -18,7 +18,7 @@ def generate_launch_description():
         )
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
         .planning_pipelines(
-            pipelines=["ompl", "pilz_industrial_motion_planner", "stomp"]
+            pipelines=["ompl"]
         )
         .to_moveit_configs()
     )
@@ -33,17 +33,17 @@ def generate_launch_description():
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        parameters=[
-            moveit_config.to_dict(),
-            move_group_capabilities,
-        ],
+        parameters=[moveit_config.to_dict(),
+                    move_group_capabilities,
+                   ],
+        arguments=["--ros-args", "--log-level", "info"],
     )
 
     # RViz
     rviz_config_file = (
         get_package_share_directory("denso_cobotta_moveit_config") + "/launch/moveit.rviz"
     )
-    rviz_node = Node(
+    rviz_node_moveit = Node(
         package="rviz2",
         executable="rviz2",
         name="rviz2",
@@ -70,7 +70,9 @@ def generate_launch_description():
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="both",
-        parameters=[moveit_config.robot_description],
+        parameters=[
+            moveit_config.robot_description,
+        ],
     )
 
     # ros2_control using FakeSystem as hardware
@@ -91,6 +93,11 @@ def generate_launch_description():
         executable="block_services",
     )
 
+    world_builder = Node(
+        package="environment_builder",
+        executable="world_builder",
+    )
+
     # Load controllers
     load_controllers = []
     for controller in [
@@ -108,12 +115,13 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            rviz_node,
+            rviz_node_moveit,
             static_tf,
             robot_state_publisher,
             run_move_group_node,
             ros2_control_node,
             block_services,
+            world_builder,
         ]
         + load_controllers
     )
