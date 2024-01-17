@@ -1,8 +1,0 @@
-# Default initial positions for scara_robot's ros2_control fake system
-
-initial_positions:
-  joint1: -1.88496
-  joint2: 2.51327
-  joint3: -5.444
-  joint4: -0.628319
-  joint_gripper: 0
