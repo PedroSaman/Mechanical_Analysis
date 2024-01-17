@@ -1,10 +1,10 @@
 # Default initial positions for denso_cobotta's ros2_control fake system
 
 initial_positions:
-  joint_1: 1.5708
-  joint_2: 0
-  joint_3: 1.5708
-  joint_4: 0
-  joint_5: 0
-  joint_6: 0
-  joint_gripper: 0
+  joint_1: -0.680678
+  joint_2: 0.0
+  joint_3: 2.00713
+  joint_4: 0.0
+  joint_5: 1.11701
+  joint_6: 0.890118
+  joint_gripper: 1.882

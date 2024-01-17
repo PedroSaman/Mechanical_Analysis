@@ -128,7 +128,7 @@ std_msgs::msg::ColorRGBA getColor(int color_index)
     block_color.r = 0.5;
     block_color.g = 0.5;
     block_color.b = 0.5;
-    block_color.a = 0.1;
+    block_color.a = 0.5;
     color_name = "Support block color";
     break;
   default:

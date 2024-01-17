@@ -112,7 +112,7 @@ std::pair<CollisionObject, ObjectColor> Setup_Builder::setupBase()
   pose.orientation.y = 0.0;
   pose.orientation.z = 0;
   pose.position.x = -0.94;//measured in the real setup
-  pose.position.y = 0;//measured in the real setup
+  pose.position.y = 0.0;//measured in the real setup 15 ror cobotta and 0 for VP
   pose.position.z = table_z_size/2 + base_z_size/2 + minimum_resolution;
 
   object.primitives.push_back(primitive);
