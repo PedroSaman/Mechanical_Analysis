@@ -75,10 +75,10 @@ void get_color(const std::shared_ptr<environment_interface::srv::GetBlockColor::
     color_name = "Gray";
     break;
   case SUPPORT:
-    block_color.r = 1.0;
-    block_color.g = 1.0;
-    block_color.b = 1.0;
-    block_color.a = 0.3;
+    block_color.r = 0.5;
+    block_color.g = 0.5;
+    block_color.b = 0.5;
+    block_color.a = 0.5;
     color_name = "Support block color";
     break;
   default:

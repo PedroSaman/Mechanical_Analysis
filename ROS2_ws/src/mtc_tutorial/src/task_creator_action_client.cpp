@@ -118,6 +118,7 @@ public:
 
   environment_interface::msg::Block prepare_block_structure(size_t current_block)
   {  
+    //AssemblyArea,X,Y,Z,SizeX,SizeY,SizeZ,ColorIndex,IsSupport,CanPress,ShiftX,ShiftY
     environment_interface::msg::Block block;
     block.x = assembly_plan_[current_block][1];
     block.y = assembly_plan_[current_block][2];
@@ -208,7 +209,7 @@ private:
   void feedback_callback(GoalHandleTaskCreator::SharedPtr, const std::shared_ptr<const TaskCreator::Feedback> feedback)
   {
     std::stringstream ss;
-    ss << "Comptuing the Task:";
+    ss << "Computing the Task:";
     ss << feedback->partial_output;
     RCLCPP_INFO(this->get_logger(), ss.str().c_str());
   }
@@ -346,7 +347,7 @@ void correct_color(environment_interface::msg::Block block)
   psi.applyCollisionObject(replacement_block, block.color);
 }
 
-void refil_block(moveit_msgs::msg::CollisionObject refil_object, std_msgs::msg::ColorRGBA refil_color)
+void refill_block(moveit_msgs::msg::CollisionObject refil_object, std_msgs::msg::ColorRGBA refil_color)
 {
   //std_msgs::msg::ColorRGBA refil_color = this->getColor(GRAY);
   refil_object.operation = refil_object.ADD;
@@ -373,14 +374,14 @@ int main(int argc, char **argv)
   {
     block = action_client->prepare_block_structure(current_block);
     replacement_block = request_block(block);
-    for (size_t operation_id = 1; operation_id < 9; operation_id++)
+    for (size_t operation_id = 1; operation_id < 10; operation_id++)
     { 
-      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "\nSending operation %ld to block %ld", operation_id, current_block);
+      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "\nSending operation %ld to block %ld", operation_id, current_block+1);
       call_service(operation_id, block, action_client);
-      sleep(0.5);
+      sleep(0.2);
     }
     std_msgs::msg::ColorRGBA refil_color = action_client->getColor(GRAY);
-    refil_block(replacement_block, refil_color);
+    refill_block(replacement_block, refil_color);
     correct_color(block);
   }
   call_service(GO_HOME, block, action_client);

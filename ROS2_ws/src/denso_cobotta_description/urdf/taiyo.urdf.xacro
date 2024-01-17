@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot name="denso_vp6242" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="taiyo_gripper" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 	<link name="gripper_base">
 		<visual>
@@ -73,7 +73,7 @@
 		<child link="left_finger"/>
 		<origin rpy="0.000000 0.000000 1.57079632679" xyz="0 ${scale_value*0.036789} ${scale_value*0.08427}"/>
 		<axis xyz="-1.000000 0.000000 -0.000000"/>
-		<limit effort="${scale_value * 200000}" lower="0.000000" upper="${scale_value * 0.018819}" velocity="${scale_value * 18.000000}"/>
+		<limit effort="${scale_value * 200000}" lower="0.000000" upper="${scale_value * 0.018819}" velocity="${scale_value * 18.000001}"/>
 		<dynamics damping="0" friction="0"/>
 	</joint>
 
@@ -124,7 +124,7 @@
 		<mimic joint="joint_gripper" multiplier="-1.000000" offset="0.000000"/>
 		<origin rpy="0.000000 0.000000 1.57079632679" xyz="0 -${scale_value*0.036789} ${scale_value*0.08427}"/>
 		<axis xyz="-1.000000 0.000000 -0.000000"/>
-		<limit effort="${scale_value * 200000}" lower="-${scale_value * 0.018819}" upper="0.000000" velocity="${scale_value * 18.00000}"/>
+		<limit effort="${scale_value * 200000}" lower="-${scale_value * 0.018819}" upper="0.000000" velocity="${scale_value * 18.00001}"/>
 		<dynamics damping="0" friction="0"/>
 	</joint>
 
