@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: epson_t3_description
+    relative_path: urdf/epson_t3_description.urdf.xacro
+  srdf:
+    relative_path: config/epson_t3.srdf
+  package_settings:
+    author_name: rakshith
+    author_email: rakshith@rakshith.com
+    generated_timestamp: 1705471591
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

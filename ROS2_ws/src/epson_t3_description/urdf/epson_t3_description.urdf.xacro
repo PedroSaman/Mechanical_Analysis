@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="epson_t3" xmlns:xacro="http://www.ros.org/wiki/xacro"> 
+  <xacro:arg name="gripper_type" default="tayo"/>
+	<xacro:property name="gripper_type" value="$(arg gripper_type)" />
+	<xacro:property name="scale_value" value="100.0"/>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/base_link.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/base_link.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/link_1.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/link_1.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/link_2.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+      <material
+        name="">
+        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/link_2.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="link_2_virtual">
+  </link>
+
+  <link name="link_3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/link_3.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+      <material
+        name="">
+        <color  rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://epson_t3_description/meshes/link_3.STL" scale="${scale_value} ${scale_value} ${scale_value}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint_1" type="revolute">
+    <origin xyz="${scale_value*0.14498} ${scale_value*-0.0016851} ${scale_value*0.1913}" rpy="1.5708 0 -0.011622" />
+    <parent link="base_link" />
+    <child link="link_1" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.0492" upper="2.0492" effort="1000" velocity="1" />
+  </joint>
+
+  <joint name="joint_2" type="revolute">
+    <origin xyz="${scale_value*0.225} ${scale_value*0.0128} ${scale_value*-0.0016852}" rpy="0 0.023733 0" />
+    <parent link="link_1" />
+    <child link="link_2" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.4609" upper="2.4609" effort="0" velocity="1" />
+  </joint>
+
+  <joint name="joint_3" type="prismatic">
+    <origin xyz="${scale_value*0.175} ${scale_value*0} 0" rpy="0 1.0337 0" />
+    <parent link="link_2" />
+    <child link="link_2_virtual" />
+    <axis xyz="0 1 0" />
+    <limit lower="${scale_value*-0.1200}" upper="${scale_value*-0.0220}" effort="10" velocity="0.1" />
+  </joint>
+
+  <joint name="joint_4" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 -3.14" />
+    <parent link="link_2_virtual" />
+    <child link="link_3" />
+    <axis xyz="0 1 0" />
+    <limit lower="-3.14" upper="3.14" effort="0" velocity="0" />
+  </joint>
+
+	<xacro:if value="${gripper_type != 'none'}">
+   	<xacro:include filename="$(find epson_t3_description)/urdf/${gripper_type}.urdf.xacro" />
+  </xacro:if>
+
+  <link name="world"/>
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="-10 0 20"/>
+  </joint>
+
+</robot>

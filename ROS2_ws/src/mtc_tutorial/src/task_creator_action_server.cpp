@@ -36,6 +36,7 @@ public:
 
 private:
   // Compose an MTC task from a series of stages.
+  std::string scara_testing(environment_interface::msg::Block block, std::string robot_name, std::string planner_id);
   std::string position_to_pickPlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id);
   std::string descend_to_pickPlan(std::string robot_name, std::string planner_id);
   std::string move_gripperPlan(environment_interface::msg::Block block, std::string command, std::string robot_name);
@@ -130,6 +131,10 @@ std::string MTCTaskNode::doTask(environment_interface::msg::Block block, size_t 
   bool is_a_mtc_task = false;
   std::string plan_output;
   mtc::Task task;
+  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Do task");
+  /*operation_id_string = "SCARA_TESTING";
+  plan_outout = scara_testing(block, robot_name, planner_id);*/
+
   
   switch (operation_id)
   {
@@ -190,6 +195,7 @@ std::string MTCTaskNode::doTask(environment_interface::msg::Block block, size_t 
     plan_output = "Operation is not implemented.";
     break;
   }
+  
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "operation_id: %s",operation_id_string.c_str());
 
   if(is_a_mtc_task){ //If the plan was done using the MTC task constructor
@@ -222,6 +228,54 @@ std::string MTCTaskNode::doTask(environment_interface::msg::Block block, size_t 
     }
   }
   return "Everything should have went right, yahooo";
+}
+
+std::string MTCTaskNode::scara_testing(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
+{
+  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "entered scara testing.");
+  const auto& arm_group_name = robot_name + "_arm";
+  const auto& hand_frame = "gripper_tip";
+
+  /*moveit::planning_interface::PlanningSceneInterface psi;
+  std::map<std::string, geometry_msgs::msg::Pose> object_name_pose;
+  geometry_msgs::msg::Pose retrieved_pose = object_name_pose[hand_frame];
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position x: %.2f y: %.2f z: %.2f\n",retrieved_pose.position.x,retrieved_pose.position.y,retrieved_pose.position.z);
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",retrieved_pose.orientation.w,retrieved_pose.orientation.x,retrieved_pose.orientation.y,retrieved_pose.orientation.z);
+*/
+  auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
+  std::vector<double> group_variable_values;
+  group_variable_values = move_group_interface.getCurrentJointValues();
+  RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Retrieved position of joint : %.2f", group_variable_values[0]);
+  std::map<std::string, double> variable_values;
+    /*variable_values.insert(std::pair<std::string, double>("joint_1", -0.733038));
+    variable_values.insert(std::pair<std::string, double>("joint_2", -0.349066));
+    variable_values.insert(std::pair<std::string, double>("joint_3", -4.158));
+    variable_values.insert(std::pair<std::string, double>("joint_4", -1.85));*/
+    variable_values.insert(std::pair<std::string, double>("joint_1", group_variable_values[0]+0.1));
+    variable_values.insert(std::pair<std::string, double>("joint_2", group_variable_values[1]-0.1));
+    variable_values.insert(std::pair<std::string, double>("joint_3", group_variable_values[2]-0.30));
+    variable_values.insert(std::pair<std::string, double>("joint_4", group_variable_values[3]-0.2));
+
+  move_group_interface.setJointValueTarget(variable_values);
+  /*move_group_interface.setPoseTarget(retrieved_pose,hand_frame);*/
+  move_group_interface.setPlannerId(planner_id);
+  
+  move_group_interface.setMaxVelocityScalingFactor(0.9);
+  move_group_interface.setMaxAccelerationScalingFactor(0.9);
+  
+  // Create a plan to that target pose
+  moveit::planning_interface::MoveGroupInterface::Plan plan;
+  auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
+  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "created plan.");
+  // Execute the plan
+  if(plan_output) {
+    move_group_interface.execute(plan);
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
+  }
+  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "executed plan.");
+
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 std::string MTCTaskNode::position_to_pickPlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
@@ -261,7 +315,7 @@ std::string MTCTaskNode::position_to_pickPlan(environment_interface::msg::Block 
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
 
-  return moveit::core::errorCodeToString(plan_output);
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 std::string MTCTaskNode::descend_to_pickPlan(std::string robot_name, std::string planner_id)
@@ -291,7 +345,7 @@ std::string MTCTaskNode::descend_to_pickPlan(std::string robot_name, std::string
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
-  return moveit::core::errorCodeToString(plan_output);
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 std::string MTCTaskNode::move_gripperPlan(environment_interface::msg::Block block, std::string command, std::string robot_name)
@@ -339,7 +393,11 @@ std::string MTCTaskNode::move_gripperPlan(environment_interface::msg::Block bloc
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
-  return moveit::core::errorCodeToString(plan_output);
+
+
+  return moveit::core::error_code_to_string(plan_output);
+
+
 }
 
 std::string MTCTaskNode::ascend_with_blockPlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
@@ -386,7 +444,7 @@ std::string MTCTaskNode::ascend_with_blockPlan(environment_interface::msg::Block
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
 
-  return moveit::core::errorCodeToString(plan_output);
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 std::string MTCTaskNode::position_to_placePlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
@@ -443,7 +501,7 @@ std::string MTCTaskNode::position_to_placePlan(environment_interface::msg::Block
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
 
-  return moveit::core::errorCodeToString(plan_output);
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 std::string MTCTaskNode::descend_to_placePlan(std::string robot_name, std::string planner_id)
@@ -473,7 +531,7 @@ std::string MTCTaskNode::descend_to_placePlan(std::string robot_name, std::strin
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
-  return moveit::core::errorCodeToString(plan_output);
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 std::string MTCTaskNode::retreat_from_structurePlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
@@ -508,7 +566,7 @@ std::string MTCTaskNode::retreat_from_structurePlan(environment_interface::msg::
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
 
-  return moveit::core::errorCodeToString(plan_output);
+  return moveit::core::error_code_to_string(plan_output);
 }
 
 mtc::Task MTCTaskNode::go_homeTask(std::string robot_name)
