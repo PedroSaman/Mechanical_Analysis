@@ -1,8 +1,8 @@
 # Default initial positions for epson_t3's ros2_control fake system
 
 initial_positions:
-  joint_1: 0.767945
-  joint_2: -1.90247
-  joint_3: -2.2
+  joint_1: 0.77945
+  joint_2: -1.98247
+  joint_3: -4.3
   joint_4: 0.15708
-  joint_gripper: -0.139626
+  joint_gripper: 0.139626
