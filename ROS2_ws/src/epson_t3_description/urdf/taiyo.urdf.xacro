@@ -8,8 +8,8 @@
 				<mesh filename="package://epson_t3_description/meshes/visual/tool/ESG1-FS-2840.dae" scale="${scale_value} ${scale_value} ${scale_value}"/>
 			</geometry>
 		</visual>
-		<collision>
-			<origin rpy="0 0 1.57079632679" xyz="0 0 ${scale_value*0.042135}"/>
+		<collision>7222
+			<origin rpy="0 0 1.57079632679" xyz="0 0 ${scale_value*0.042135}"/> 
 			<geometry>
 				<box size="${scale_value*0.11095} ${scale_value*0.04021} ${scale_value*0.08427}"/>
 			</geometry>
@@ -42,7 +42,7 @@
 	<joint name="robot_to_gripper" type="fixed">
 		<parent link="link_3"/>
 		<child link="robot_gripper_interface"/>
-		<origin rpy="-1.5708 0 0" xyz="0 1 0"/>
+		<origin rpy="1.5708 3.14159 0" xyz="0 0 0"/> <!--DECREASED Y-Axis from orign-->
 	</joint>
 
 	<joint name="joint_gripper_base" type="fixed">
@@ -68,6 +68,7 @@
 			</geometry>
 		</collision>
 	</link>
+
 	<joint name="joint_gripper" type="prismatic">
 		<parent link="gripper_base"/>
 		<child link="left_finger"/>
@@ -160,4 +161,3 @@
 	</joint>
 
 </robot>
-
