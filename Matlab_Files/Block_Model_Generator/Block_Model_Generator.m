@@ -34,11 +34,11 @@ function Block_Model_Generator(file_name)
 
     voxels_vector = sortrows(voxels_vector,collumn_to_sort); % Sort voxels from lowest Z to highest
     last_layer = voxels_vector(end,3); % Last layer    
-    range = Voxel_Model_Range_Calculator(voxels_vector); % Each layer range (first and last voxels)
+    range = voxel_model_range_calculator(voxels_vector); % Each layer range (first and last voxels)
     
     block_index = 1; 
     for i = 1 : last_layer % For every layer converts voxel representation to initial block model
-        Layer_Blocks = create_layer(voxels_vector(range(i,1):range(i,2),1:3)); % Funtion that returns the block list that represents the current layer
+        Layer_Blocks = create_layer(voxels_vector(range(i,1):range(i,2),1:3)); % Function that returns the block list that represents the current layer
         if(Layer_Blocks == -1)
             fprintf("\nERROR. populate_voxel_map did not find a block that fit one voxel.\n");
             return;
@@ -49,5 +49,6 @@ function Block_Model_Generator(file_name)
     end
     Block_Model(block_index:end,:) = []; % Erase unused space
     Block_Model(:,1:3) = Block_Model(:,1:3) - 1; % Correct Cartesian representation to be the same as Kohama structure
+    Block_Model(:,7) = 0;
     dlmwrite(save_file_location + file_name + '_P.txt', Block_Model, ' '); % Create the block model using the endind "_P" to identify that this block model was created using Pedro algorithm
 end

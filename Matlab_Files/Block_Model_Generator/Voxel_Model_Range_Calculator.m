@@ -1,4 +1,4 @@
-function range = Voxel_Model_Range_Calculator(voxels_vector)
+function range = voxel_model_range_calculator(voxels_vector)
 % Given the voxels model in the input, determines the first and last blocks
 % of each layer.
 %
