@@ -178,10 +178,10 @@ function Fnz = Fnz(join)
     
     if(size(remove ~= 0))
         while(count_remove ~= 0)
-            Fnz(remove(count_remove),3) = -3;
+            Fnz(remove(count_remove),:) = [];
             count_remove = count_remove - 1;
         end
     end
 
-    %Fnz(:,1) = 1:size(Fnz,1);
+    Fnz(:,1) = 1:size(Fnz,1);
 end

@@ -1,4 +1,4 @@
-function plan_formatation(plan,file_location)
+function [csv_plan] = plan_formatation(plan,file_location,final_plan_flag)
 %myFun - Description
 %
 % Syntax: output = myFun(input)
@@ -6,10 +6,9 @@ function plan_formatation(plan,file_location)
 % Long description
 
 % #AssemblyArea,X,Y,Z,SizeX,SizeY,SizeZ,ColorIndex,IsSupport,CanPress,ShiftX,ShiftY
-
-    csv_plan = ones(size(plan,1),12);
-
-    for i = 1:size(plan,1)
+    plan_size = size(plan,1);
+    csv_plan = ones(plan_size,12);
+    for i = 1:plan_size
         csv_plan(i,1) = 0;
         csv_plan(i,2:3) = plan(i,2:3) - 1;
         csv_plan(i,4) = plan(i,4);
@@ -21,17 +20,51 @@ function plan_formatation(plan,file_location)
         else
             csv_plan(i,8) = 0;
         end
+        csv_plan(i,10) = plan(i,7);
+    end
+    
+    if(final_plan_flag == 1)
+        shiftX = zeros(plan_size,1);
+        shiftY = zeros(plan_size,1);
+        for k = 1:plan(end,4)
+            knob_i = knob(plan, k); % Layer knob information
+            adjoin_i = adjoin(knob_i); % Layer adjoin blocks information
+            for j = 1:size(adjoin_i,1)
+                if(adjoin_i(j,1) == 1) %shiftX
+                    block_in_the_left = adjoin_i(j,2);
+                    block_in_the_right = adjoin_i(j,4);
+                    if(block_in_the_left>block_in_the_right)
+                        shiftX(block_in_the_left) = shiftX(block_in_the_left) - 1;
+                    elseif(block_in_the_right>block_in_the_left)
+                        shiftX(block_in_the_right) = shiftX(block_in_the_right) + 1;
+                    end
+                elseif(adjoin_i(j,1) == 2) %shiftY
+                    block_in_the_front = adjoin_i(j,2);
+                    block_in_the_back = adjoin_i(j,4);
+                    if(block_in_the_front>block_in_the_back)
+                        shiftY(block_in_the_front) = shiftY(block_in_the_front) - 1;
+                    elseif(block_in_the_back>block_in_the_front)
+                        shiftY(block_in_the_back) = shiftY(block_in_the_back) + 1;
+                    end
+                end
+            end
+        end
 
-        csv_plan(i,11) = 0; %for now = 0
-        csv_plan(i,12) = 0; %for now = 0
-        %{
-            ShiftX,ShiftY =  
+        for k = 1:plan_size
+            if(shiftX(k) > 0)
+                shiftX(k) = 1;
+            elseif(shiftX(k) < 0)
+                shiftX(k) = -1;
+            end
+            if(shiftY(k) > 0)
+                shiftY(k) = 1;
+            elseif(shiftY(k) < 0)
+                shiftY(k) = -1;
+            end
+        end
 
-            if (rightNeightbors.Any(p => this.Occupy(p))) shiftX--;
-            if (leftNeightbors.Any(p => this.Occupy(p))) shiftX++;
-            if (frontNeightbors.Any(p => this.Occupy(p))) shiftY--;
-            if (backNeightbors.Any(p => this.Occupy(p))) shiftY++;
-        %} 
+        csv_plan(:,11) = shiftX;
+        csv_plan(:,12) = shiftY;
     end
     csvwrite(strrep(file_location, 'txt' , 'csv' ), csv_plan);
 end

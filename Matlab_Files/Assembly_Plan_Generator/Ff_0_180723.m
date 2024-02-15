@@ -1,4 +1,4 @@
-function Ff = Ff_0_180723(model)
+function F = Ff_0_180723(model)
 %Compute the friction force position for blocks in the first layer
 %input: model:(Block_Number, x, y, z, type, color)
 %output: Ff = (Force_Number, Block_Number, Knob_Number, x, y, z, ub/lb, ...)
@@ -24,7 +24,6 @@ end
 force = 1;
 max_force_number = 80; % Maximum number of forces that can appear in a block. (for a 2x9 block is 80)
 F = zeros(count*max_force_number, 13);
-F(1:(count*max_force_number), 1) = 1: (count*max_force_number); % Force Number
 for n = 1 : count
     [col,row] = col_row_converter(model(n, 5)); % Block number of columns and rows
     i = 1;
@@ -112,7 +111,10 @@ for n = 1 : count
            end
         end
     end
-    force = force + block_force; % Update force value
+    F(force+block_force:force+2*block_force-1,:) = F(force:force+block_force-1,:); %Double the friction force
+    F(force+block_force:force+2*block_force-1,6) = -0.5;
+    F(force:force+2*block_force-1) = 1:2*block_force;
+    force = force + 2*block_force; % Update force value
 end
 
-Ff = F(1:force-1, :);
+F = F(1:force-1, :);
