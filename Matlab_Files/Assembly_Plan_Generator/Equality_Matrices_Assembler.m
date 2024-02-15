@@ -42,8 +42,7 @@ function [Aeq,beq] = Equality_Matrices_Assembler(F,N,force,model,M)
         Aeq((6*n - 5) : 6*n, 1 : (3*force + 1)) = [K_i; P_i] * PN_i; %[W1*A1;W2*A2,...,Wn*An]
         %Mass changes depending on block type [b1;b2;...;bn]
         [col,row] = col_row_converter(model(n, 5));
-        mass = col*row*2/60; % If the block does not have a registered mass
-
+        mass = col*row*1/30; % If the block does not have a registered mass
         for i = 1:size(M) % Search for the registered mass
             if(model(n, 5) == M(i,1))
                 mass =  M(i,2);

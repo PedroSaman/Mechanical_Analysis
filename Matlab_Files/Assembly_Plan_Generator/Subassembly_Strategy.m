@@ -16,7 +16,6 @@ function [plan,subassembly_strategy_output] = Subassembly_Strategy(model,block_n
     break_layer = layer - 1; % Where to divide the two subassemblies
     [submodel1,submodel2] = Separate_Subassemblies(model,break_layer); % Create both subassemblies data structure
     
-    fprintf("\nFrom block %d a Subassembly is necessary.\n",block_number);
     fprintf("\nStarted the Subassembly assembly planning. It has %d blocks\n\n",size(submodel2,1));
     
     %% Count support blocks in subassembly one

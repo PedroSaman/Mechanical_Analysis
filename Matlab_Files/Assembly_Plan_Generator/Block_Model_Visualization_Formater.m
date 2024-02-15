@@ -5,8 +5,8 @@ function Block_Model_Visualization_Formater(filename)
 
 directory = "../../Block_Printer_System/Models/BlockModel/";
 block_model = model_loader(directory + filename + ".txt"); % Load model and adapt it to the Stability Judge format
-plan_formatation(block_model,directory + filename + "_visualization" + ".txt");
-fprintf("\nModel completed. Plan available in %s\n",directory + filename + ".txt");
+plan_formatation(block_model,directory + filename + "_visualization" + ".txt",1);
+fprintf("\nModel completed. Plan available in %s\n",directory + filename + "_visualization" + ".txt");
 
 end
 
