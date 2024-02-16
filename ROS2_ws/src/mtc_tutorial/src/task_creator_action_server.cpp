@@ -20,7 +20,7 @@
 #include <functional>
 #include <memory>
 #include <thread>
-
+#include <moveit/robot_model_loader/robot_model_loader.h>
 using namespace std::chrono_literals;
 namespace mtc = moveit::task_constructor;
 
@@ -36,7 +36,6 @@ public:
 
 private:
   // Compose an MTC task from a series of stages.
-  std::string scara_testing(environment_interface::msg::Block block, std::string robot_name, std::string planner_id);
   std::string position_to_pickPlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id);
   std::string descend_to_pickPlan(std::string robot_name, std::string planner_id);
   std::string move_gripperPlan(environment_interface::msg::Block block, std::string command, std::string robot_name);
@@ -131,10 +130,6 @@ std::string MTCTaskNode::doTask(environment_interface::msg::Block block, size_t 
   bool is_a_mtc_task = false;
   std::string plan_output;
   mtc::Task task;
-  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Do task");
-  /*operation_id_string = "SCARA_TESTING";
-  plan_outout = scara_testing(block, robot_name, planner_id);*/
-
   
   switch (operation_id)
   {
@@ -230,54 +225,6 @@ std::string MTCTaskNode::doTask(environment_interface::msg::Block block, size_t 
   return "Everything should have went right, yahooo";
 }
 
-std::string MTCTaskNode::scara_testing(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
-{
-  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "entered scara testing.");
-  const auto& arm_group_name = robot_name + "_arm";
-  const auto& hand_frame = "gripper_tip";
-
-  /*moveit::planning_interface::PlanningSceneInterface psi;
-  std::map<std::string, geometry_msgs::msg::Pose> object_name_pose;
-  geometry_msgs::msg::Pose retrieved_pose = object_name_pose[hand_frame];
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position x: %.2f y: %.2f z: %.2f\n",retrieved_pose.position.x,retrieved_pose.position.y,retrieved_pose.position.z);
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",retrieved_pose.orientation.w,retrieved_pose.orientation.x,retrieved_pose.orientation.y,retrieved_pose.orientation.z);
-*/
-  auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
-  std::vector<double> group_variable_values;
-  group_variable_values = move_group_interface.getCurrentJointValues();
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Retrieved position of joint : %.2f", group_variable_values[0]);
-  std::map<std::string, double> variable_values;
-    /*variable_values.insert(std::pair<std::string, double>("joint_1", -0.733038));
-    variable_values.insert(std::pair<std::string, double>("joint_2", -0.349066));
-    variable_values.insert(std::pair<std::string, double>("joint_3", -4.158));
-    variable_values.insert(std::pair<std::string, double>("joint_4", -1.85));*/
-    variable_values.insert(std::pair<std::string, double>("joint_1", group_variable_values[0]+0.1));
-    variable_values.insert(std::pair<std::string, double>("joint_2", group_variable_values[1]-0.1));
-    variable_values.insert(std::pair<std::string, double>("joint_3", group_variable_values[2]-0.30));
-    variable_values.insert(std::pair<std::string, double>("joint_4", group_variable_values[3]-0.2));
-
-  move_group_interface.setJointValueTarget(variable_values);
-  /*move_group_interface.setPoseTarget(retrieved_pose,hand_frame);*/
-  move_group_interface.setPlannerId(planner_id);
-  
-  move_group_interface.setMaxVelocityScalingFactor(0.9);
-  move_group_interface.setMaxAccelerationScalingFactor(0.9);
-  
-  // Create a plan to that target pose
-  moveit::planning_interface::MoveGroupInterface::Plan plan;
-  auto const plan_output = static_cast<bool>(move_group_interface.plan(plan));
-  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "created plan.");
-  // Execute the plan
-  if(plan_output) {
-    move_group_interface.execute(plan);
-  } else {
-    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
-  }
-  RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "executed plan.");
-
-  return moveit::core::error_code_to_string(plan_output);
-}
-
 std::string MTCTaskNode::position_to_pickPlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
 {
   const auto& arm_group_name = robot_name + "_arm";
@@ -298,7 +245,15 @@ std::string MTCTaskNode::position_to_pickPlan(environment_interface::msg::Block 
   retrieved_pose.position.x -= GRIPPER_POSITION_TO_PICK_CORRECTION; //Stop at POSITION_TO_PICK_DISTANCE cm above the block
   retrieved_pose.orientation.w = 0; //Correcting the orientation to pick
   retrieved_pose.orientation.y = 1;
-  move_group_interface.setPoseTarget(retrieved_pose,hand_frame);
+  
+  if(robot_name == "epson_t3")
+  {
+    move_group_interface.setJointValueTarget(retrieved_pose,hand_frame);
+  }
+  else
+  {
+    move_group_interface.setPoseTarget(retrieved_pose,hand_frame);
+  }
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(10);
@@ -310,7 +265,7 @@ std::string MTCTaskNode::position_to_pickPlan(environment_interface::msg::Block 
 
   // Execute the plan
   if(plan_output) {
-    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing success!");
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Planing success!");
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
@@ -325,11 +280,18 @@ std::string MTCTaskNode::descend_to_pickPlan(std::string robot_name, std::string
 
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
   geometry_msgs::msg::PoseStamped gripper_tip_pose = move_group_interface.getCurrentPose(hand_frame);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.position.x,gripper_tip_pose.pose.position.y,gripper_tip_pose.pose.position.z);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.orientation.w,gripper_tip_pose.pose.orientation.x,gripper_tip_pose.pose.orientation.y,gripper_tip_pose.pose.orientation.z);
-  gripper_tip_pose.pose.position.z -= (POSITION_TO_PICK_DISTANCE - block_size_z/2 - minimum_resolution); //Stop at POSITION_TO_PICK_DISTANCE cm above the block 22.12;//
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
-  move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+
+  if(robot_name == "epson_t3")
+  {
+    //geometry_msgs::msg::PoseStamped gripper_tip_pose = move_group_interface.getCurrentPose("gripper_base");
+    gripper_tip_pose.pose.position.z -= (POSITION_TO_PICK_DISTANCE - block_size_z/2 - minimum_resolution);
+    move_group_interface.setJointValueTarget(gripper_tip_pose.pose,hand_frame);
+  }
+  else
+  {
+    gripper_tip_pose.pose.position.z -= (POSITION_TO_PICK_DISTANCE - block_size_z/2 - minimum_resolution); //Stop at POSITION_TO_PICK_DISTANCE cm above the block 22.12;//
+    move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+  }
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(10);
@@ -354,13 +316,23 @@ std::string MTCTaskNode::move_gripperPlan(environment_interface::msg::Block bloc
   const auto& hand_group_name = robot_name + "_hand";
   float gripper_joint_position;
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, hand_group_name);
-  float block_size;
-  
-  if(command == "OPEN"){
+  float block_size, gripper_max;
+  if(robot_name == "epson_t3")
+  {
+   gripper_max = 1.5;
+  }
+  else
+  {
+   gripper_max = gripper_max_opening;
+  }
+
+  if(command == "OPEN")
+  {
     std::vector<double> current_joint_value;
     current_joint_value = move_group_interface.getCurrentJointValues();
     gripper_joint_position = current_joint_value[0] - 0.05; //Open the gripper 0.05 cm 
-  }else{
+  }
+  else{
     if((block.x_size == 2 && block.y_size == 1) || (block.x_size == 1 && block.y_size == 2)){
       block_size = block_size_x/2;
     }else if(block.x_size > block.y_size){
@@ -369,16 +341,17 @@ std::string MTCTaskNode::move_gripperPlan(environment_interface::msg::Block bloc
       block_size = block_size_x*block.y_size/2;
     }
     if(command == "CLOSE"){
-      gripper_joint_position = gripper_max_opening - block_size + KNOB_DISTANCE_TO_GRASP;
+      gripper_joint_position = gripper_max - block_size + KNOB_DISTANCE_TO_GRASP-0.07;
     }else if(command == "PRE_OPEN"){
-      gripper_joint_position = gripper_max_opening - block_size + KNOB_DISTANCE_TO_GRASP - 0.1;
+      gripper_joint_position = gripper_max - block_size + KNOB_DISTANCE_TO_GRASP - 0.1;
     }
   }
 
   std::map<std::string, double> joint_values;
   joint_values["joint_gripper"] = gripper_joint_position;
-  
+  RCLCPP_ERROR(rclcpp::get_logger("rclpp"),"Gripper position: %.4f", gripper_joint_position);
   move_group_interface.setJointValueTarget(joint_values);
+  
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(10);
@@ -394,10 +367,7 @@ std::string MTCTaskNode::move_gripperPlan(environment_interface::msg::Block bloc
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
 
-
   return moveit::core::error_code_to_string(plan_output);
-
-
 }
 
 std::string MTCTaskNode::ascend_with_blockPlan(environment_interface::msg::Block block, std::string robot_name, std::string planner_id)
@@ -411,14 +381,7 @@ std::string MTCTaskNode::ascend_with_blockPlan(environment_interface::msg::Block
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
   move_group_interface.attachObject(object_name, hand_frame);
   geometry_msgs::msg::PoseStamped gripper_tip_pose = move_group_interface.getCurrentPose(hand_frame);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.position.x,gripper_tip_pose.pose.position.y,gripper_tip_pose.pose.position.z);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.orientation.w,gripper_tip_pose.pose.orientation.x,gripper_tip_pose.pose.orientation.y,gripper_tip_pose.pose.orientation.z);
-  /*
-  if(robot_name == "denso_cobotta"){
-    gripper_tip_pose.pose.position.z += POSITION_TO_PICK_DISTANCE*4;
-  }else{
-    gripper_tip_pose.pose.position.z += POSITION_TO_PICK_DISTANCE/4;
-  }*/
+
   if(robot_name == "denso_cobotta"){
     gripper_tip_pose.pose.position.z += POSITION_TO_PICK_DISTANCE*5;
   }else if(robot_name == "denso_vp6242"){
@@ -427,7 +390,15 @@ std::string MTCTaskNode::ascend_with_blockPlan(environment_interface::msg::Block
     gripper_tip_pose.pose.position.z += POSITION_TO_PICK_DISTANCE;
   }
   //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
-  move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+  if(robot_name == "epson_t3")
+  {
+    move_group_interface.setJointValueTarget(gripper_tip_pose.pose,hand_frame);
+  }
+  else
+  {
+    move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+  }
+  
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(10);
@@ -453,7 +424,7 @@ std::string MTCTaskNode::position_to_placePlan(environment_interface::msg::Block
   const auto& hand_frame = "gripper_tip";
 
   geometry_msgs::msg::PoseStamped target_pose_msg;
-  target_pose_msg.header.frame_id = "base";
+  target_pose_msg.header.frame_id = "base"; 
   target_pose_msg.pose.position.x = -base_x_size/2 + block_size_x*((block.x) + block.x_size/2);
   target_pose_msg.pose.position.y = -base_y_size/2 + block_size_x*((block.y) + block.y_size/2);
   target_pose_msg.pose.position.z = base_z_size/2 + block_size_z/2 + block_size_z*(block.z + BASE_CORRECTION_VALUE) + INSERT_DISTANCE;
@@ -483,7 +454,43 @@ std::string MTCTaskNode::position_to_placePlan(environment_interface::msg::Block
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",target_pose_msg.pose.orientation.w,target_pose_msg.pose.orientation.x,target_pose_msg.pose.orientation.y,target_pose_msg.pose.orientation.z);
 
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
-  move_group_interface.setPoseTarget(target_pose_msg,hand_frame);
+  if(robot_name == "epson_t3")
+  {
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "executing Position to place!!!!");
+    std::vector<geometry_msgs::msg::Pose> collision_objects;
+    geometry_msgs::msg::Pose object;
+    std::map<std::string, geometry_msgs::msg::Pose> object_name_map;
+    geometry_msgs::msg::Pose corrected_pose;
+    moveit::planning_interface::PlanningSceneInterface psi;
+    std::vector<std::string> obj;
+    std::map<std::string, geometry_msgs::msg::Pose>::iterator it;
+    obj.push_back("base");
+    object_name_map = psi.getObjectPoses(obj); 
+    it = object_name_map.find("base");
+    if (it != object_name_map.end()) 
+    {
+      corrected_pose = it->second;
+    }
+    corrected_pose.position.x += target_pose_msg.pose.position.x;
+    corrected_pose.position.y += target_pose_msg.pose.position.y;
+    corrected_pose.position.z += target_pose_msg.pose.position.z;
+
+    target_pose_msg.header.frame_id = "world";
+    target_pose_msg.pose.position.x =corrected_pose.position.x;
+    target_pose_msg.pose.position.y = corrected_pose.position.y;
+    target_pose_msg.pose.position.z = corrected_pose.position.z;
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position from Target Pos  x: %.2f y: %.2f z: %.2f\n",target_pose_msg.pose.position.x,target_pose_msg.pose.position.y,target_pose_msg.pose.position.z);
+
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position from corrected Pos x: %.2f y: %.2f z: %.2f\n",corrected_pose.position.x,corrected_pose.position.y,corrected_pose.position.z);
+
+    move_group_interface.setJointValueTarget(target_pose_msg,hand_frame);
+  }
+  else
+  {
+    move_group_interface.setPoseTarget(target_pose_msg,hand_frame);
+  }
+  
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(10);
@@ -500,7 +507,6 @@ std::string MTCTaskNode::position_to_placePlan(environment_interface::msg::Block
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
-
   return moveit::core::error_code_to_string(plan_output);
 }
 
@@ -508,14 +514,18 @@ std::string MTCTaskNode::descend_to_placePlan(std::string robot_name, std::strin
 {
   const auto& arm_group_name = robot_name + "_arm";
   const auto& hand_frame = "gripper_tip";
-
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
   geometry_msgs::msg::PoseStamped gripper_tip_pose = move_group_interface.getCurrentPose(hand_frame);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.position.x,gripper_tip_pose.pose.position.y,gripper_tip_pose.pose.position.z);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.orientation.w,gripper_tip_pose.pose.orientation.x,gripper_tip_pose.pose.orientation.y,gripper_tip_pose.pose.orientation.z);
-  gripper_tip_pose.pose.position.z -= (INSERT_DISTANCE - block_size_z/2 - minimum_resolution); //Stop at POSITION_TO_PICK_DISTANCE cm above the block 22.12;//
-  RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
-  move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+  gripper_tip_pose.pose.position.z -= (INSERT_DISTANCE - block_size_z/2 - minimum_resolution);
+  if(robot_name == "epson_t3")
+  {
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
+    move_group_interface.setJointValueTarget(gripper_tip_pose.pose,hand_frame);
+  }
+  else
+  {
+    move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+  }
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(15);
@@ -524,7 +534,6 @@ std::string MTCTaskNode::descend_to_placePlan(std::string robot_name, std::strin
   move_group_interface.setMaxAccelerationScalingFactor(1.0);
   // Create a plan to that target pose
   auto const plan_output = static_cast<bool>(move_group_interface.move());
-
   // Execute the plan
   if(plan_output) {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing success!");
@@ -545,11 +554,17 @@ std::string MTCTaskNode::retreat_from_structurePlan(environment_interface::msg::
   auto move_group_interface = moveit::planning_interface::MoveGroupInterface(node_, arm_group_name);
   move_group_interface.detachObject(object_name);
   geometry_msgs::msg::PoseStamped gripper_tip_pose = move_group_interface.getCurrentPose(hand_frame);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose position x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.position.x,gripper_tip_pose.pose.position.y,gripper_tip_pose.pose.position.z);
-  //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Retrieved pose orientation w: %.2f x: %.2f y: %.2f z: %.2f",gripper_tip_pose.pose.orientation.w,gripper_tip_pose.pose.orientation.x,gripper_tip_pose.pose.orientation.y,gripper_tip_pose.pose.orientation.z);
   gripper_tip_pose.pose.position.z += POSITION_TO_RETREAT;
   //RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "New z position: %.2f",gripper_tip_pose.pose.position.z);
-  move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+
+  if(robot_name == "epson_t3")
+  {
+    move_group_interface.setJointValueTarget(gripper_tip_pose.pose,hand_frame);
+  }
+  else
+  {
+    move_group_interface.setPoseTarget(gripper_tip_pose.pose,hand_frame);
+  }
   move_group_interface.allowReplanning(true);
   move_group_interface.setReplanDelay(100);
   move_group_interface.setPlanningTime(10);
@@ -565,7 +580,7 @@ std::string MTCTaskNode::retreat_from_structurePlan(environment_interface::msg::
   } else {
     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Planing failed!");
   }
-
+  
   return moveit::core::error_code_to_string(plan_output);
 }
 
