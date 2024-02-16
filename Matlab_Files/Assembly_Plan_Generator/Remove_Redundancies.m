@@ -1,9 +1,10 @@
 function [plan,removed_blocks_number] = Remove_Redundancies(plan,block,pillar_numb)
 % Remove unnecessary support pillars from the plan. The nature of this
-% stratey can insert more pillars than necessary sometimes. This function
+% strategy can sometimes insert more pillars than necessary. This function
 % searches for those unnecessary and erases them. Also, this function 
-% changes the support blocks "color" value to 99 to represent that it is a
-% support block.
+% changes the support blocks "color" value to 98 to represent that it is a
+% support block. After exiting the support block strategy and if a
+% subassembly strategy is not necessary, this value changes to 99.
 %
 % input: plan: Current assembly plan.
 %       block: block being inserted number uptaded (plus inserted support)
@@ -31,7 +32,7 @@ function [plan,removed_blocks_number] = Remove_Redundancies(plan,block,pillar_nu
                         evaluating_model(j,:) = []; % Remove this block from the evaluating model.
                         removed_blocks = removed_blocks + 1;
                         Z  = Z - 1; % Step down the Z value.
-                        plan(j,6) = 99; % Mark this block as visited in plan.
+                        plan(j,6) = 98; % Mark this block as visited in plan.
                     end
                     j = j - 1;
                 end
@@ -42,7 +43,7 @@ function [plan,removed_blocks_number] = Remove_Redundancies(plan,block,pillar_nu
                 evaluating_model = evaluating_model(1:evaluate_range,:); % Do not consider blocks after the one being evaluated
                 evaluating_model = [(1:size(evaluating_model,1))' , evaluating_model(1:end,2:end)]; %Correct block numbering
                 [planner_output] = Planner_Stability_Judge(evaluating_model); % Evaluate evaluating_model insertion stability
-                if(strcmp(planner_output,'safe')) % If it safe => the removed support pillar is redundant
+                if(strcmp(planner_output,'safe')||strcmp(planner_output,'100safe')) % If it safe => the removed support pillar is redundant
                     plan = [evaluating_model;merger]; % Save the plan as the one without the redundant support pillar
                     block = block - removed_blocks; % Update the number of the being inserted block.
                     i = i - removed_blocks + 1; % Update the iterator i
@@ -55,7 +56,7 @@ function [plan,removed_blocks_number] = Remove_Redundancies(plan,block,pillar_nu
         % Change the support blocks from the support pillar from -1 to 99 in case this is the only support pillar.
         for i = 1 : block
             if(plan(i,6) == -1)
-                plan(i,6) = 99;
+                plan(i,6) = 98;
             end
         end
     end

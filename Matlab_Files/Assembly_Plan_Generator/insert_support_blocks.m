@@ -2,8 +2,8 @@ function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coo
     %Insert support pillars in the positions given by 'support_coordinate' while testing the stability via the stability judge.
     %It is needed a strategy to choose the 'support_coordinate' positions order. For now it is alternated the block to insert the pillar
     %from the ones possible.
-    %input: model: current plan. (PRECISO VERIFICAR NO LAB)
-    %       support_coordinate: (PRECISO VERIFICAR NO LAB)
+    %input: model: current plan.
+    %       support_coordinate:
     %       insert_block: being inserted block number.
     %output: plan: new assembly plan with support pillars inserted.
     %        ins_blk_n: number of blocks inserted.
@@ -57,14 +57,14 @@ function [plan,ins_blk_n,pilar_number] = insert_support_blocks(model,support_coo
                                 break;
                             end
                         end
-                        plan = [plan(1:j-1,:); [0,X,Y,i,11,-1]; plan(j:end,:)];
+                        plan = [plan(1:j-1,:); [0,X,Y,i,11,-1,1]; plan(j:end,:)];
                         ins_blk_n = ins_blk_n + 1;
                     end
                 end
                 support_coordinate(m,:) = [];
                 plan(:,1) = 1:size(plan,1);
                 [planner_output] = Planner_Stability_Judge(plan(1:insert_block + ins_blk_n,:));
-                if(strcmp(planner_output,'safe')) %If the insertion is stable, there is no need to check the rest
+                if(strcmp(planner_output,'safe')||strcmp(planner_output,'100safe')) %If the insertion is stable, there is no need to check the rest
                     return;
                 end
             end

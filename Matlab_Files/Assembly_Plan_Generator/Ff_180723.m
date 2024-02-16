@@ -25,8 +25,8 @@ for n = 1 : loop
     end
 end
 
-Ff = zeros(4*loop, 13); % Maximum possible number of friction force (If all blocks were 1x1)
-Ff(1:4*loop, 1) = 1 : 4*loop; % Force Number
+Ff = zeros(8*loop, 13); % Maximum possible number of friction force (If all blocks were 1x1)
+%Ff(1:4*loop, 1) = 1 : 4*loop; % Force Number
 count = 1; 
 for n = 1 : loop % For each knob connection
     type_1 = join(n, 2); % Upper block type
@@ -119,6 +119,10 @@ for n = 1 : loop % For each knob connection
         end
         i = i + 4;
     end
-    count = count + force_number + 1;
+    Ff(count+force_number+1:count+2*force_number+1,:) = Ff(count:count+force_number,:);
+    Ff(count+force_number+1:count+2*force_number+1,6) = -0.5;
+    Ff(count+force_number+1:count+2*force_number+1,12) = 2.5;
+    Ff(count:count+2*force_number+1) = 1:2*(force_number+1);
+    count = count + 2*(force_number+1); % Update count value
 end
 Ff(count:end,:) = [];

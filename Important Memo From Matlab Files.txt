@@ -1,14 +1,6 @@
 Here I am going to write all possible "problems" that I found while revising the files.
-format: File Name| Problem| Solution Sugestion
-
-Inequality_Matrices_Assembler| Line 28 not optimal usage of sparse matrix| Tried but could't do the optmal way
-
-Equality_Matrices_Assembler| Lines 23,25,27,29,32,34,36,38,42 not optimal usage of sparse matrix| Tried but could't do the optmal way
-
-Subassembly_Strategy| I did not implement how to handle with an error occurs. That way, in the nested execution of NewPlaner, if a subassembly can't be assembled, it will correctly generate the error message, but without much insights on where it went wrong| Try to index better the error messages to say in which subassembly or global block the insertion could't not be done.
+format: File Name| Problem| Solution Suggestion
 
 Support_Block_Strategy| This strategy only tries to insert support pillars bellow or the blocks directly bellow the block being inserted| Try to look for more places to insert support pillars.
 
-Support_Block_Strategy| The way how I defined support_coordinates variable, makes it nonoptmial due increasing size every loop| If possible, prealocate this matrix with the maximum size and after clean it
-
-Search_Blocks| In this function I define the maximum number of knobs a block can have is 16 (2x8 block) mannualy. That way, if new bigger blocks are desired, 
+Rearrange Strategy| I decided to execute this in advance for each layer to search for possibly better initial layer layout. But this could be changed to be executed only if a block is unstable and by trying to change the order of insertion around the block that had the low capacity. The problem is that if this is done, the assembly checking would need to be done again for all blocks in the layer, as if the block order change, all blocks around the change will need to be checked again

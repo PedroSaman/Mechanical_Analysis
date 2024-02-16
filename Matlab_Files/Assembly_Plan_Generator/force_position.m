@@ -98,7 +98,7 @@ elseif(force_type == "ff") % Friction force (excluding some forces)
     r = 1.25; % Knob radius
     b = 2; % Half block size
     pf_index = 1; % Force index in pf matrix
-    z = -0.5;
+    z = -1.5;
     
     %That force vector Pf have the forces excluding the ones that doesn’t 
     %exist in the block (only the ones that actually appears in the knobs)
@@ -157,7 +157,7 @@ elseif(force_type == "ffc") % Complete friction force matrix
     r = 1.25; % Knob radius
     b = 2; % Half block size
     force_index = 1; % Force index in FP matrix
-    z = 2.5;
+    z = 1.5;
     
     %These force vector Pf are have the forces excluding the ones that
     %doesnt exist in the block.

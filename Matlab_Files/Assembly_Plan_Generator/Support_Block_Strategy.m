@@ -34,7 +34,7 @@ function [plan,inserted_block_number] = Support_Block_Strategy(model,block_numbe
         
         k = size(knob_map,2);
         while(k >= 1)
-            if(knob_map(j,k) == -1 || knob_map(j,k) == 1) %If this knob is no free, or do not exists.
+            if(knob_map(j,k) == -1 || knob_map(j,k) == 1) %If this knob is not free, or do not exists.
                 tentative_positions(k,:) = []; %Erase this tentative position.
             elseif(knob_map(j,k) == 0) %This knob is free.
                 support_knob = k;

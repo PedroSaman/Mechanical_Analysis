@@ -6,7 +6,7 @@ function block_list = create_layer(voxel_model_layer)
     
     voxel_vector_size = size(voxel_model_layer,1);
     block_list = zeros(voxel_vector_size,7); % Preallocate the block list for this layer (X,Y,Z,block_type)
-    voxel_model_layer = define_edge_voxels(voxel_model_layer); % Resort the voxel_model_layer vector to prioritise the voxels in the edges
+    voxel_model_layer = voxels_priority_list(voxel_model_layer); % Resort the voxel_model_layer vector to prioritise the voxels in the edges
     
     [layer_map,voxel_model_layer] = create_layer_map(voxel_model_layer); % Creates a visual representation map of the current layer
     block_counter = 0;

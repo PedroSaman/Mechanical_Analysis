@@ -1,6 +1,6 @@
 function [block_coordinate,layer_map] = insert_block(layer_map,voxel_coordinates,knob_index,block_size)
 %Try to insert the input block in the voxel map. The targeted voxel
-%position will be the input block knob_index. I if the block using this
+%position will be the input block knob_index. If the block using this
 %knob as targeted voxel does not fit, the output will be empty
 %
 %input: layer_map: To check if the block fit the voxel model
