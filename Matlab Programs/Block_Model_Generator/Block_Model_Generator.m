@@ -7,11 +7,11 @@ function Block_Model_Generator(file_name)
 %minimum value is 0. To change the possible blocks to use change the
 %block_list vector in the populate_voxel_map.m file.
 %output: there is no output from this function, but the program creates a
-%.txt file in the Models/BlockModel/ folder.
+%.txt file in the Models/Block Models/ folder.
 %     each row has a block info: [x, y, z, size_x, size_y, filler, color]
 
-    voxel_file_location = '../../Block_Printer_System/Models/VoxelModel/' + file_name + '.json'; % Input file path
-    save_file_location = '../../Block_Printer_System/Models/BlockModel/'; % Output file path
+    voxel_file_location = '../../Models/Voxel Models/' + file_name + '.json'; % Input file path
+    save_file_location = '../../Models/Block Models/'; % Output file path
     fid = fopen(voxel_file_location); 
     raw = fread(fid,inf); 
     str = char(raw'); 

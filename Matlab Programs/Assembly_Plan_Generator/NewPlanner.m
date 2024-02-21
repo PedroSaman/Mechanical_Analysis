@@ -8,7 +8,7 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
     offset = 0; % Keep track of support blocks number to preserve the block iteration
     %max_pil_h = 24; % Maximum height a support pillar can have (Not implemented)
     max_layer_sup = 0.5; % Relative (%) number of blocks compared with the current layer number of blocks to start a sub-assembly
-    incomplete_plan_location = "../../Block_Printer_System/Models/plan/Incomplete_Plans/incomplete_" + filename + "/";
+    incomplete_plan_location = "../../Models/Assembly Plans/Incomplete_Plans/incomplete_" + filename + "/";
     
     %% First Layer
     %fprintf("\nBlocks %d to %d are from the 1st layer and therefore insertion is stable\n",initial_condition(2)+1,range(1,2)+initial_condition(2));
@@ -32,7 +32,7 @@ function [plan,output] = NewPlanner(plan,filename,initial_condition)
         layer_max_supp_blk_numb = ceil(range(layer,3)*max_layer_sup); %max_layer_sup% times the volume of blocks in the layer rounded up
         for block = range(layer,1):range(layer,2) % For every block in the current layer
             sup_strat_output = 0;
-            %global_block = block + initial_condition(2);
+            global_block = block + initial_condition(2);
             evaluating_model = plan(1:block + offset,:); % Delimit the model to be from the 1st to the "block"-th of the "layer"-th layer
             [planner_output] = Planner_Stability_Judge(evaluating_model); % Evaluate the current block insertion stability
             if(strcmp(planner_output,'100safe'))
