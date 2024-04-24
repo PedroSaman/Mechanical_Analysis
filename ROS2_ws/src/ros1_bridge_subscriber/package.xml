@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ros1_bridge_subscriber</name>
+  <version>0.0.1</version>
+  <description>ROS 2 package for subscribing to ROS 1 topic \joint_states</description>
+  <maintainer email="rakshith@rakshith.com">rakshith</maintainer>
+  <license>TODO: License declaration</license>
+
+  <build_depend>ament_cmake</build_depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <build_depend>control_msgs</build_depend>
+  <exec_depend>control_msgs</exec_depend>
+  <build_depend>std_msgs</build_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <!-- Add any other dependencies your program needs -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

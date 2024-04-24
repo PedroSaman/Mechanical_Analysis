@@ -13,6 +13,7 @@
 <depend>moveit_task_constructor_core</depend>
 <depend>moveit_ros_planning_interface</depend>
 <depend>rclcpp</depend>
+<depend>std_msgs</depend>
 <depend>moveit_visual_tools</depend>
 
 <test_depend>ament_lint_auto</test_depend>
