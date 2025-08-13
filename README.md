@@ -50,7 +50,6 @@ The project focused on demonstrating **robot-agnostic modular printing**, showin
 ## How to View Videos
 - In GitHub’s web interface, `.webm` files won’t autoplay inline — you’ll need to click and view them in a separate tab.
 - If you open this README locally (in VS Code, a browser, or your portfolio site), the videos will play directly inside the page.
-- For seamless streaming on GitHub, consider hosting videos on **YouTube (unlisted)** or **GitHub Pages**.
 
 ---
 
