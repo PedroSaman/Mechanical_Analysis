@@ -1,4 +1,4 @@
-# Nano-Block 3D Printing – YNU Research Internship
+# Nano-Block 3D Printing – YNU
 
 ## Overview
 This repository documents my research internship at **Yokohama National University (YNU)**, where I explored **3D printing using nano-blocks** (Lego-like modular components).  
@@ -54,7 +54,7 @@ The project focused on demonstrating **robot-agnostic modular printing**, showin
 ---
 
 ## Acknowledgements
-Special thanks to **Prof. [Name]** and the YNU research team for their mentorship and guidance during the internship.
+Special thanks to **Prof. Maeda Yusuke** and the YNU research team for their mentorship and guidance during the internship.
 
 ---
 
